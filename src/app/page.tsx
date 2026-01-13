@@ -1,65 +1,452 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import Link from "next/link";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useRef } from "react";
+import {
+  ArrowRight,
+  Zap,
+  Image as ImageIcon,
+  Sparkles,
+  Play,
+  Star,
+  ArrowUpRight,
+  CircleCheck,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Navbar } from "@/components/layout/navbar";
+import { Footer } from "@/components/layout/footer";
+
+// Stats
+const stats = [
+  { value: "50K+", label: "Generated" },
+  { value: "<30s", label: "Per Image" },
+  { value: "98%", label: "Satisfaction" },
+];
+
+// Features for bento
+const features = [
+  {
+    title: "AI That Understands Products",
+    description: "Our AI doesn't just edit — it understands context, materials, and lighting to create photos that sell.",
+    icon: Sparkles,
+    span: "col-span-2",
+  },
+  {
+    title: "30 Second Generation",
+    description: "Upload to download in under 30 seconds.",
+    icon: Zap,
+    span: "col-span-1",
+  },
+  {
+    title: "2,500+ Pro Prompts",
+    description: "Curated by photographers.",
+    icon: ImageIcon,
+    span: "col-span-1",
+  },
+];
+
+// Testimonials
+const testimonials = [
+  {
+    quote: "Cut photo costs by 85%. Quality rivals studio shots.",
+    author: "Sarah Chen",
+    role: "E-commerce Director",
+  },
+  {
+    quote: "Our conversion rate jumped 40% after switching.",
+    author: "Marcus Webb",
+    role: "DTC Founder",
+  },
+  {
+    quote: "Made $12k selling prompts. Platform is incredible.",
+    author: "Elena Torres",
+    role: "Prompt Engineer",
+  },
+];
+
+export default function HomePage() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll();
+  const y = useTransform(scrollYProgress, [0, 1], [0, -100]);
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <div ref={containerRef} className="min-h-screen bg-background text-foreground overflow-hidden">
+      <Navbar />
+
+      {/* Background Effects - only visible in dark mode */}
+      <div
+        className="fixed inset-0 pointer-events-none dark:opacity-100 opacity-0 transition-opacity"
+        style={{
+          background: `
+            radial-gradient(at 40% 20%, rgba(191, 255, 0, 0.15) 0px, transparent 50%),
+            radial-gradient(at 80% 0%, rgba(191, 255, 0, 0.1) 0px, transparent 50%),
+            radial-gradient(at 0% 50%, rgba(191, 255, 0, 0.08) 0px, transparent 50%),
+            radial-gradient(at 80% 50%, rgba(191, 255, 0, 0.05) 0px, transparent 50%),
+            radial-gradient(at 0% 100%, rgba(191, 255, 0, 0.1) 0px, transparent 50%)
+          `
+        }}
+      />
+      <div
+        className="fixed inset-0 pointer-events-none dark:opacity-60 opacity-0 transition-opacity"
+        style={{
+          backgroundImage: `
+            linear-gradient(rgba(191, 255, 0, 0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(191, 255, 0, 0.03) 1px, transparent 1px)
+          `,
+          backgroundSize: '50px 50px'
+        }}
+      />
+
+      {/* Hero Section */}
+      <section className="relative min-h-screen flex items-center pt-20">
+        <div className="section-container relative z-10 py-20">
+          <div className="max-w-6xl">
+            {/* Eyebrow */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="mb-8"
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+              <span className="pill">
+                <Sparkles className="w-4 h-4" />
+                Powered by Google Imagen 3
+              </span>
+            </motion.div>
+
+            {/* Main Headline - Super Bold */}
+            <motion.h1
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="text-[clamp(3rem,10vw,8rem)] font-bold leading-[0.9] tracking-tight mb-8"
             >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+              <span className="block">Product photos</span>
+              <span className="block text-neon">reimagined.</span>
+            </motion.h1>
+
+            {/* Subheadline */}
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="text-xl md:text-2xl text-muted-foreground max-w-xl mb-12"
+            >
+              Transform any product image into studio-quality photography.
+              No photographer. No studio. Just AI.
+            </motion.p>
+
+            {/* CTA Buttons */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="flex flex-wrap gap-4 mb-16"
+            >
+              <Link href="/studio">
+                <button className="btn-cta flex items-center gap-2 text-lg">
+                  Start Creating
+                  <ArrowRight className="w-5 h-5" />
+                </button>
+              </Link>
+              <Link href="/marketplace">
+                <button className="btn-ghost flex items-center gap-2 text-lg">
+                  <Play className="w-5 h-5" />
+                  See Examples
+                </button>
+              </Link>
+            </motion.div>
+
+            {/* Stats Row */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+              className="flex gap-12"
+            >
+              {stats.map((stat, i) => (
+                <div key={stat.label} className="stat-card p-0 text-left">
+                  <div className="text-4xl md:text-5xl font-bold text-neon-subtle mb-1">
+                    {stat.value}
+                  </div>
+                  <div className="text-sm text-muted-foreground uppercase tracking-wider">
+                    {stat.label}
+                  </div>
+                </div>
+              ))}
+            </motion.div>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+
+        {/* Floating badge */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, delay: 0.6 }}
+          style={{ y }}
+          className="hidden lg:flex absolute right-12 top-1/2 -translate-y-1/2"
+        >
+          <div className="bento-card p-6 w-72">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-full bg-neon/20 flex items-center justify-center">
+                <Star className="w-5 h-5 text-neon" />
+              </div>
+              <div>
+                <div className="font-semibold">4.9/5 Rating</div>
+                <div className="text-sm text-muted-foreground">2,000+ reviews</div>
+              </div>
+            </div>
+            <div className="flex -space-x-2">
+              {["SC", "MW", "ET", "JD", "AK"].map((initials) => (
+                <div
+                  key={initials}
+                  className="w-8 h-8 rounded-full bg-muted border-2 border-background flex items-center justify-center text-xs font-medium"
+                >
+                  {initials}
+                </div>
+              ))}
+              <div className="w-8 h-8 rounded-full bg-neon/20 border-2 border-background flex items-center justify-center text-xs text-neon">
+                +2k
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      </section>
+
+      {/* Bento Grid Section */}
+      <section className="relative py-32">
+        <div className="section-container">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mb-16"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            <h2 className="text-5xl md:text-6xl font-bold mb-4">
+              Why <span className="text-neon-subtle">PromptLens</span>?
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-xl">
+              Everything you need to create professional product photography at scale.
+            </p>
+          </motion.div>
+
+          {/* Bento Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Large Feature Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="md:col-span-2 bento-card p-8 md:p-12 group"
+            >
+              <div className="flex items-start justify-between mb-8">
+                <div className="w-14 h-14 rounded-2xl bg-neon/10 border border-neon/20 flex items-center justify-center group-hover:bg-neon/20 transition-colors">
+                  <Sparkles className="w-7 h-7 text-neon" />
+                </div>
+                <ArrowUpRight className="w-6 h-6 text-muted-foreground group-hover:text-neon transition-colors" />
+              </div>
+              <h3 className="text-2xl md:text-3xl font-bold mb-4">
+                AI That Understands Products
+              </h3>
+              <p className="text-muted-foreground text-lg max-w-md">
+                Our AI doesn&apos;t just edit — it understands context, materials, and lighting to create photos that sell.
+              </p>
+            </motion.div>
+
+            {/* Speed Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="bento-card p-8 group"
+            >
+              <div className="w-12 h-12 rounded-xl bg-neon/10 border border-neon/20 flex items-center justify-center mb-6 group-hover:bg-neon/20 transition-colors">
+                <Zap className="w-6 h-6 text-neon" />
+              </div>
+              <div className="text-5xl font-bold text-neon mb-2">&lt;30s</div>
+              <p className="text-muted-foreground">Per generation</p>
+            </motion.div>
+
+            {/* Prompts Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="bento-card p-8 group"
+            >
+              <div className="w-12 h-12 rounded-xl bg-neon/10 border border-neon/20 flex items-center justify-center mb-6 group-hover:bg-neon/20 transition-colors">
+                <ImageIcon className="w-6 h-6 text-neon" />
+              </div>
+              <div className="text-5xl font-bold text-neon mb-2">2,500+</div>
+              <p className="text-muted-foreground">Pro prompts available</p>
+            </motion.div>
+
+            {/* CTA Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3 }}
+              className="md:col-span-2 bento-card p-8 md:p-12 bg-gradient-to-br from-neon/10 to-transparent group"
+            >
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div>
+                  <h3 className="text-2xl md:text-3xl font-bold mb-2">
+                    Ready to transform your photos?
+                  </h3>
+                  <p className="text-muted-foreground">Start free. No credit card required.</p>
+                </div>
+                <Link href="/studio">
+                  <button className="btn-cta flex items-center gap-2 whitespace-nowrap">
+                    Get Started
+                    <ArrowRight className="w-5 h-5" />
+                  </button>
+                </Link>
+              </div>
+            </motion.div>
+          </div>
         </div>
-      </main>
+      </section>
+
+      {/* How It Works */}
+      <section className="relative py-32">
+        <div className="section-container">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-20"
+          >
+            <h2 className="text-5xl md:text-6xl font-bold mb-4">
+              How it <span className="text-neon-subtle">works</span>
+            </h2>
+            <p className="text-xl text-muted-foreground">Three steps. Under a minute.</p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              { num: "01", title: "Upload", desc: "Drop your product image. Any angle, any lighting." },
+              { num: "02", title: "Choose", desc: "Pick a prompt from our marketplace or write your own." },
+              { num: "03", title: "Generate", desc: "Get studio-quality photos in seconds. Download & use." },
+            ].map((step, i) => (
+              <motion.div
+                key={step.num}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="relative"
+              >
+                <div className="text-[8rem] font-bold text-muted/50 absolute -top-8 -left-4 select-none">
+                  {step.num}
+                </div>
+                <div className="relative pt-16">
+                  <h3 className="text-2xl font-bold mb-3">{step.title}</h3>
+                  <p className="text-muted-foreground">{step.desc}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="relative py-32">
+        <div className="section-container">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mb-16"
+          >
+            <h2 className="text-5xl md:text-6xl font-bold mb-4">
+              Loved by <span className="text-neon-subtle">creators</span>
+            </h2>
+          </motion.div>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {testimonials.map((t, i) => (
+              <motion.div
+                key={t.author}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="bento-card p-8"
+              >
+                <div className="flex gap-1 mb-4">
+                  {[...Array(5)].map((_, j) => (
+                    <Star key={j} className="w-4 h-4 fill-neon text-neon" />
+                  ))}
+                </div>
+                <p className="text-lg mb-6">&ldquo;{t.quote}&rdquo;</p>
+                <div>
+                  <div className="font-semibold">{t.author}</div>
+                  <div className="text-sm text-muted-foreground">{t.role}</div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      <section className="relative py-32">
+        <div className="section-container">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            className="bento-card p-12 md:p-20 text-center relative overflow-hidden"
+          >
+            {/* Glow effect */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-neon/20 rounded-full blur-[100px]" />
+
+            <div className="relative">
+              <h2 className="text-4xl md:text-6xl font-bold mb-6">
+                Start creating <span className="text-neon">today</span>
+              </h2>
+              <p className="text-xl text-muted-foreground mb-10 max-w-lg mx-auto">
+                Join thousands of creators using PromptLens. Free to start.
+              </p>
+
+              <div className="flex flex-wrap justify-center gap-4 mb-10">
+                <Link href="/sign-up">
+                  <button className="btn-cta flex items-center gap-2 text-lg glow-neon-pulse">
+                    Get Started Free
+                    <ArrowRight className="w-5 h-5" />
+                  </button>
+                </Link>
+                <Link href="/marketplace">
+                  <button className="btn-ghost flex items-center gap-2 text-lg">
+                    Browse Prompts
+                  </button>
+                </Link>
+              </div>
+
+              <div className="flex flex-wrap justify-center gap-6 text-sm text-muted-foreground">
+                <span className="flex items-center gap-2">
+                  <CircleCheck className="w-4 h-4 text-neon" />
+                  Free to start
+                </span>
+                <span className="flex items-center gap-2">
+                  <CircleCheck className="w-4 h-4 text-neon" />
+                  No watermarks
+                </span>
+                <span className="flex items-center gap-2">
+                  <CircleCheck className="w-4 h-4 text-neon" />
+                  Commercial license
+                </span>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      <Footer />
     </div>
   );
 }
