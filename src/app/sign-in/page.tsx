@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
@@ -23,7 +23,7 @@ import { Separator } from "@/components/ui/separator";
 import { signInSchema, type SignInSchema } from "@/lib/validations";
 import { cn } from "@/lib/utils";
 
-export default function SignInPage() {
+function SignInForm() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
@@ -85,16 +85,13 @@ export default function SignInPage() {
                     className="w-full max-w-md"
                 >
                     {/* Logo */}
-                    <Link href="/" className="flex items-center gap-2 mb-8">
-                        <div className="h-10 w-10 rounded-xl gradient-bg flex items-center justify-center">
-                            <Sparkles className="h-6 w-6 text-white" />
-                        </div>
-                        <span className="text-2xl font-bold gradient-text">PromptLens</span>
+                    <Link href="/" className="inline-block mb-8">
+                        <span className="text-2xl font-display font-bold gradient-text">ZeroLens</span>
                     </Link>
 
                     {/* Header */}
                     <div className="mb-8">
-                        <h1 className="text-2xl sm:text-3xl font-bold mb-2">Welcome back</h1>
+                        <h1 className="text-2xl sm:text-3xl font-display font-bold mb-2">Welcome back</h1>
                         <p className="text-muted-foreground">
                             Sign in to your account to continue
                         </p>
@@ -252,7 +249,7 @@ export default function SignInPage() {
                     <div className="h-20 w-20 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center mb-8">
                         <Sparkles className="h-10 w-10" />
                     </div>
-                    <h2 className="text-3xl font-bold mb-4">
+                    <h2 className="text-3xl font-display font-bold mb-4">
                         Transform Your Product Photography
                     </h2>
                     <p className="text-white/80 max-w-md">
@@ -262,5 +259,21 @@ export default function SignInPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+function SignInLoading() {
+    return (
+        <div className="min-h-screen flex items-center justify-center">
+            <div className="h-8 w-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+        </div>
+    );
+}
+
+export default function SignInPage() {
+    return (
+        <Suspense fallback={<SignInLoading />}>
+            <SignInForm />
+        </Suspense>
     );
 }

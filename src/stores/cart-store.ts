@@ -91,7 +91,7 @@ export const useCartStore = create<CartState>()(
             },
         }),
         {
-            name: "promptlens-cart",
+            name: "zerolens-cart",
             storage: createJSONStorage(() => localStorage),
             partialize: (state) => ({ items: state.items }), // Only persist items
         }

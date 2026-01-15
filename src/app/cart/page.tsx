@@ -139,7 +139,7 @@ function CartContent() {
             {/* Header */}
             <div className="mb-8">
                 <Badge className="mb-4">Shopping Cart</Badge>
-                <h1 className="text-3xl md:text-4xl font-bold mb-2">
+                <h1 className="text-3xl md:text-4xl font-display font-bold mb-2">
                     Your <span className="gradient-text">Cart</span>
                 </h1>
                 <p className="text-muted-foreground">
@@ -153,7 +153,7 @@ function CartContent() {
                     <div className="h-24 w-24 rounded-full bg-muted flex items-center justify-center mx-auto mb-6">
                         <ShoppingCart className="h-12 w-12 text-muted-foreground" />
                     </div>
-                    <h2 className="text-xl font-semibold mb-2">Your cart is empty</h2>
+                    <h2 className="text-xl font-display font-semibold mb-2">Your cart is empty</h2>
                     <p className="text-muted-foreground mb-6 max-w-md mx-auto">
                         Explore our marketplace to discover amazing AI prompts for your
                         product photography needs.

@@ -1,23 +1,28 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
 import { CartSidebar } from "@/components/layout/cart-sidebar";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-space-grotesk",
+  subsets: ["latin"],
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-mono",
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
   title: {
-    default: "PromptLens - AI Product Photography Marketplace",
-    template: "%s | PromptLens",
+    default: "ZeroLens - AI Product Photography Marketplace",
+    template: "%s | ZeroLens",
   },
   description:
     "The premium marketplace for AI-powered product photography prompts. Transform your e-commerce images with expert-crafted prompts.",
@@ -30,23 +35,23 @@ export const metadata: Metadata = {
     "image generation",
     "Imagen 3",
   ],
-  authors: [{ name: "PromptLens" }],
-  creator: "PromptLens",
+  authors: [{ name: "ZeroLens" }],
+  creator: "ZeroLens",
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://promptlens.ai",
-    siteName: "PromptLens",
-    title: "PromptLens - AI Product Photography Marketplace",
+    url: "https://zerolens.ai",
+    siteName: "ZeroLens",
+    title: "ZeroLens - AI Product Photography Marketplace",
     description:
       "The premium marketplace for AI-powered product photography prompts. Transform your e-commerce images with expert-crafted prompts.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "PromptLens - AI Product Photography Marketplace",
+    title: "ZeroLens - AI Product Photography Marketplace",
     description:
       "The premium marketplace for AI-powered product photography prompts. Transform your e-commerce images with expert-crafted prompts.",
-    creator: "@promptlens",
+    creator: "@zerolens",
   },
   robots: {
     index: true,
@@ -62,7 +67,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased min-h-screen`}
+        className={`${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} font-sans antialiased min-h-screen`}
         suppressHydrationWarning
       >
         <Providers>

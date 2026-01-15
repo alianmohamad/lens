@@ -104,18 +104,15 @@ export default function SignUpPage() {
                     className="w-full max-w-md"
                 >
                     {/* Logo */}
-                    <Link href="/" className="flex items-center gap-2 mb-8">
-                        <div className="h-10 w-10 rounded-xl gradient-bg flex items-center justify-center">
-                            <Sparkles className="h-6 w-6 text-white" />
-                        </div>
-                        <span className="text-2xl font-bold gradient-text">PromptLens</span>
+                    <Link href="/" className="inline-block mb-8">
+                        <span className="text-2xl font-display font-bold gradient-text">ZeroLens</span>
                     </Link>
 
                     {/* Header */}
                     <div className="mb-6">
-                        <h1 className="text-2xl sm:text-3xl font-bold mb-2">Create an account</h1>
+                        <h1 className="text-2xl sm:text-3xl font-display font-bold mb-2">Create an account</h1>
                         <p className="text-muted-foreground">
-                            Join PromptLens and start creating amazing product images
+                            Join ZeroLens and start creating amazing product images
                         </p>
                     </div>
 
@@ -373,12 +370,12 @@ export default function SignUpPage() {
                     <div className="h-20 w-20 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center mb-8">
                         <Sparkles className="h-10 w-10" />
                     </div>
-                    <h2 className="text-3xl font-bold mb-4">
+                    <h2 className="text-3xl font-display font-bold mb-4">
                         Join Our Community
                     </h2>
                     <p className="text-white/80 max-w-md mb-8">
                         Whether you're buying prompts to enhance your product photos or selling
-                        your expertise to earn passive income, PromptLens is your platform.
+                        your expertise to earn passive income, ZeroLens is your platform.
                     </p>
 
                     <div className="space-y-4 text-left">

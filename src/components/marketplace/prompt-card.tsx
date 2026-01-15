@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { SaveButton } from "@/components/pocket/save-button";
 import { useCartStore } from "@/stores/cart-store";
 import { formatPrice } from "@/lib/stripe";
 import { CATEGORY_LABELS } from "@/types";
@@ -105,7 +106,12 @@ export function PromptCard({ prompt, onPreview }: PromptCardProps) {
                         </div>
 
                         {/* Price Badge */}
-                        <div className="absolute top-3 right-3">
+                        <div className="absolute top-3 right-3 flex items-center gap-2">
+                            <SaveButton
+                                promptId={prompt.id}
+                                size="sm"
+                                className="bg-white/90 backdrop-blur-sm hover:bg-white shadow-md"
+                            />
                             <Badge className="badge-gradient text-sm font-semibold px-3 py-1 shadow-lg">
                                 {formatPrice(prompt.price)}
                             </Badge>

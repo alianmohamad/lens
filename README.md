@@ -1,8 +1,8 @@
-# PromptLens - AI Product Photography Marketplace
+# ZeroLens - AI Product Photography Marketplace
 
 A premium marketplace for AI-powered product photography prompts. Buyers can purchase expert-crafted prompts to transform their product photos, while sellers can monetize their prompt engineering expertise.
 
-![PromptLens](https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=1200)
+![ZeroLens](https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=1200)
 
 ## 🚀 Quick Start
 

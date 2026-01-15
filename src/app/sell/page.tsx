@@ -212,7 +212,7 @@ export default function SellPage() {
                 {/* Header */}
                 <div className="mb-8">
                     <Badge className="mb-4">Create Prompt</Badge>
-                    <h1 className="text-3xl md:text-4xl font-bold mb-2">
+                    <h1 className="text-3xl md:text-4xl font-display font-bold mb-2">
                         Sell Your <span className="gradient-text">Expertise</span>
                     </h1>
                     <p className="text-muted-foreground">

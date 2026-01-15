@@ -6,7 +6,7 @@ import { MarketplaceFilters } from "@/components/marketplace/filters";
 import { PromptCard } from "@/components/marketplace/prompt-card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { Category, PromptCardData } from "@/types";
+import type { PromptCardData } from "@/types";
 
 interface MarketplacePageProps {
     searchParams: Promise<{
@@ -107,12 +107,13 @@ async function getPrompts(searchParams: {
     };
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function PromptGridSkeleton() {
     return (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {Array.from({ length: 8 }).map((_, i) => (
                 <div key={i} className="space-y-4">
-                    <Skeleton className="aspect-[4/3] rounded-xl" />
+                    <Skeleton className="aspect-4/3 rounded-xl" />
                     <Skeleton className="h-4 w-20" />
                     <Skeleton className="h-6 w-full" />
                     <Skeleton className="h-4 w-full" />
@@ -139,7 +140,7 @@ export default async function MarketplacePage({ searchParams }: MarketplacePageP
                 {/* Header */}
                 <div className="mb-8">
                     <Badge className="mb-4">Marketplace</Badge>
-                    <h1 className="text-3xl md:text-4xl font-bold mb-2">
+                    <h1 className="text-3xl md:text-4xl font-display font-bold mb-2">
                         Discover <span className="gradient-text">Expert Prompts</span>
                     </h1>
                     <p className="text-muted-foreground">

@@ -218,7 +218,7 @@ export default function StudioPage() {
 
         const link = document.createElement("a");
         link.href = generatedImage;
-        link.download = `promptlens-generated-${Date.now()}.png`;
+        link.download = `zerolens-generated-${Date.now()}.png`;
         link.click();
     };
 
@@ -276,7 +276,7 @@ export default function StudioPage() {
                 {/* Header */}
                 <div className="mb-8">
                     <Badge className="mb-4">AI Studio</Badge>
-                    <h1 className="text-3xl md:text-4xl font-bold mb-2">
+                    <h1 className="text-3xl md:text-4xl font-display font-bold mb-2">
                         Transform Your <span className="gradient-text">Product Photos</span>
                     </h1>
                     <p className="text-muted-foreground">
@@ -566,7 +566,7 @@ export default function StudioPage() {
 
                 {/* How It Works */}
                 <div className="mt-16">
-                    <h2 className="text-xl font-semibold mb-6">How It Works</h2>
+                    <h2 className="text-xl font-display font-semibold mb-6">How It Works</h2>
                     <div className="grid md:grid-cols-3 gap-6">
                         {[
                             {

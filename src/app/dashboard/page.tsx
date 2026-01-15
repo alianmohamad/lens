@@ -1,11 +1,11 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
-    LayoutDashboard,
     ShoppingBag,
     TrendingUp,
     Settings,
@@ -22,52 +22,55 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 
-// Mock data - would come from API
-const buyerStats = {
-    totalPurchases: 12,
-    totalSpent: 8995, // cents
-    totalGenerations: 47,
-    recentPurchases: [
-        {
-            id: "1",
-            title: "Luxury Product Showcase",
-            date: "2 hours ago",
-            price: 499,
-        },
-        {
-            id: "2",
-            title: "Minimalist White Background",
-            date: "Yesterday",
-            price: 299,
-        },
-    ],
-};
+interface BuyerStats {
+    totalPurchases: number;
+    totalSpent: number;
+    totalGenerations: number;
+}
 
-const sellerStats = {
-    totalEarnings: 345000, // cents
-    totalSales: 156,
-    activePrompts: 12,
-    averageRating: 4.8,
-    recentSales: [
-        {
-            id: "1",
-            title: "Pro Product Studio",
-            buyer: "John D.",
-            amount: 699,
-            date: "1 hour ago",
-        },
-        {
-            id: "2",
-            title: "Fashion Lifestyle",
-            buyer: "Sarah M.",
-            amount: 599,
-            date: "3 hours ago",
-        },
-    ],
-};
+interface SellerStats {
+    totalEarnings: number;
+    totalSales: number;
+    approvedPrompts: number;
+    averageRating: number;
+}
+
+interface RecentPurchase {
+    id: string;
+    amount: number;
+    createdAt: string;
+    prompt: {
+        id: string;
+        title: string;
+    };
+}
+
+interface RecentSale {
+    id: string;
+    amount: number;
+    sellerEarnings: number;
+    createdAt: string;
+    prompt: {
+        id: string;
+        title: string;
+    };
+    user: {
+        name: string | null;
+    };
+}
+
+interface UserProfile {
+    id: string;
+    name: string | null;
+    email: string;
+    image: string | null;
+    role: string;
+    createdAt: string;
+}
 
 function formatCurrency(cents: number) {
     return new Intl.NumberFormat("en-US", {
@@ -76,9 +79,122 @@ function formatCurrency(cents: number) {
     }).format(cents / 100);
 }
 
+function formatRelativeTime(dateString: string) {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+    if (diffInSeconds < 60) return "Just now";
+    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`;
+    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
+    if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)} days ago`;
+    return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+
+function formatMemberSince(dateString: string) {
+    return new Date(dateString).toLocaleDateString("en-US", {
+        month: "short",
+        year: "numeric",
+    });
+}
+
+function StatCardSkeleton() {
+    return (
+        <Card>
+            <CardContent className="pt-6">
+                <div className="flex items-center justify-between">
+                    <div className="space-y-2">
+                        <Skeleton className="h-4 w-24" />
+                        <Skeleton className="h-8 w-20" />
+                    </div>
+                    <Skeleton className="h-12 w-12 rounded-xl" />
+                </div>
+                <Skeleton className="h-4 w-32 mt-2" />
+            </CardContent>
+        </Card>
+    );
+}
+
+function ActivityItemSkeleton() {
+    return (
+        <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+            <div className="flex items-center gap-3">
+                <Skeleton className="h-10 w-10 rounded-lg" />
+                <div className="space-y-1">
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-3 w-20" />
+                </div>
+            </div>
+            <Skeleton className="h-5 w-16" />
+        </div>
+    );
+}
+
 export default function DashboardPage() {
     const { data: session, status } = useSession();
     const router = useRouter();
+
+    const [isLoading, setIsLoading] = useState(true);
+    const [profile, setProfile] = useState<UserProfile | null>(null);
+    const [buyerStats, setBuyerStats] = useState<BuyerStats | null>(null);
+    const [sellerStats, setSellerStats] = useState<SellerStats | null>(null);
+    const [recentPurchases, setRecentPurchases] = useState<RecentPurchase[]>([]);
+    const [recentSales, setRecentSales] = useState<RecentSale[]>([]);
+
+    useEffect(() => {
+        async function fetchDashboardData() {
+            if (!session?.user) return;
+
+            try {
+                // Fetch profile and stats
+                const profileResponse = await fetch("/api/user/profile");
+                const profileData = await profileResponse.json();
+
+                if (profileData.success && profileData.data) {
+                    setProfile(profileData.data.user);
+
+                    const isSeller =
+                        profileData.data.user.role === "SELLER" ||
+                        profileData.data.user.role === "ADMIN";
+
+                    if (isSeller) {
+                        setSellerStats({
+                            totalEarnings: profileData.data.stats.totalEarnings || 0,
+                            totalSales: profileData.data.stats.totalSales || 0,
+                            approvedPrompts: profileData.data.stats.approvedPrompts || 0,
+                            averageRating: profileData.data.stats.averageRating || 0,
+                        });
+
+                        // Fetch recent sales
+                        const salesResponse = await fetch("/api/user/sales?limit=3");
+                        const salesData = await salesResponse.json();
+                        if (salesData.success && salesData.data) {
+                            setRecentSales(salesData.data);
+                        }
+                    } else {
+                        setBuyerStats({
+                            totalPurchases: profileData.data.stats.totalPurchases || 0,
+                            totalSpent: profileData.data.stats.totalSpent || 0,
+                            totalGenerations: profileData.data.stats.totalGenerations || 0,
+                        });
+                    }
+
+                    // Fetch recent purchases (for all users)
+                    const purchasesResponse = await fetch("/api/user/purchases?limit=3");
+                    const purchasesData = await purchasesResponse.json();
+                    if (purchasesData.success && purchasesData.data) {
+                        setRecentPurchases(purchasesData.data);
+                    }
+                }
+            } catch (err) {
+                console.error("Failed to fetch dashboard data:", err);
+            } finally {
+                setIsLoading(false);
+            }
+        }
+
+        fetchDashboardData();
+    }, [session]);
 
     if (status === "loading") {
         return (
@@ -110,13 +226,15 @@ export default function DashboardPage() {
                             </AvatarFallback>
                         </Avatar>
                         <div>
-                            <h1 className="text-2xl md:text-3xl font-bold">
+                            <h1 className="text-2xl md:text-3xl font-display font-bold">
                                 Welcome back, {session.user.name?.split(" ")[0] || "there"}!
                             </h1>
                             <div className="flex items-center gap-2 mt-1">
                                 <Badge variant="outline">{session.user.role}</Badge>
                                 <span className="text-sm text-muted-foreground">
-                                    Member since Jan 2024
+                                    {profile?.createdAt
+                                        ? `Member since ${formatMemberSince(profile.createdAt)}`
+                                        : ""}
                                 </span>
                             </div>
                         </div>
@@ -149,7 +267,14 @@ export default function DashboardPage() {
 
                 {/* Quick Stats */}
                 <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                    {isSeller ? (
+                    {isLoading ? (
+                        <>
+                            <StatCardSkeleton />
+                            <StatCardSkeleton />
+                            <StatCardSkeleton />
+                            <StatCardSkeleton />
+                        </>
+                    ) : isSeller ? (
                         <>
                             <motion.div
                                 initial={{ opacity: 0, y: 20 }}
@@ -161,16 +286,15 @@ export default function DashboardPage() {
                                             <div>
                                                 <p className="text-sm text-muted-foreground">Total Earnings</p>
                                                 <p className="text-2xl font-bold gradient-text">
-                                                    {formatCurrency(sellerStats.totalEarnings)}
+                                                    {formatCurrency(sellerStats?.totalEarnings || 0)}
                                                 </p>
                                             </div>
                                             <div className="h-12 w-12 rounded-xl bg-green-500/10 flex items-center justify-center">
                                                 <DollarSign className="h-6 w-6 text-green-500" />
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-1 mt-2 text-sm text-green-500">
-                                            <ArrowUpRight className="h-4 w-4" />
-                                            <span>12% from last month</span>
+                                        <div className="flex items-center gap-1 mt-2 text-sm text-muted-foreground">
+                                            <span>After 30% platform fee</span>
                                         </div>
                                     </CardContent>
                                 </Card>
@@ -186,16 +310,19 @@ export default function DashboardPage() {
                                         <div className="flex items-center justify-between">
                                             <div>
                                                 <p className="text-sm text-muted-foreground">Total Sales</p>
-                                                <p className="text-2xl font-bold">{sellerStats.totalSales}</p>
+                                                <p className="text-2xl font-bold">{sellerStats?.totalSales || 0}</p>
                                             </div>
                                             <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center">
                                                 <TrendingUp className="h-6 w-6 text-primary" />
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-1 mt-2 text-sm text-green-500">
-                                            <ArrowUpRight className="h-4 w-4" />
-                                            <span>8 sales this week</span>
-                                        </div>
+                                        <Link
+                                            href="/dashboard/sales"
+                                            className="flex items-center gap-1 mt-2 text-sm text-primary hover:underline"
+                                        >
+                                            View all sales
+                                            <ArrowRight className="h-4 w-4" />
+                                        </Link>
                                     </CardContent>
                                 </Card>
                             </motion.div>
@@ -210,17 +337,17 @@ export default function DashboardPage() {
                                         <div className="flex items-center justify-between">
                                             <div>
                                                 <p className="text-sm text-muted-foreground">Active Prompts</p>
-                                                <p className="text-2xl font-bold">{sellerStats.activePrompts}</p>
+                                                <p className="text-2xl font-bold">{sellerStats?.approvedPrompts || 0}</p>
                                             </div>
                                             <div className="h-12 w-12 rounded-xl bg-cyan-500/10 flex items-center justify-center">
                                                 <Package className="h-6 w-6 text-cyan-500" />
                                             </div>
                                         </div>
                                         <Link
-                                            href="/dashboard/prompts"
+                                            href="/sell"
                                             className="flex items-center gap-1 mt-2 text-sm text-primary hover:underline"
                                         >
-                                            Manage prompts
+                                            Create new prompt
                                             <ArrowRight className="h-4 w-4" />
                                         </Link>
                                     </CardContent>
@@ -238,8 +365,14 @@ export default function DashboardPage() {
                                             <div>
                                                 <p className="text-sm text-muted-foreground">Average Rating</p>
                                                 <div className="flex items-center gap-2">
-                                                    <p className="text-2xl font-bold">{sellerStats.averageRating}</p>
-                                                    <Star className="h-5 w-5 fill-amber-400 text-amber-400" />
+                                                    <p className="text-2xl font-bold">
+                                                        {sellerStats?.averageRating
+                                                            ? sellerStats.averageRating.toFixed(1)
+                                                            : "N/A"}
+                                                    </p>
+                                                    {sellerStats?.averageRating ? (
+                                                        <Star className="h-5 w-5 fill-amber-400 text-amber-400" />
+                                                    ) : null}
                                                 </div>
                                             </div>
                                             <div className="h-12 w-12 rounded-xl bg-amber-500/10 flex items-center justify-center">
@@ -247,7 +380,9 @@ export default function DashboardPage() {
                                             </div>
                                         </div>
                                         <p className="text-sm text-muted-foreground mt-2">
-                                            Based on 89 reviews
+                                            {sellerStats?.averageRating
+                                                ? "Based on customer reviews"
+                                                : "No reviews yet"}
                                         </p>
                                     </CardContent>
                                 </Card>
@@ -264,7 +399,7 @@ export default function DashboardPage() {
                                         <div className="flex items-center justify-between">
                                             <div>
                                                 <p className="text-sm text-muted-foreground">Purchased Prompts</p>
-                                                <p className="text-2xl font-bold">{buyerStats.totalPurchases}</p>
+                                                <p className="text-2xl font-bold">{buyerStats?.totalPurchases || 0}</p>
                                             </div>
                                             <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center">
                                                 <ShoppingBag className="h-6 w-6 text-primary" />
@@ -292,7 +427,7 @@ export default function DashboardPage() {
                                             <div>
                                                 <p className="text-sm text-muted-foreground">Total Spent</p>
                                                 <p className="text-2xl font-bold gradient-text">
-                                                    {formatCurrency(buyerStats.totalSpent)}
+                                                    {formatCurrency(buyerStats?.totalSpent || 0)}
                                                 </p>
                                             </div>
                                             <div className="h-12 w-12 rounded-xl bg-green-500/10 flex items-center justify-center">
@@ -313,17 +448,17 @@ export default function DashboardPage() {
                                         <div className="flex items-center justify-between">
                                             <div>
                                                 <p className="text-sm text-muted-foreground">Images Generated</p>
-                                                <p className="text-2xl font-bold">{buyerStats.totalGenerations}</p>
+                                                <p className="text-2xl font-bold">{buyerStats?.totalGenerations || 0}</p>
                                             </div>
                                             <div className="h-12 w-12 rounded-xl bg-cyan-500/10 flex items-center justify-center">
                                                 <Image className="h-6 w-6 text-cyan-500" />
                                             </div>
                                         </div>
                                         <Link
-                                            href="/dashboard/history"
+                                            href="/studio"
                                             className="flex items-center gap-1 mt-2 text-sm text-primary hover:underline"
                                         >
-                                            View history
+                                            Generate more
                                             <ArrowRight className="h-4 w-4" />
                                         </Link>
                                     </CardContent>
@@ -372,39 +507,54 @@ export default function DashboardPage() {
                             </Button>
                         </CardHeader>
                         <CardContent>
-                            {isSeller ? (
+                            {isLoading ? (
                                 <div className="space-y-4">
-                                    {sellerStats.recentSales.map((sale) => (
-                                        <div
-                                            key={sale.id}
-                                            className="flex items-center justify-between p-3 rounded-lg bg-muted/50"
-                                        >
-                                            <div className="flex items-center gap-3">
-                                                <div className="h-10 w-10 rounded-lg gradient-bg-subtle flex items-center justify-center">
-                                                    <Package className="h-5 w-5 text-primary" />
+                                    <ActivityItemSkeleton />
+                                    <ActivityItemSkeleton />
+                                    <ActivityItemSkeleton />
+                                </div>
+                            ) : isSeller ? (
+                                recentSales.length > 0 ? (
+                                    <div className="space-y-4">
+                                        {recentSales.map((sale) => (
+                                            <div
+                                                key={sale.id}
+                                                className="flex items-center justify-between p-3 rounded-lg bg-muted/50"
+                                            >
+                                                <div className="flex items-center gap-3">
+                                                    <div className="h-10 w-10 rounded-lg gradient-bg-subtle flex items-center justify-center">
+                                                        <Package className="h-5 w-5 text-primary" />
+                                                    </div>
+                                                    <div>
+                                                        <p className="font-medium text-sm">{sale.prompt.title}</p>
+                                                        <p className="text-xs text-muted-foreground">
+                                                            Purchased by {sale.user.name || "Anonymous"}
+                                                        </p>
+                                                    </div>
                                                 </div>
-                                                <div>
-                                                    <p className="font-medium text-sm">{sale.title}</p>
-                                                    <p className="text-xs text-muted-foreground">
-                                                        Purchased by {sale.buyer}
+                                                <div className="text-right">
+                                                    <p className="font-semibold text-green-500">
+                                                        +{formatCurrency(sale.sellerEarnings)}
+                                                    </p>
+                                                    <p className="text-xs text-muted-foreground flex items-center gap-1">
+                                                        <Clock className="h-3 w-3" />
+                                                        {formatRelativeTime(sale.createdAt)}
                                                     </p>
                                                 </div>
                                             </div>
-                                            <div className="text-right">
-                                                <p className="font-semibold text-green-500">
-                                                    +{formatCurrency(sale.amount * 0.7)}
-                                                </p>
-                                                <p className="text-xs text-muted-foreground flex items-center gap-1">
-                                                    <Clock className="h-3 w-3" />
-                                                    {sale.date}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : (
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="text-center py-8">
+                                        <p className="text-muted-foreground mb-4">No sales yet</p>
+                                        <Button variant="outline" size="sm" asChild>
+                                            <Link href="/sell">Create your first prompt</Link>
+                                        </Button>
+                                    </div>
+                                )
+                            ) : recentPurchases.length > 0 ? (
                                 <div className="space-y-4">
-                                    {buyerStats.recentPurchases.map((purchase) => (
+                                    {recentPurchases.map((purchase) => (
                                         <div
                                             key={purchase.id}
                                             className="flex items-center justify-between p-3 rounded-lg bg-muted/50"
@@ -414,16 +564,23 @@ export default function DashboardPage() {
                                                     <ShoppingBag className="h-5 w-5 text-primary" />
                                                 </div>
                                                 <div>
-                                                    <p className="font-medium text-sm">{purchase.title}</p>
+                                                    <p className="font-medium text-sm">{purchase.prompt.title}</p>
                                                     <p className="text-xs text-muted-foreground flex items-center gap-1">
                                                         <Clock className="h-3 w-3" />
-                                                        {purchase.date}
+                                                        {formatRelativeTime(purchase.createdAt)}
                                                     </p>
                                                 </div>
                                             </div>
-                                            <p className="font-semibold">{formatCurrency(purchase.price)}</p>
+                                            <p className="font-semibold">{formatCurrency(purchase.amount)}</p>
                                         </div>
                                     ))}
+                                </div>
+                            ) : (
+                                <div className="text-center py-8">
+                                    <p className="text-muted-foreground mb-4">No purchases yet</p>
+                                    <Button variant="outline" size="sm" asChild>
+                                        <Link href="/marketplace">Browse marketplace</Link>
+                                    </Button>
                                 </div>
                             )}
                         </CardContent>

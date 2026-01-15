@@ -30,10 +30,10 @@ const footerLinks = {
 };
 
 const socialLinks = [
-    { icon: Twitter, href: "https://twitter.com/promptlens", label: "Twitter" },
-    { icon: Github, href: "https://github.com/promptlens", label: "GitHub" },
-    { icon: Linkedin, href: "https://linkedin.com/company/promptlens", label: "LinkedIn" },
-    { icon: Mail, href: "mailto:hello@promptlens.ai", label: "Email" },
+    { icon: Twitter, href: "https://twitter.com/zerolens", label: "Twitter" },
+    { icon: Github, href: "https://github.com/zerolens", label: "GitHub" },
+    { icon: Linkedin, href: "https://linkedin.com/company/zerolens", label: "LinkedIn" },
+    { icon: Mail, href: "mailto:hello@zerolens.ai", label: "Email" },
 ];
 
 export function Footer() {
@@ -44,11 +44,8 @@ export function Footer() {
                 <div className="grid grid-cols-2 md:grid-cols-6 gap-8 lg:gap-12">
                     {/* Brand Column */}
                     <div className="col-span-2">
-                        <Link href="/" className="flex items-center gap-2 mb-4">
-                            <div className="relative h-8 w-8 rounded-lg gradient-bg flex items-center justify-center">
-                                <Sparkles className="h-5 w-5 text-white" />
-                            </div>
-                            <span className="text-xl font-bold gradient-text">PromptLens</span>
+                        <Link href="/" className="inline-block mb-4">
+                            <span className="text-xl font-display font-bold gradient-text">ZeroLens</span>
                         </Link>
                         <p className="text-sm text-muted-foreground mb-6 max-w-xs">
                             The premium marketplace for AI-powered product photography prompts.
@@ -144,7 +141,7 @@ export function Footer() {
                 {/* Bottom Bar */}
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                     <p className="text-sm text-muted-foreground">
-                        © {new Date().getFullYear()} PromptLens. All rights reserved.
+                        © {new Date().getFullYear()} ZeroLens. All rights reserved.
                     </p>
                     <div className="flex items-center gap-6">
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">

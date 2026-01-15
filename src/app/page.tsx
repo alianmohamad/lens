@@ -13,7 +13,6 @@ import {
   ArrowUpRight,
   CircleCheck,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 
@@ -22,28 +21,6 @@ const stats = [
   { value: "50K+", label: "Generated" },
   { value: "<30s", label: "Per Image" },
   { value: "98%", label: "Satisfaction" },
-];
-
-// Features for bento
-const features = [
-  {
-    title: "AI That Understands Products",
-    description: "Our AI doesn't just edit — it understands context, materials, and lighting to create photos that sell.",
-    icon: Sparkles,
-    span: "col-span-2",
-  },
-  {
-    title: "30 Second Generation",
-    description: "Upload to download in under 30 seconds.",
-    icon: Zap,
-    span: "col-span-1",
-  },
-  {
-    title: "2,500+ Pro Prompts",
-    description: "Curated by photographers.",
-    icon: ImageIcon,
-    span: "col-span-1",
-  },
 ];
 
 // Testimonials
@@ -74,25 +51,25 @@ export default function HomePage() {
     <div ref={containerRef} className="min-h-screen bg-background text-foreground overflow-hidden">
       <Navbar />
 
-      {/* Background Effects - only visible in dark mode */}
+      {/* Background Mesh */}
       <div
-        className="fixed inset-0 pointer-events-none dark:opacity-100 opacity-0 transition-opacity"
+        className="fixed inset-0 pointer-events-none opacity-60 dark:opacity-100"
         style={{
           background: `
-            radial-gradient(at 40% 20%, rgba(191, 255, 0, 0.15) 0px, transparent 50%),
-            radial-gradient(at 80% 0%, rgba(191, 255, 0, 0.1) 0px, transparent 50%),
-            radial-gradient(at 0% 50%, rgba(191, 255, 0, 0.08) 0px, transparent 50%),
-            radial-gradient(at 80% 50%, rgba(191, 255, 0, 0.05) 0px, transparent 50%),
-            radial-gradient(at 0% 100%, rgba(191, 255, 0, 0.1) 0px, transparent 50%)
+            radial-gradient(at 40% 20%, rgba(6, 182, 212, 0.12) 0px, transparent 50%),
+            radial-gradient(at 80% 0%, rgba(6, 182, 212, 0.08) 0px, transparent 50%),
+            radial-gradient(at 0% 50%, rgba(6, 182, 212, 0.06) 0px, transparent 50%),
+            radial-gradient(at 0% 100%, rgba(6, 182, 212, 0.08) 0px, transparent 50%)
           `
         }}
       />
+      {/* Background Grid */}
       <div
-        className="fixed inset-0 pointer-events-none dark:opacity-60 opacity-0 transition-opacity"
+        className="fixed inset-0 pointer-events-none opacity-50 dark:opacity-60"
         style={{
           backgroundImage: `
-            linear-gradient(rgba(191, 255, 0, 0.03) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(191, 255, 0, 0.03) 1px, transparent 1px)
+            linear-gradient(var(--grid-color) 1px, transparent 1px),
+            linear-gradient(90deg, var(--grid-color) 1px, transparent 1px)
           `,
           backgroundSize: '50px 50px'
         }}
@@ -111,7 +88,7 @@ export default function HomePage() {
             >
               <span className="pill">
                 <Sparkles className="w-4 h-4" />
-                Powered by Google Imagen 3
+                AI-Powered Generation
               </span>
             </motion.div>
 
@@ -120,7 +97,7 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
-              className="text-[clamp(3rem,10vw,8rem)] font-bold leading-[0.9] tracking-tight mb-8"
+              className="text-[clamp(3rem,10vw,8rem)] font-display font-bold leading-[0.9] tracking-tight mb-8"
             >
               <span className="block">Product photos</span>
               <span className="block text-neon">reimagined.</span>
@@ -165,7 +142,7 @@ export default function HomePage() {
               transition={{ duration: 0.5, delay: 0.4 }}
               className="flex gap-12"
             >
-              {stats.map((stat, i) => (
+              {stats.map((stat) => (
                 <div key={stat.label} className="stat-card p-0 text-left">
                   <div className="text-4xl md:text-5xl font-bold text-neon-subtle mb-1">
                     {stat.value}
@@ -223,8 +200,8 @@ export default function HomePage() {
             viewport={{ once: true }}
             className="mb-16"
           >
-            <h2 className="text-5xl md:text-6xl font-bold mb-4">
-              Why <span className="text-neon-subtle">PromptLens</span>?
+            <h2 className="text-5xl md:text-6xl font-display font-bold mb-4">
+              Why <span className="text-neon-subtle">ZeroLens</span>?
             </h2>
             <p className="text-xl text-muted-foreground max-w-xl">
               Everything you need to create professional product photography at scale.
@@ -290,7 +267,7 @@ export default function HomePage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.3 }}
-              className="md:col-span-2 bento-card p-8 md:p-12 bg-gradient-to-br from-neon/10 to-transparent group"
+              className="md:col-span-2 bento-card p-8 md:p-12 bg-linear-to-br from-neon/10 to-transparent group"
             >
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
@@ -320,7 +297,7 @@ export default function HomePage() {
             viewport={{ once: true }}
             className="text-center mb-20"
           >
-            <h2 className="text-5xl md:text-6xl font-bold mb-4">
+            <h2 className="text-5xl md:text-6xl font-display font-bold mb-4">
               How it <span className="text-neon-subtle">works</span>
             </h2>
             <p className="text-xl text-muted-foreground">Three steps. Under a minute.</p>
@@ -362,7 +339,7 @@ export default function HomePage() {
             viewport={{ once: true }}
             className="mb-16"
           >
-            <h2 className="text-5xl md:text-6xl font-bold mb-4">
+            <h2 className="text-5xl md:text-6xl font-display font-bold mb-4">
               Loved by <span className="text-neon-subtle">creators</span>
             </h2>
           </motion.div>
@@ -406,11 +383,11 @@ export default function HomePage() {
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-neon/20 rounded-full blur-[100px]" />
 
             <div className="relative">
-              <h2 className="text-4xl md:text-6xl font-bold mb-6">
+              <h2 className="text-4xl md:text-6xl font-display font-bold mb-6">
                 Start creating <span className="text-neon">today</span>
               </h2>
               <p className="text-xl text-muted-foreground mb-10 max-w-lg mx-auto">
-                Join thousands of creators using PromptLens. Free to start.
+                Join thousands of creators using ZeroLens. Free to start.
               </p>
 
               <div className="flex flex-wrap justify-center gap-4 mb-10">

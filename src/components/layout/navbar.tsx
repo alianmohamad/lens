@@ -19,6 +19,7 @@ import {
     Sun,
     Moon,
     ChevronDown,
+    Bookmark,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
@@ -37,6 +38,7 @@ import { cn } from "@/lib/utils";
 const navLinks = [
     { href: "/marketplace", label: "Marketplace", icon: Store },
     { href: "/studio", label: "Studio", icon: Sparkles },
+    { href: "/pocket", label: "Pocket", icon: Bookmark },
     { href: "/sell", label: "Sell", icon: PenTool },
 ];
 
@@ -82,12 +84,9 @@ export function Navbar() {
                 <nav className="section-container">
                     <div className="flex h-16 items-center justify-between gap-4">
                         {/* Logo */}
-                        <Link href="/" className="flex items-center gap-2 shrink-0">
-                            <div className="relative h-8 w-8 rounded-lg gradient-bg flex items-center justify-center">
-                                <Sparkles className="h-5 w-5 text-white" />
-                            </div>
-                            <span className="text-xl font-bold gradient-text hidden sm:block">
-                                PromptLens
+                        <Link href="/" className="shrink-0">
+                            <span className="text-xl font-display font-bold gradient-text">
+                                ZeroLens
                             </span>
                         </Link>
 

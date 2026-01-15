@@ -1,4 +1,4 @@
-// PromptLens - AI Product Photography Marketplace Schema
+// ZeroLens - AI Product Photography Marketplace Schema
 
 generator client {
   provider = "prisma-client-js"
@@ -32,6 +32,7 @@ model User {
   accounts        Account[]
   sessions        Session[]
   cartItems       CartItem[]
+  savedPrompts    SavedPrompt[]
 
   @@index([email])
   @@index([stripeCustomerId])
@@ -69,6 +70,7 @@ model Prompt {
   reviews       Review[]
   images        GeneratedImage[]
   cartItems     CartItem[]
+  savedBy       SavedPrompt[]
 
   @@index([creatorId])
   @@index([category])
@@ -136,6 +138,21 @@ enum PaymentStatus {
   COMPLETED
   FAILED
   REFUNDED
+}
+
+// ==================== PROMPT POCKET MODEL ====================
+
+model SavedPrompt {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId   String
+  prompt   Prompt @relation(fields: [promptId], references: [id], onDelete: Cascade)
+  promptId String
+
+  @@unique([userId, promptId])  // One save per user per prompt
+  @@index([userId])
 }
 
 // ==================== REVIEW MODEL ====================

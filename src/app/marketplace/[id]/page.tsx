@@ -297,7 +297,7 @@ export default async function PromptDetailPage({ params }: PromptDetailPageProps
                                     <Badge variant="outline" className="mb-3">
                                         {CATEGORY_LABELS[prompt.category]}
                                     </Badge>
-                                    <h1 className="text-2xl font-bold mb-2">{prompt.title}</h1>
+                                    <h1 className="text-2xl font-display font-bold mb-2">{prompt.title}</h1>
 
                                     {/* Rating & Sales */}
                                     <div className="flex items-center gap-4 mb-4">
