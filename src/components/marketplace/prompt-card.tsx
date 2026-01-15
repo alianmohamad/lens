@@ -49,9 +49,9 @@ export function PromptCard({ prompt, onPreview }: PromptCardProps) {
             transition={{ duration: 0.2 }}
         >
             <Link href={`/marketplace/${prompt.id}`}>
-                <Card className="group overflow-hidden border-2 border-transparent hover:border-primary/20 transition-all duration-300 h-full bg-card/50">
+                <Card className="group overflow-hidden border-2 border-transparent hover:border-primary/20 transition-all duration-300 h-full bg-card/50 p-0 gap-0">
                     {/* Image Container */}
-                    <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+                    <div className="relative aspect-4/3 overflow-hidden bg-muted">
                         {prompt.exampleImages[0] ? (
                             <Image
                                 src={prompt.exampleImages[0]}
@@ -69,7 +69,7 @@ export function PromptCard({ prompt, onPreview }: PromptCardProps) {
                         )}
 
                         {/* Overlay Actions */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                             <div className="absolute bottom-3 left-3 right-3 flex gap-2">
                                 <Button
                                     size="sm"
@@ -109,8 +109,7 @@ export function PromptCard({ prompt, onPreview }: PromptCardProps) {
                         <div className="absolute top-3 right-3 flex items-center gap-2">
                             <SaveButton
                                 promptId={prompt.id}
-                                size="sm"
-                                className="bg-white/90 backdrop-blur-sm hover:bg-white shadow-md"
+                                className="h-9 w-9 bg-white hover:bg-white/90 text-black shadow-lg rounded-full border border-transparent"
                             />
                             <Badge className="badge-gradient text-sm font-semibold px-3 py-1 shadow-lg">
                                 {formatPrice(prompt.price)}

@@ -79,15 +79,15 @@ export function Navbar() {
                 className={cn(
                     "fixed z-50 transition-all duration-500",
                     isScrolled
-                        ? "top-4 left-4 right-4 mx-auto max-w-6xl rounded-2xl glass-strong shadow-xl border border-neon/10"
+                        ? "top-4 left-4 right-4 mx-auto max-w-6xl rounded-full glass-strong shadow-xl border border-neon/10"
                         : "top-0 left-0 right-0 bg-transparent"
                 )}
             >
                 <nav className={cn(
                     "transition-all duration-300",
-                    isScrolled ? "px-6" : "section-container"
+                    isScrolled ? "px-4 sm:px-6" : "px-4 sm:px-6 lg:px-8 mx-auto max-w-6xl"
                 )}>
-                    <div className="flex h-16 items-center justify-between gap-4">
+                    <div className="flex h-16 items-center justify-between gap-2 sm:gap-4">
                         {/* Logo */}
                         <Link href="/" className="shrink-0">
                             <span className="text-xl font-display font-bold gradient-text">
@@ -125,7 +125,7 @@ export function Navbar() {
                                     variant="ghost"
                                     size="icon"
                                     onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                                    className="rounded-lg"
+                                    className="rounded-lg hover:bg-muted hover:text-foreground transition-colors"
                                 >
                                     {theme === "dark" ? (
                                         <Sun className="h-5 w-5" />
@@ -140,7 +140,7 @@ export function Navbar() {
                                 variant="ghost"
                                 size="icon"
                                 onClick={openCart}
-                                className="relative rounded-lg"
+                                className="relative rounded-lg hover:bg-muted hover:text-foreground transition-colors"
                             >
                                 <ShoppingCart className="h-5 w-5" />
                                 {cartItemCount > 0 && (
@@ -158,9 +158,8 @@ export function Navbar() {
                             ) : session?.user ? (
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                        <Button
-                                            variant="ghost"
-                                            className="flex items-center gap-2 rounded-lg px-2"
+                                        <button
+                                            className="flex items-center gap-1 rounded-lg px-1 bg-transparent border-none cursor-pointer"
                                         >
                                             <Avatar className="h-8 w-8">
                                                 <AvatarImage
@@ -171,8 +170,10 @@ export function Navbar() {
                                                     {session.user.name?.[0]?.toUpperCase() || "U"}
                                                 </AvatarFallback>
                                             </Avatar>
-                                            <ChevronDown className="h-4 w-4 hidden sm:block" />
-                                        </Button>
+                                            <span className="hidden sm:flex items-center justify-center h-6 w-6 rounded hover:bg-muted transition-colors">
+                                                <ChevronDown className="h-4 w-4" />
+                                            </span>
+                                        </button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end" className="w-56">
                                         <div className="px-2 py-1.5">
@@ -212,7 +213,7 @@ export function Navbar() {
                                 </DropdownMenu>
                             ) : (
                                 <div className="hidden sm:flex items-center gap-2">
-                                    <Button variant="ghost" asChild>
+                                    <Button variant="ghost" className="hover:bg-neon/10 hover:text-neon" asChild>
                                         <Link href="/sign-in">Sign in</Link>
                                     </Button>
                                     <Button className="btn-premium" asChild>
@@ -246,9 +247,12 @@ export function Navbar() {
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -20 }}
-                        className="fixed inset-x-0 top-16 z-40 md:hidden"
+                        className={cn(
+                            "fixed inset-x-0 z-40 md:hidden",
+                            isScrolled ? "top-24" : "top-20"
+                        )}
                     >
-                        <div className="glass-strong border-b border-border mx-4 rounded-xl p-4 shadow-xl">
+                        <div className="glass-strong border border-border mx-4 rounded-2xl p-4 shadow-xl">
                             <div className="flex flex-col gap-2">
                                 {navLinks.map((link) => {
                                     const isActive = pathname.startsWith(link.href);

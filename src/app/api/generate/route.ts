@@ -12,6 +12,13 @@ interface GenerateImageRequest {
     productImageUrl: string;
     promptId: string;
     customPrompt?: string;
+    // New Params
+    aspectRatio?: "1:1" | "16:9" | "4:5" | "9:16";
+    stylePreset?: string;
+    productStrength?: number;
+    quality?: "standard" | "hd";
+    negativePrompt?: string;
+    numImages?: number;
 }
 
 export async function POST(request: NextRequest) {
@@ -26,7 +33,7 @@ export async function POST(request: NextRequest) {
         }
 
         const body: GenerateImageRequest = await request.json();
-        const { productImageUrl, promptId, customPrompt } = body;
+        const { productImageUrl, promptId, customPrompt, aspectRatio = "1:1", stylePreset, productStrength = 80, quality = "standard", negativePrompt, numImages = 1 } = body;
 
         if (!productImageUrl) {
             return NextResponse.json(
@@ -68,8 +75,42 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Replace [product] placeholder with actual product image reference
-        const finalPrompt = promptText.replace(/\[product\]/gi, "the product in the image");
+        // --- Apply Advanced Prompt Logic ---
+
+        // 1. Style Preset Injection
+        let styleInstruction = "";
+        if (stylePreset) {
+            switch (stylePreset) {
+                case "Studio": styleInstruction = " in a clean, professional studio setting with neutral lighting"; break;
+                case "Luxury": styleInstruction = " in a high-end luxury setting with dramatic mood lighting, dark elegance, premium aesthetic"; break;
+                case "Nature": styleInstruction = " in a natural outdoor setting, soft sunlight, organic elements, bokeh background"; break;
+                case "Neon": styleInstruction = " in a cyberpunk futuristic setting, neon rim lighting, tech aesthetic, vibrant colors"; break;
+                case "Minimal": styleInstruction = " in a minimal setting, plenty of negative space, soft shadows, clean lines"; break;
+            }
+        }
+
+        // 2. Aspect Ratio Instruction (Gemini handles this better via prompt than config for some models)
+        const ratioMap = {
+            "1:1": "square aspect ratio",
+            "16:9": "cinematic wide 16:9 aspect ratio",
+            "4:5": "portrait 4:5 aspect ratio",
+            "9:16": "tall vertical 9:16 aspect ratio"
+        };
+        const ratioInstruction = ratioMap[aspectRatio] || "square aspect ratio";
+
+        // 3. Product Strength (Integrity)
+        // We simulate this by adjusting the system instruction emphasis
+        const integrityInstruction = productStrength > 85
+            ? "Keep the product EXTREMELY accurate to the original image. Do not change its shape, label, or details at all."
+            : productStrength > 50
+                ? "Keep the product accurate to the original image."
+                : "The product should be recognizable but you can creatively adapt it to the scene.";
+
+        // 4. Negative Prompt
+        const negativeInstruction = negativePrompt ? ` Avoid these elements: ${negativePrompt}.` : "";
+
+        // Combine for Final Prompt
+        const finalPrompt = `${promptText}${styleInstruction}. ${ratioInstruction}. ${negativeInstruction}`.replace(/\[product\]/gi, "the product in the image");
 
         // Check if Gemini API is configured
         if (!GEMINI_API_KEY) {
@@ -139,13 +180,14 @@ export async function POST(request: NextRequest) {
                     ]
                 }],
                 generationConfig: {
+                    // map aspect ratio to closest supported if possible, otherwise rely on prompt
                     responseModalities: ["IMAGE"],
-                    temperature: 1.0,
+                    temperature: productStrength < 50 ? 1.2 : 0.8, // More creative if strength is low
                 },
                 // For image generation with specific params
                 systemInstruction: {
                     parts: [{
-                        text: "You are a professional product photographer AI. The user will provide a product image and instructions for how to photograph it. Generate a new high-quality product photograph based on the provided product image, applying the styling, background, lighting, and composition described in the prompt. Keep the product itself accurate to the original image while transforming the scene around it. The output should be suitable for e-commerce use."
+                        text: `You are a professional product photographer AI. ${integrityInstruction} Generate a high-quality product photograph based on the provided product image, applying the styling, background, lighting, and composition described in the prompt. The output should be suitable for e-commerce use. Output resolution: ${quality === 'hd' ? 'high definition' : 'standard'}.`
                     }]
                 },
             } as any);

@@ -15,7 +15,15 @@ import {
     Lock,
     Check,
     AlertCircle,
+    Settings2,
+    Share2,
+    Copy,
+    Maximize2,
+    Zap,
+    SplitSquareHorizontal,
 } from "lucide-react";
+import { Slider } from "@/components/ui/slider";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -30,7 +38,10 @@ import {
 } from "@/components/ui/select";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
+import { ComparisonSlider } from "@/components/studio/comparison-slider";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
+import { useSearchParams } from "next/navigation";
 
 interface PurchasedPrompt {
     id: string;
@@ -42,6 +53,14 @@ interface PurchasedPrompt {
 export default function StudioPage() {
     const { data: session, status } = useSession();
     const router = useRouter();
+    const searchParams = useSearchParams();
+
+    // Quick prompts for users with no purchases
+    const QUICK_PROMPTS = [
+        { id: "quick-1", title: "Marble Luxury", text: "Product photography on a polished white marble surface, soft natural lighting, high-end aesthetic" },
+        { id: "quick-2", title: "Neon Tech", text: "Cyberpunk product shot, neon blue and pink rim lighting, dark background, futuristic vibes" },
+        { id: "quick-3", title: "Nature Outdoor", text: "Outdoor product photography, placed on a mossy rock in a forest, dappled sunlight, bokeh background" },
+    ];
 
     const [purchasedPrompts, setPurchasedPrompts] = useState<PurchasedPrompt[]>([]);
     const [isLoadingPrompts, setIsLoadingPrompts] = useState(true);
@@ -52,9 +71,29 @@ export default function StudioPage() {
     const [generatedImage, setGeneratedImage] = useState<string | null>(null);
     const [isGenerating, setIsGenerating] = useState(false);
     const [generationProgress, setGenerationProgress] = useState(0);
+    const [statusText, setStatusText] = useState("Initializing..."); // Smart status
+    const [showComparison, setShowComparison] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [isDragging, setIsDragging] = useState(false);
     const [demoMode, setDemoMode] = useState(false);
+
+    // Advanced Settings State
+    const [showSettings, setShowSettings] = useState(false);
+    const [aspectRatio, setAspectRatio] = useState<"1:1" | "16:9" | "4:5" | "9:16">("1:1");
+    const [numImages, setNumImages] = useState(1);
+    const [stylePreset, setStylePreset] = useState("Studio");
+    const [negativePrompt, setNegativePrompt] = useState("");
+    const [productStrength, setProductStrength] = useState(80);
+    const [quality, setQuality] = useState<"standard" | "hd">("standard");
+
+    const STYLE_PRESETS = [
+        { id: "None", label: "None", color: "bg-muted" },
+        { id: "Studio", label: "Studio Clean", color: "bg-blue-500/10 text-blue-500 border-blue-200" },
+        { id: "Luxury", label: "Luxury Dark", color: "bg-amber-500/10 text-amber-500 border-amber-200" },
+        { id: "Nature", label: "Nature", color: "bg-green-500/10 text-green-500 border-green-200" },
+        { id: "Neon", label: "Neon Cyber", color: "bg-purple-500/10 text-purple-500 border-purple-200" },
+        { id: "Minimal", label: "Minimalist", color: "bg-gray-500/10 text-gray-500 border-gray-200" },
+    ];
 
     // Fetch purchased prompts
     useEffect(() => {
@@ -80,6 +119,15 @@ export default function StudioPage() {
 
         fetchPurchasedPrompts();
     }, [session]);
+
+    // Check for query param prompt
+    useEffect(() => {
+        const promptParam = searchParams.get("prompt");
+        if (promptParam) {
+            setCustomPrompt(promptParam);
+            setUseCustomPrompt(true);
+        }
+    }, [searchParams]);
 
     const handleDragOver = useCallback((e: React.DragEvent) => {
         e.preventDefault();
@@ -129,14 +177,31 @@ export default function StudioPage() {
         setGenerationProgress(0);
         setDemoMode(false);
 
-        // Simulate progress while waiting for API
+        // Simulate progress and smart status while waiting for API
+        const statusMessages = [
+            "Analyzing composition...",
+            "Identifying subjects...",
+            "Enhancing lighting...",
+            "Applying style transfer...",
+            "Rendering details...",
+            "Finalizing output..."
+        ];
+
+        let messageIndex = 0;
+        setStatusText(statusMessages[0]);
+
         const interval = setInterval(() => {
             setGenerationProgress((prev) => {
                 if (prev >= 90) {
-                    clearInterval(interval);
                     return 90;
                 }
-                return prev + Math.random() * 15;
+                // Cycle messages based on progress approx
+                const newProgress = prev + Math.random() * 10;
+                if (newProgress > (messageIndex + 1) * (90 / statusMessages.length)) {
+                    messageIndex = Math.min(messageIndex + 1, statusMessages.length - 1);
+                    setStatusText(statusMessages[messageIndex]);
+                }
+                return newProgress;
             });
         }, 500);
 
@@ -146,8 +211,19 @@ export default function StudioPage() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     productImageUrl: uploadedImage,
-                    promptId: useCustomPrompt ? undefined : selectedPrompt,
-                    customPrompt: useCustomPrompt ? customPrompt : undefined,
+                    promptId: useCustomPrompt && !String(selectedPrompt).startsWith("quick-") ? undefined : selectedPrompt,
+                    customPrompt: useCustomPrompt
+                        ? customPrompt
+                        : String(selectedPrompt).startsWith("quick-")
+                            ? QUICK_PROMPTS.find(p => p.id === selectedPrompt)?.text
+                            : undefined,
+                    // Advanced Parameters
+                    aspectRatio,
+                    stylePreset: stylePreset === "None" ? undefined : stylePreset,
+                    productStrength,
+                    quality,
+                    negativePrompt: negativePrompt.trim() || undefined,
+                    numImages
                 }),
             });
 
@@ -232,6 +308,22 @@ export default function StudioPage() {
         setDemoMode(false);
     };
 
+    const handleCopyImage = async () => {
+        if (!generatedImage) return;
+        try {
+            const response = await fetch(generatedImage);
+            const blob = await response.blob();
+            await navigator.clipboard.write([
+                new ClipboardItem({
+                    [blob.type]: blob
+                })
+            ]);
+            toast.success("Image copied to clipboard");
+        } catch (err) {
+            toast.error("Failed to copy image");
+        }
+    };
+
     // Auth check
     if (status === "loading") {
         return (
@@ -268,347 +360,488 @@ export default function StudioPage() {
         );
     }
 
-    return (
-        <div className="min-h-screen">
-            <Navbar />
 
-            <main className="section-container py-8">
-                {/* Header */}
-                <div className="mb-8">
-                    <Badge className="mb-4">AI Studio</Badge>
-                    <h1 className="text-3xl md:text-4xl font-display font-bold mb-2">
-                        Transform Your <span className="gradient-text">Product Photos</span>
-                    </h1>
-                    <p className="text-muted-foreground">
-                        Upload your product image, select a prompt, and let AI create stunning
-                        visuals
-                    </p>
-                </div>
+    // [HELPER COMPONENT FOR CONTROLS TO AVOID DUPLICATION]
+    const StudioSidebar = ({
+        inputId = "file-upload",
+        className = ""
+    }: { inputId?: string, className?: string }) => (
+        <div className={cn("space-y-8", className)}>
+            {/* Header */}
+            <div>
+                <Badge className="mb-3 px-3 py-1 bg-primary/10 text-primary border-primary/20 hover:bg-primary/20">AI Studio Workspace</Badge>
+                <h1 className="text-2xl font-display font-bold mb-1 tracking-tight">
+                    Create <span className="gradient-text">Magic</span>
+                </h1>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                    Configure your shot settings and transform your product.
+                </p>
+            </div>
 
-                {/* Demo Mode Banner */}
-                {demoMode && (
-                    <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="mb-6 p-4 rounded-lg bg-amber-500/10 border border-amber-500/20"
-                    >
-                        <p className="text-sm text-amber-600 dark:text-amber-400">
-                            <strong>Demo Mode:</strong> Image generation API is not configured.
-                            Configure <code>REPLICATE_API_TOKEN</code> in your environment for
-                            actual AI generation.
-                        </p>
-                    </motion.div>
-                )}
-
-                {/* Main Content */}
-                <div className="grid lg:grid-cols-2 gap-8">
-                    {/* Left Column - Upload & Preview */}
-                    <div className="space-y-6">
-                        {/* Upload Area */}
-                        <Card className="border-2 border-dashed border-border overflow-hidden">
-                            <CardHeader className="pb-3">
-                                <CardTitle className="text-lg flex items-center gap-2">
-                                    <Upload className="h-5 w-5 text-primary" />
-                                    Upload Product Image
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <div
-                                    className={cn(
-                                        "relative rounded-xl overflow-hidden transition-all duration-300",
-                                        isDragging && "ring-2 ring-primary ring-offset-2"
-                                    )}
-                                    onDragOver={handleDragOver}
-                                    onDragLeave={handleDragLeave}
-                                    onDrop={handleDrop}
-                                >
-                                    {uploadedImage ? (
-                                        <div className="relative aspect-square">
-                                            <img
-                                                src={uploadedImage}
-                                                alt="Uploaded product"
-                                                className="w-full h-full object-contain bg-muted rounded-xl"
-                                            />
-                                            <Button
-                                                variant="secondary"
-                                                size="sm"
-                                                className="absolute top-3 right-3"
-                                                onClick={handleReset}
-                                            >
-                                                <RefreshCw className="h-4 w-4 mr-1" />
-                                                Change
-                                            </Button>
-                                        </div>
-                                    ) : (
-                                        <label className="block cursor-pointer">
-                                            <div className="aspect-square bg-muted rounded-xl flex flex-col items-center justify-center p-8 hover:bg-muted/80 transition-colors">
-                                                <div className="h-16 w-16 rounded-2xl gradient-bg-subtle flex items-center justify-center mb-4">
-                                                    <ImageIcon className="h-8 w-8 text-primary" />
-                                                </div>
-                                                <p className="font-medium mb-1">
-                                                    Drop your image here or click to upload
-                                                </p>
-                                                <p className="text-sm text-muted-foreground">
-                                                    Supports JPG, PNG, WebP (max 10MB)
-                                                </p>
-                                            </div>
-                                            <input
-                                                type="file"
-                                                accept="image/*"
-                                                className="hidden"
-                                                onChange={handleFileSelect}
-                                            />
-                                        </label>
-                                    )}
-                                </div>
-                            </CardContent>
-                        </Card>
-
-                        {/* Prompt Selection */}
-                        <Card>
-                            <CardHeader className="pb-3">
-                                <CardTitle className="text-lg flex items-center gap-2">
-                                    <Sparkles className="h-5 w-5 text-primary" />
-                                    Select a Prompt
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                {/* Toggle between purchased and custom */}
-                                <div className="flex gap-2">
-                                    <Button
-                                        variant={!useCustomPrompt ? "default" : "outline"}
-                                        size="sm"
-                                        onClick={() => setUseCustomPrompt(false)}
-                                    >
-                                        My Prompts
-                                    </Button>
-                                    <Button
-                                        variant={useCustomPrompt ? "default" : "outline"}
-                                        size="sm"
-                                        onClick={() => setUseCustomPrompt(true)}
-                                    >
-                                        Custom Prompt
-                                    </Button>
-                                </div>
-
-                                {useCustomPrompt ? (
-                                    <Textarea
-                                        placeholder="Enter your custom prompt for image generation..."
-                                        value={customPrompt}
-                                        onChange={(e) => setCustomPrompt(e.target.value)}
-                                        className="min-h-[120px]"
-                                    />
-                                ) : isLoadingPrompts ? (
-                                    <div className="py-8 text-center">
-                                        <div className="h-6 w-6 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-2" />
-                                        <p className="text-sm text-muted-foreground">
-                                            Loading your prompts...
-                                        </p>
-                                    </div>
-                                ) : purchasedPrompts.length === 0 ? (
-                                    <div className="text-center py-8">
-                                        <p className="text-muted-foreground mb-4">
-                                            You haven't purchased any prompts yet
-                                        </p>
-                                        <Button
-                                            variant="outline"
-                                            onClick={() => router.push("/marketplace")}
-                                        >
-                                            Browse Marketplace
-                                        </Button>
-                                    </div>
-                                ) : (
-                                    <Select value={selectedPrompt} onValueChange={setSelectedPrompt}>
-                                        <SelectTrigger className="h-12">
-                                            <SelectValue placeholder="Choose from your purchased prompts" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {purchasedPrompts.map((prompt) => (
-                                                <SelectItem key={prompt.id} value={prompt.id}>
-                                                    <div className="flex items-center gap-2">
-                                                        <span>{prompt.title}</span>
-                                                        <Badge variant="outline" className="text-xs">
-                                                            {prompt.category}
-                                                        </Badge>
-                                                    </div>
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                )}
-                            </CardContent>
-                        </Card>
-
-                        {/* Generate Button */}
-                        <Button
-                            size="lg"
-                            className="w-full h-14 text-lg btn-premium"
-                            disabled={
-                                !uploadedImage ||
-                                (!useCustomPrompt && !selectedPrompt) ||
-                                (useCustomPrompt && !customPrompt.trim()) ||
-                                isGenerating
-                            }
-                            onClick={handleGenerate}
-                        >
-                            {isGenerating ? (
-                                <>
-                                    <div className="h-5 w-5 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
-                                    Generating...
-                                </>
-                            ) : (
-                                <>
-                                    <Wand2 className="h-5 w-5 mr-2" />
-                                    Generate Image
-                                </>
-                            )}
-                        </Button>
-
-                        {/* Progress */}
-                        <AnimatePresence>
-                            {isGenerating && (
-                                <motion.div
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: 10 }}
-                                    className="space-y-2"
-                                >
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-muted-foreground">Processing...</span>
-                                        <span className="font-medium">
-                                            {Math.round(generationProgress)}%
-                                        </span>
-                                    </div>
-                                    <Progress value={generationProgress} className="h-2" />
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-
-                        {/* Error */}
-                        {error && (
-                            <motion.div
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                className="p-4 rounded-lg bg-destructive/10 border border-destructive/20 flex items-center gap-3"
-                            >
-                                <AlertCircle className="h-5 w-5 text-destructive shrink-0" />
-                                <p className="text-sm text-destructive">{error}</p>
-                            </motion.div>
-                        )}
-                    </div>
-
-                    {/* Right Column - Result */}
-                    <div>
-                        <Card className="h-full">
-                            <CardHeader className="pb-3">
-                                <CardTitle className="text-lg flex items-center gap-2">
-                                    <Wand2 className="h-5 w-5 text-primary" />
-                                    Generated Result
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                {generatedImage ? (
-                                    <motion.div
-                                        initial={{ opacity: 0, scale: 0.95 }}
-                                        animate={{ opacity: 1, scale: 1 }}
-                                        className="space-y-4"
-                                    >
-                                        <div className="relative aspect-square rounded-xl overflow-hidden bg-muted">
-                                            <img
-                                                src={generatedImage}
-                                                alt="Generated result"
-                                                className="w-full h-full object-contain"
-                                            />
-                                            <div className="absolute top-3 right-3">
-                                                <Badge className="badge-gradient">
-                                                    <Check className="h-3 w-3 mr-1" />
-                                                    Complete
-                                                </Badge>
-                                            </div>
-                                        </div>
-
-                                        <div className="flex gap-3">
-                                            <Button
-                                                className="flex-1 btn-premium"
-                                                onClick={handleDownload}
-                                            >
-                                                <Download className="h-4 w-4 mr-2" />
-                                                Download
-                                            </Button>
-                                            <Button
-                                                variant="outline"
-                                                className="flex-1"
-                                                onClick={handleGenerate}
-                                                disabled={isGenerating}
-                                            >
-                                                <RefreshCw className="h-4 w-4 mr-2" />
-                                                Regenerate
-                                            </Button>
-                                        </div>
-                                    </motion.div>
-                                ) : (
-                                    <div className="aspect-square bg-muted rounded-xl flex flex-col items-center justify-center text-center p-8">
-                                        <div className="h-16 w-16 rounded-2xl bg-muted-foreground/10 flex items-center justify-center mb-4">
-                                            <ImageIcon className="h-8 w-8 text-muted-foreground" />
-                                        </div>
-                                        <p className="font-medium mb-1 text-muted-foreground">
-                                            Your generated image will appear here
-                                        </p>
-                                        <p className="text-sm text-muted-foreground/70">
-                                            Upload an image and select a prompt to get started
-                                        </p>
-                                    </div>
-                                )}
-                            </CardContent>
-                        </Card>
-                    </div>
-                </div>
-
-                {/* How It Works */}
-                <div className="mt-16">
-                    <h2 className="text-xl font-display font-semibold mb-6">How It Works</h2>
-                    <div className="grid md:grid-cols-3 gap-6">
-                        {[
-                            {
-                                step: 1,
-                                title: "Upload Your Product",
-                                description: "Drop or select your product image in any format",
-                                icon: Upload,
-                            },
-                            {
-                                step: 2,
-                                title: "Choose a Prompt",
-                                description:
-                                    "Select from your purchased prompts or write a custom one",
-                                icon: Sparkles,
-                            },
-                            {
-                                step: 3,
-                                title: "Generate & Download",
-                                description: "AI transforms your image in seconds",
-                                icon: Download,
-                            },
-                        ].map((item, index) => (
-                            <div key={item.step} className="flex items-start gap-4">
-                                <div className="h-10 w-10 rounded-xl gradient-bg flex items-center justify-center shrink-0">
-                                    <item.icon className="h-5 w-5 text-white" />
-                                </div>
-                                <div>
-                                    <h3 className="font-medium mb-1">{item.title}</h3>
-                                    <p className="text-sm text-muted-foreground">
-                                        {item.description}
-                                    </p>
-                                </div>
-                                {index < 2 && (
-                                    <ChevronRight className="h-5 w-5 text-muted-foreground hidden md:block shrink-0 mt-2.5" />
-                                )}
+            {/* Upload Area - Compact */}
+            <div className="space-y-4">
+                <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
+                    <Upload className="h-3.5 w-3.5" /> Source
+                </label>
+                <div
+                    className={cn(
+                        "group relative rounded-2xl border border-dashed transition-all duration-300 overflow-hidden cursor-pointer",
+                        isDragging ? "border-primary bg-primary/5 ring-2 ring-primary/20" : "border-border bg-card/50 hover:border-primary/50 hover:bg-muted/50",
+                        uploadedImage ? "h-48 shadow-inner" : "h-36"
+                    )}
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                    onClick={() => !uploadedImage && document.getElementById(inputId)?.click()}
+                >
+                    {uploadedImage ? (
+                        <>
+                            <img
+                                src={uploadedImage || ""}
+                                alt="Uploaded"
+                                className="w-full h-full object-contain p-4 transition-transform duration-500 group-hover:scale-105"
+                            />
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
+                                <Button size="sm" variant="secondary" className="rounded-full font-medium" onClick={(e) => { e.stopPropagation(); handleReset(); }}>
+                                    <RefreshCw className="h-3 w-3 mr-2" /> Replace Image
+                                </Button>
                             </div>
+                            {/* Scanning Animation */}
+                            <AnimatePresence>
+                                {isGenerating && (
+                                    <motion.div
+                                        initial={{ top: "0%" }}
+                                        animate={{ top: "100%" }}
+                                        transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
+                                        className="absolute left-0 right-0 h-0.5 bg-primary shadow-[0_0_15px_rgba(59,130,246,1)] z-10"
+                                    />
+                                )}
+                            </AnimatePresence>
+                        </>
+                    ) : (
+                        <div className="flex flex-col items-center justify-center h-full">
+                            <div className="h-10 w-10 rounded-xl bg-muted flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300 shadow-sm">
+                                <ImageIcon className="h-5 w-5 text-muted-foreground" />
+                            </div>
+                            <p className="text-sm font-medium">Upload Product</p>
+                            <p className="text-[10px] text-muted-foreground mt-1">Accepts JPG, PNG, WEBP</p>
+                            <input id={inputId} type="file" accept="image/*" className="hidden" onChange={handleFileSelect} />
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* Prompt Selection */}
+            <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
+                        <Sparkles className="h-3.5 w-3.5" /> Creative Direction
+                    </label>
+                    <div className="flex bg-muted/50 p-0.5 rounded-lg border border-border/50">
+                        <button
+                            onClick={() => setUseCustomPrompt(false)}
+                            className={cn("px-3 py-1 text-[10px] font-medium rounded-md transition-all", !useCustomPrompt ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground")}
+                        >
+                            Saved
+                        </button>
+                        <button
+                            onClick={() => setUseCustomPrompt(true)}
+                            className={cn("px-3 py-1 text-[10px] font-medium rounded-md transition-all", useCustomPrompt ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground")}
+                        >
+                            Custom
+                        </button>
+                    </div>
+                </div>
+
+                {useCustomPrompt ? (
+                    <Textarea
+                        placeholder="Describe the scene, lighting, and mood..."
+                        value={customPrompt}
+                        onChange={(e) => setCustomPrompt(e.target.value)}
+                        className="min-h-[100px] text-sm resize-y bg-background/50 border-input focus:border-primary/50 transition-colors"
+                    />
+                ) : (
+                    <Select value={selectedPrompt} onValueChange={setSelectedPrompt}>
+                        <SelectTrigger className="w-full h-12 bg-background/50">
+                            <SelectValue placeholder="Select a saved prompt" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {purchasedPrompts.map((prompt) => (
+                                <SelectItem key={prompt.id} value={prompt.id}>{prompt.title}</SelectItem>
+                            ))}
+                            <div className="p-2 border-t border-border mt-1">
+                                <p className="text-[10px] text-muted-foreground mb-2 px-2 uppercase tracking-wider font-bold">Quick Try</p>
+                                {QUICK_PROMPTS.map(qp => (
+                                    <div
+                                        key={qp.id}
+                                        onClick={() => setSelectedPrompt(qp.id)}
+                                        className={cn("text-sm px-3 py-2 rounded-md cursor-pointer hover:bg-muted flex items-center justify-between transition-colors", selectedPrompt === qp.id && "bg-primary/5 text-primary")}
+                                    >
+                                        <span className="truncate">{qp.title}</span>
+                                        {selectedPrompt === qp.id && <Check className="h-3.5 w-3.5 shrink-0" />}
+                                    </div>
+                                ))}
+                            </div>
+                        </SelectContent>
+                    </Select>
+                )}
+            </div>
+
+            {/* Controls Grid */}
+            <div className="space-y-6 pt-2">
+                {/* Aspect Ratio */}
+                <div className="space-y-3">
+                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Aspect Ratio</label>
+                    <div className="grid grid-cols-4 gap-2">
+                        {[
+                            { id: "1:1", label: "1:1", icon: "▢" },
+                            { id: "4:5", label: "4:5", icon: "▯" },
+                            { id: "16:9", label: "16:9", icon: "▭" },
+                            { id: "9:16", label: "9:16", icon: "▮" },
+                        ].map((ratio) => (
+                            <button
+                                key={ratio.id}
+                                onClick={() => setAspectRatio(ratio.id as any)}
+                                className={cn(
+                                    "flex flex-col items-center justify-center p-3 rounded-xl border text-xs transition-all duration-200",
+                                    aspectRatio === ratio.id
+                                        ? "border-primary bg-primary/5 text-primary shadow-sm ring-1 ring-primary/20"
+                                        : "border-border bg-card/30 hover:bg-muted text-muted-foreground hover:text-foreground"
+                                )}
+                            >
+                                <span className="text-lg mb-1 leading-none opacity-80">{ratio.icon}</span>
+                                <span className="font-medium">{ratio.label}</span>
+                            </button>
                         ))}
                     </div>
                 </div>
-            </main>
 
-            <Footer />
+                {/* Styles */}
+                <div className="space-y-3">
+                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Style Preset</label>
+                    <div className="flex flex-wrap gap-2">
+                        {STYLE_PRESETS.map((style) => (
+                            <button
+                                key={style.id}
+                                onClick={() => setStylePreset(style.id)}
+                                className={cn(
+                                    "px-4 py-1.5 rounded-full text-xs font-medium border transition-all duration-200 shadow-sm",
+                                    stylePreset === style.id
+                                        ? `${style.color} ring-1 ring-current border-transparent bg-opacity-10`
+                                        : "bg-card/50 border-border hover:bg-muted text-muted-foreground hover:text-foreground"
+                                )}
+                            >
+                                {style.label}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Advanced Accordion */}
+                <div className="pt-4 border-t border-border/50">
+                    <button
+                        onClick={() => setShowSettings(!showSettings)}
+                        className="flex items-center justify-between w-full text-xs font-bold text-muted-foreground uppercase tracking-widest hover:text-primary transition-colors group"
+                    >
+                        Advanced Settings
+                        <Settings2 className={cn("h-3.5 w-3.5 transition-transform duration-300 group-hover:rotate-45", showSettings && "rotate-180 text-primary")} />
+                    </button>
+
+                    <AnimatePresence>
+                        {showSettings && (
+                            <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: "auto", opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                className="overflow-hidden space-y-6 pt-5 pb-2"
+                            >
+                                {/* Product Strength */}
+                                <div className="space-y-3">
+                                    <div className="flex justify-between items-center text-xs">
+                                        <span className="font-medium text-foreground">Product Integrity</span>
+                                        <span className="bg-muted px-2 py-0.5 rounded text-muted-foreground font-mono">{productStrength}%</span>
+                                    </div>
+                                    <Slider
+                                        value={[productStrength]}
+                                        onValueChange={([val]) => setProductStrength(val)}
+                                        max={100}
+                                        step={1}
+                                        className="py-1"
+                                    />
+                                    <p className="text-[10px] text-muted-foreground">Adjust how strictly the AI adheres to the original shape.</p>
+                                </div>
+
+                                {/* Quality & Batch */}
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-medium">Quality</label>
+                                        <div className="flex rounded-lg shadow-sm">
+                                            <button onClick={() => setQuality("standard")} className={cn("flex-1 px-2 py-1.5 text-xs font-medium rounded-l-lg border transition-colors", quality === "standard" ? "bg-primary text-primary-foreground border-primary" : "bg-card border-border hover:bg-muted")}>Std</button>
+                                            <button onClick={() => setQuality("hd")} className={cn("flex-1 px-2 py-1.5 text-xs font-medium rounded-r-lg border-y border-r transition-colors", quality === "hd" ? "bg-primary text-primary-foreground border-primary" : "bg-card border-border hover:bg-muted")}>HD</button>
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-medium">Count</label>
+                                        <div className="flex rounded-lg shadow-sm">
+                                            {[1, 2, 4].map((num) => (
+                                                <button key={num} onClick={() => setNumImages(num)} className={cn("flex-1 px-2 py-1.5 text-xs font-medium border-y border-r first:border-l first:rounded-l-lg last:rounded-r-lg transition-colors", numImages === num ? "bg-primary text-primary-foreground border-primary" : "bg-card border-border hover:bg-muted")}>{num}</button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="text-xs font-medium">Negative Prompt</label>
+                                    <Textarea
+                                        placeholder="blur, darkness, distortion..."
+                                        value={negativePrompt}
+                                        onChange={e => setNegativePrompt(e.target.value)}
+                                        className="h-20 text-xs resize-none bg-background/50"
+                                    />
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
+            </div>
+
+            {/* Generate Button */}
+            <div className="sticky bottom-0 pt-6 pb-2 bg-gradient-to-t from-background via-background to-transparent z-10">
+                <Button
+                    size="lg"
+                    className="w-full h-14 text-base font-semibold shadow-xl shadow-primary/25 btn-premium rounded-2xl hover:scale-[1.02] transition-transform duration-200"
+                    disabled={!uploadedImage || (!useCustomPrompt && !selectedPrompt) || (useCustomPrompt && !customPrompt.trim()) || isGenerating}
+                    onClick={handleGenerate}
+                >
+                    {isGenerating ? (
+                        <div className="flex items-center gap-2">
+                            <div className="h-4 w-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                            <span>Generating...</span>
+                        </div>
+                    ) : (
+                        <div className="flex items-center gap-2">
+                            <Wand2 className="h-4 w-4" />
+                            <span>Generate Studio Shot</span>
+                        </div>
+                    )}
+                </Button>
+                <div className="mt-2 h-6 flex items-center justify-center">
+                    <AnimatePresence mode="wait">
+                        {isGenerating ? (
+                            <motion.p
+                                key="status"
+                                initial={{ opacity: 0, y: 5 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -5 }}
+                                className="text-[10px] text-primary font-medium flex items-center gap-1.5"
+                            >
+                                <Zap className="h-3 w-3" /> {statusText}
+                            </motion.p>
+                        ) : (
+                            <motion.p
+                                key="ready"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                className="text-[10px] text-muted-foreground/50"
+                            >
+                                Ready to create
+                            </motion.p>
+                        )}
+                    </AnimatePresence>
+                </div>
+            </div>
+        </div>
+    );
+
+    return (
+        <div className="flex flex-col h-screen overflow-hidden bg-background text-foreground">
+            <Navbar />
+
+            <main className="flex-1 flex overflow-hidden">
+                {/* LEFT SIDEBAR - CONTROLS (Common) */}
+                <div className="w-[420px] flex-none overflow-y-auto border-r border-border bg-sidebar/50 backdrop-blur-xl p-6 custom-scrollbar relative z-20 shadow-xl lg:block hidden">
+                    <StudioSidebar inputId="desktop-upload" />
+                </div>
+
+                {/* RIGHT CANVAS - MAIN WORKSPACE */}
+                <div className="flex-1 relative flex flex-col items-center justify-center p-6 lg:p-10 overflow-hidden bg-background">
+                    {/* Subtle Grid Overlay */}
+                    <div className="absolute inset-0 opacity-[0.6] pointer-events-none grid-bg" />
+
+                    {/* Mobile Upload Drawer Trigger */}
+                    <div className="lg:hidden absolute top-4 left-4 z-50">
+                        <Sheet>
+                            <SheetTrigger asChild>
+                                <Button variant="outline" size="sm" className="bg-background/80 backdrop-blur shadow-lg border-primary/20">
+                                    <Settings2 className="h-4 w-4 mr-2" />
+                                    Studio Controls
+                                </Button>
+                            </SheetTrigger>
+                            <SheetContent side="left" className="w-[90%] sm:w-[420px] overflow-y-auto p-6 pt-10">
+                                <StudioSidebar inputId="mobile-upload" />
+                            </SheetContent>
+                        </Sheet>
+                    </div>
+
+                    {/* ... Rest of Canvas ... */}
+                    {demoMode && (
+                        <motion.div
+                            initial={{ opacity: 0, y: -20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="absolute top-4 z-20 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 backdrop-blur-md shadow-lg"
+                        >
+                            <p className="text-[10px] font-mono text-amber-600 dark:text-amber-400 font-medium flex items-center gap-2">
+                                <AlertCircle className="h-3 w-3" /> DEMO MODE: Configure REPLICATE_API_TOKEN
+                            </p>
+                        </motion.div>
+                    )}
+
+                    {/* Main Stage */}
+                    <div className="relative w-full h-full flex flex-col items-center justify-center max-w-6xl mx-auto z-10 perspective-1000">
+
+                        {isGenerating ? (
+                            /* GENERATING STATE - Scanning Animation */
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                className="relative w-full h-full flex flex-col items-center justify-center"
+                            >
+                                <div className="relative w-full h-full max-h-[80vh] aspect-square md:aspect-video rounded-2xl overflow-hidden shadow-2xl border border-primary/20 bg-background/50 backdrop-blur-sm ring-1 ring-primary/10 flex items-center justify-center">
+                                    {/* Source Image with Scanning Effect */}
+                                    {uploadedImage && (
+                                        <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
+                                            <img
+                                                src={uploadedImage || ""}
+                                                alt="Processing"
+                                                className="max-w-full max-h-full object-contain opacity-50 blur-sm scale-105 transition-all duration-[20s] ease-linear"
+                                                style={{ filter: 'grayscale(100%) contrast(1.2) brightness(0.8)' }}
+                                            />
+                                            {/* Scanning Laser */}
+                                            <motion.div
+                                                initial={{ top: "-10%" }}
+                                                animate={{ top: "110%" }}
+                                                transition={{ repeat: Infinity, duration: 2.5, ease: "linear" }}
+                                                className="absolute left-0 right-0 h-1 bg-primary shadow-[0_0_20px_rgba(59,130,246,0.8)] z-10"
+                                            />
+                                            <motion.div
+                                                initial={{ top: "-10%", opacity: 0 }}
+                                                animate={{ top: "110%", opacity: [0, 0.5, 0] }}
+                                                transition={{ repeat: Infinity, duration: 2.5, ease: "linear" }}
+                                                className="absolute left-0 right-0 h-20 bg-gradient-to-b from-primary/0 via-primary/10 to-primary/0 z-0"
+                                            />
+                                        </div>
+                                    )}
+
+                                    {/* Central Status loader */}
+                                    <div className="absolute inset-0 flex flex-col items-center justify-center z-20">
+                                        <div className="relative">
+                                            <div className="absolute inset-0 bg-background/80 backdrop-blur-xl rounded-full blur-xl" />
+                                            <div className="relative w-24 h-24 rounded-full bg-background/80 backdrop-blur-md border border-primary/20 flex items-center justify-center shadow-[0_0_30px_rgba(59,130,246,0.2)]">
+                                                <div className="absolute inset-0 border-t-2 border-primary rounded-full animate-spin" />
+                                                <Sparkles className="h-8 w-8 text-primary animate-pulse" />
+                                            </div>
+                                        </div>
+                                        <div className="mt-8 px-6 py-2 rounded-full bg-background/80 backdrop-blur-md border border-primary/20 shadow-lg relative overflow-hidden">
+                                            <motion.div
+                                                className="absolute inset-0 bg-primary/5"
+                                                initial={{ x: "-100%" }}
+                                                animate={{ x: "100%" }}
+                                                transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
+                                            />
+                                            <p className="text-sm font-medium text-primary flex items-center gap-2 relative z-10">
+                                                <Zap className="h-3.5 w-3.5 fill-primary" />
+                                                {statusText}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        ) : generatedImage ? (
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.9, rotateX: 10 }}
+                                animate={{ opacity: 1, scale: 1, rotateX: 0 }}
+                                transition={{ type: "spring", bounce: 0.2, duration: 0.8 }}
+                                className="relative w-full h-full flex flex-col items-center justify-center"
+                            >
+                                <div
+                                    className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl border border-border/50 bg-card/40 backdrop-blur-xl ring-1 ring-white/10"
+                                    style={{ maxHeight: 'calc(100vh - 160px)' }}
+                                >
+                                    {uploadedImage && showComparison ? (
+                                        <ComparisonSlider original={uploadedImage || ""} generated={generatedImage || ""} />
+                                    ) : (
+                                        <img src={generatedImage || ""} alt="Result" className="w-full h-full object-contain" />
+                                    )}
+                                </div>
+
+                                {/* Floating Toolbar */}
+                                <motion.div
+                                    initial={{ y: 40, opacity: 0 }}
+                                    animate={{ y: 0, opacity: 1 }}
+                                    transition={{ delay: 0.4, type: "spring" }}
+                                    className="absolute bottom-8 flex items-center gap-1.5 p-1.5 rounded-full bg-background/90 backdrop-blur-xl border border-border shadow-2xl ring-1 ring-white/5"
+                                >
+                                    <Button size="sm" onClick={handleDownload} className="rounded-full px-5 btn-premium h-10 font-medium shadow-lg shadow-primary/20">
+                                        <Download className="h-4 w-4 mr-2" /> Download
+                                    </Button>
+                                    <div className="w-px h-4 bg-border/50 mx-1.5" />
+                                    {uploadedImage && (
+                                        <Button
+                                            variant={showComparison ? "secondary" : "ghost"}
+                                            size="icon"
+                                            onClick={() => setShowComparison(!showComparison)}
+                                            className={cn("rounded-full h-10 w-10 transition-colors", showComparison ? "bg-muted text-foreground" : "text-muted-foreground hover:text-foreground")}
+                                            title="Toggle Comparison"
+                                        >
+                                            <SplitSquareHorizontal className="h-4 w-4" />
+                                        </Button>
+                                    )}
+                                    <Button variant="ghost" size="icon" onClick={handleCopyImage} className="rounded-full h-10 w-10 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"><Copy className="h-4 w-4" /></Button>
+                                    <Button variant="ghost" size="icon" className="rounded-full h-10 w-10 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"><Share2 className="h-4 w-4" /></Button>
+                                    <Button variant="ghost" size="icon" className="rounded-full h-10 w-10 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"><Maximize2 className="h-4 w-4" /></Button>
+                                </motion.div>
+                            </motion.div>
+                        ) : (
+                            /* Empty State / Drop Zone */
+                            <div
+                                className={cn(
+                                    "group flex flex-col items-center justify-center w-full max-w-3xl aspect-video rounded-[2rem] border-2 border-dashed transition-all duration-500 ease-out relative overflow-hidden",
+                                    isDragging
+                                        ? "border-primary bg-primary/5 scale-[1.02] shadow-2xl shadow-primary/10"
+                                        : "border-border/40 hover:border-primary/30 hover:bg-card/30 backdrop-blur-sm"
+                                )}
+                                onDragOver={handleDragOver}
+                                onDragLeave={handleDragLeave}
+                                onDrop={handleDrop}
+                            >
+                                {/* Animated Background Elements */}
+                                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+
+                                <div className="relative z-10 flex flex-col items-center text-center p-8">
+                                    <div className="h-24 w-24 rounded-full bg-gradient-to-b from-muted to-background border border-white/10 shadow-xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-500">
+                                        <Sparkles className="h-10 w-10 text-primary drop-shadow-lg" />
+                                    </div>
+                                    <h2 className="text-3xl font-display font-medium mb-3 text-foreground tracking-tight">
+                                        Start Your <span className="gradient-text">Creation</span>
+                                    </h2>
+                                    <p className="text-muted-foreground text-lg max-w-md mb-10 leading-relaxed">
+                                        Drag and drop your product image here to begin the transformation.
+                                    </p>
+                                    <Button
+                                        size="lg"
+                                        variant="outline"
+                                        className="h-12 px-8 rounded-full border-primary/20 hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-300 shadow-md"
+                                        onClick={() => document.querySelector<HTMLInputElement>('input[type="file"]')?.click()}
+                                    >
+                                        <Upload className="h-4 w-4 mr-2" />
+                                        Select Image
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </main>
         </div>
     );
 }

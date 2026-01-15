@@ -97,7 +97,7 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
-              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-display font-bold leading-[0.9] tracking-tight mb-8"
+              className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-display font-bold leading-[0.9] tracking-tight mb-8"
             >
               <span className="block">Product photos</span>
               <span className="block text-neon">reimagined.</span>
@@ -140,14 +140,14 @@ export default function HomePage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.4 }}
-              className="flex gap-12"
+              className="flex flex-wrap gap-6 sm:gap-8 md:gap-12"
             >
               {stats.map((stat) => (
                 <div key={stat.label} className="stat-card p-0 text-left">
-                  <div className="text-4xl md:text-5xl font-bold text-neon-subtle mb-1">
+                  <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-neon-subtle mb-1">
                     {stat.value}
                   </div>
-                  <div className="text-sm text-muted-foreground uppercase tracking-wider">
+                  <div className="text-xs sm:text-sm text-muted-foreground uppercase tracking-wider">
                     {stat.label}
                   </div>
                 </div>

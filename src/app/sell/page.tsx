@@ -20,6 +20,8 @@ import {
     Plus,
     X,
 } from "lucide-react";
+import Image from "next/image";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -176,6 +178,58 @@ export default function SellPage() {
         setValue(
             "tags",
             watchedValues.tags.filter((tag) => tag !== tagToRemove)
+        );
+    };
+
+    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        if (watchedValues.exampleImages.length >= 5) {
+            toast.error("Maximum 5 images allowed");
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const img = new window.Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+
+                // Resize if larger than 800px
+                const MAX_SIZE = 800;
+                if (width > MAX_SIZE || height > MAX_SIZE) {
+                    if (width > height) {
+                        height *= MAX_SIZE / width;
+                        width = MAX_SIZE;
+                    } else {
+                        width *= MAX_SIZE / height;
+                        height = MAX_SIZE;
+                    }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx?.drawImage(img, 0, 0, width, height);
+
+                // Compress to JPEG 0.7 quality
+                const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+
+                setValue("exampleImages", [...watchedValues.exampleImages, compressedBase64]);
+                toast.success("Image uploaded!");
+            };
+            img.src = event.target?.result as string;
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const handleRemoveImage = (indexToRemove: number) => {
+        setValue(
+            "exampleImages",
+            watchedValues.exampleImages.filter((_, index) => index !== indexToRemove)
         );
     };
 
@@ -475,28 +529,48 @@ export default function SellPage() {
                                             )}
                                         </div>
 
-                                        {/* Example Images */}
                                         <div className="space-y-2">
-                                            <Label>Example Images</Label>
+                                            <Label>Example Images ({watchedValues.exampleImages.length}/5)</Label>
                                             <p className="text-sm text-muted-foreground mb-2">
                                                 Upload up to 5 images showing results from your prompt
                                             </p>
                                             <div className="grid grid-cols-3 gap-4">
-                                                {[...Array(5)].map((_, i) => (
-                                                    <div
-                                                        key={i}
-                                                        className="aspect-square rounded-lg border-2 border-dashed border-border flex items-center justify-center bg-muted/50 hover:bg-muted transition-colors cursor-pointer"
-                                                    >
-                                                        <Plus className="h-6 w-6 text-muted-foreground" />
+                                                {watchedValues.exampleImages.map((img, index) => (
+                                                    <div key={index} className="relative aspect-square rounded-lg overflow-hidden border border-border group bg-muted">
+                                                        <Image
+                                                            src={img}
+                                                            alt={`Example ${index + 1}`}
+                                                            fill
+                                                            className="object-cover"
+                                                        />
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleRemoveImage(index)}
+                                                            className="absolute top-1 right-1 bg-black/60 hover:bg-destructive text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-all transform scale-90 hover:scale-100"
+                                                        >
+                                                            <X className="h-3 w-3" />
+                                                        </button>
                                                     </div>
                                                 ))}
+
+                                                {watchedValues.exampleImages.length < 5 && (
+                                                    <label className="aspect-square rounded-lg border-2 border-dashed border-border flex flex-col items-center justify-center bg-muted/30 hover:bg-muted/50 hover:border-primary/50 transition-all cursor-pointer group">
+                                                        <input
+                                                            type="file"
+                                                            className="hidden"
+                                                            accept="image/*"
+                                                            onChange={handleImageUpload}
+                                                        />
+                                                        <div className="h-10 w-10 rounded-full bg-muted group-hover:bg-background flex items-center justify-center mb-2 transition-colors border border-transparent group-hover:border-border">
+                                                            <Plus className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                                                        </div>
+                                                        <span className="text-xs text-muted-foreground font-medium">Upload</span>
+                                                    </label>
+                                                )}
                                             </div>
                                             {errors.exampleImages && (
                                                 <p className="text-sm text-destructive">{errors.exampleImages.message}</p>
                                             )}
-                                            <p className="text-xs text-muted-foreground">
-                                                Note: Image upload will be functional once Uploadthing is configured
-                                            </p>
                                         </div>
                                     </motion.div>
                                 )}

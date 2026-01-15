@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { MarketplaceFilters } from "@/components/marketplace/filters";
-import { PromptCard } from "@/components/marketplace/prompt-card";
+import { PromptGrid } from "@/components/marketplace/prompt-grid";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { PromptCardData } from "@/types";
@@ -178,10 +178,8 @@ export default async function MarketplacePage({ searchParams }: MarketplacePageP
                             </p>
                         </div>
                     ) : (
-                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                            {prompts.map((prompt) => (
-                                <PromptCard key={prompt.id} prompt={prompt} />
-                            ))}
+                        <div className="grid-cols-1">
+                            <PromptGrid prompts={prompts} />
                         </div>
                     )}
                 </div>
