@@ -77,11 +77,16 @@ export function Navbar() {
                 initial={{ y: -100 }}
                 animate={{ y: 0 }}
                 className={cn(
-                    "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-                    isScrolled ? "glass-strong shadow-lg" : "bg-transparent"
+                    "fixed z-50 transition-all duration-500",
+                    isScrolled
+                        ? "top-4 left-4 right-4 mx-auto max-w-6xl rounded-2xl glass-strong shadow-xl border border-neon/10"
+                        : "top-0 left-0 right-0 bg-transparent"
                 )}
             >
-                <nav className="section-container">
+                <nav className={cn(
+                    "transition-all duration-300",
+                    isScrolled ? "px-6" : "section-container"
+                )}>
                     <div className="flex h-16 items-center justify-between gap-4">
                         {/* Logo */}
                         <Link href="/" className="shrink-0">

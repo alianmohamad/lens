@@ -48,7 +48,7 @@ export default function HomePage() {
   const y = useTransform(scrollYProgress, [0, 1], [0, -100]);
 
   return (
-    <div ref={containerRef} className="min-h-screen bg-background text-foreground overflow-hidden">
+    <div ref={containerRef} className="min-h-screen bg-background text-foreground overflow-x-hidden">
       <Navbar />
 
       {/* Background Mesh */}
@@ -76,9 +76,9 @@ export default function HomePage() {
       />
 
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center pt-20">
-        <div className="section-container relative z-10 py-20">
-          <div className="max-w-6xl">
+      <section className="relative min-h-screen flex items-center pt-8">
+        <div className="section-container w-full relative z-10 py-12 flex flex-col xl:flex-row xl:items-center xl:justify-between gap-12">
+          <div className="max-w-4xl">
             {/* Eyebrow */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -97,7 +97,7 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
-              className="text-[clamp(3rem,10vw,8rem)] font-display font-bold leading-[0.9] tracking-tight mb-8"
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-display font-bold leading-[0.9] tracking-tight mb-8"
             >
               <span className="block">Product photos</span>
               <span className="block text-neon">reimagined.</span>
@@ -154,41 +154,40 @@ export default function HomePage() {
               ))}
             </motion.div>
           </div>
-        </div>
 
-        {/* Floating badge */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5, delay: 0.6 }}
-          style={{ y }}
-          className="hidden lg:flex absolute right-12 top-1/2 -translate-y-1/2"
-        >
-          <div className="bento-card p-6 w-72">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-full bg-neon/20 flex items-center justify-center">
-                <Star className="w-5 h-5 text-neon" />
-              </div>
-              <div>
-                <div className="font-semibold">4.9/5 Rating</div>
-                <div className="text-sm text-muted-foreground">2,000+ reviews</div>
-              </div>
-            </div>
-            <div className="flex -space-x-2">
-              {["SC", "MW", "ET", "JD", "AK"].map((initials) => (
-                <div
-                  key={initials}
-                  className="w-8 h-8 rounded-full bg-muted border-2 border-background flex items-center justify-center text-xs font-medium"
-                >
-                  {initials}
+          {/* Floating badge - Desktop only */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.6 }}
+            className="hidden xl:block shrink-0"
+          >
+            <div className="bento-card p-6 w-72">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-full bg-neon/20 flex items-center justify-center">
+                  <Star className="w-5 h-5 text-neon" />
                 </div>
-              ))}
-              <div className="w-8 h-8 rounded-full bg-neon/20 border-2 border-background flex items-center justify-center text-xs text-neon">
-                +2k
+                <div>
+                  <div className="font-semibold">4.9/5 Rating</div>
+                  <div className="text-sm text-muted-foreground">2,000+ reviews</div>
+                </div>
+              </div>
+              <div className="flex -space-x-2">
+                {["SC", "MW", "ET", "JD", "AK"].map((initials) => (
+                  <div
+                    key={initials}
+                    className="w-8 h-8 rounded-full bg-muted border-2 border-background flex items-center justify-center text-xs font-medium"
+                  >
+                    {initials}
+                  </div>
+                ))}
+                <div className="w-8 h-8 rounded-full bg-neon/20 border-2 border-background flex items-center justify-center text-xs text-neon">
+                  +2k
+                </div>
               </div>
             </div>
-          </div>
-        </motion.div>
+          </motion.div>
+        </div>
       </section>
 
       {/* Bento Grid Section */}
