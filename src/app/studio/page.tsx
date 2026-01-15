@@ -805,7 +805,7 @@ export default function StudioPage() {
                             /* Empty State / Drop Zone */
                             <div
                                 className={cn(
-                                    "group flex flex-col items-center justify-center w-full max-w-3xl aspect-video rounded-[2rem] border-2 border-dashed transition-all duration-500 ease-out relative overflow-hidden",
+                                    "group flex flex-col items-center justify-center w-full max-w-3xl aspect-auto md:aspect-video min-h-[500px] md:min-h-0 rounded-[2rem] border-2 border-dashed transition-all duration-500 ease-out relative overflow-hidden",
                                     isDragging
                                         ? "border-primary bg-primary/5 scale-[1.02] shadow-2xl shadow-primary/10"
                                         : "border-border/40 hover:border-primary/30 hover:bg-card/30 backdrop-blur-sm"
@@ -817,14 +817,14 @@ export default function StudioPage() {
                                 {/* Animated Background Elements */}
                                 <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 
-                                <div className="relative z-10 flex flex-col items-center text-center p-8">
-                                    <div className="h-24 w-24 rounded-full bg-gradient-to-b from-muted to-background border border-white/10 shadow-xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-500">
-                                        <Sparkles className="h-10 w-10 text-primary drop-shadow-lg" />
+                                <div className="relative z-10 flex flex-col items-center text-center p-6 md:p-8">
+                                    <div className="h-20 w-20 md:h-24 md:w-24 rounded-full bg-gradient-to-b from-muted to-background border border-white/10 shadow-xl flex items-center justify-center mb-6 md:mb-8 group-hover:scale-110 transition-transform duration-500">
+                                        <Sparkles className="h-8 w-8 md:h-10 md:w-10 text-primary drop-shadow-lg" />
                                     </div>
-                                    <h2 className="text-3xl font-display font-medium mb-3 text-foreground tracking-tight">
+                                    <h2 className="text-2xl md:text-3xl font-display font-medium mb-3 text-foreground tracking-tight">
                                         Start Your <span className="gradient-text">Creation</span>
                                     </h2>
-                                    <p className="text-muted-foreground text-lg max-w-md mb-10 leading-relaxed">
+                                    <p className="text-muted-foreground text-base md:text-lg max-w-md mb-8 md:mb-10 leading-relaxed">
                                         Drag and drop your product image here to begin the transformation.
                                     </p>
                                     <Button
@@ -841,7 +841,7 @@ export default function StudioPage() {
                         )}
                     </div>
                 </div>
-            </main>
-        </div>
+            </main >
+        </div >
     );
 }
