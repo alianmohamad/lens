@@ -130,20 +130,7 @@ function PromptGridSkeleton() {
 
 export default async function MarketplacePage({ searchParams }: MarketplacePageProps) {
     const resolvedParams = await searchParams;
-
-    let prompts: PromptCardData[] = [];
-    let total: number = 0;
-
-    try {
-        const data = await getPrompts(resolvedParams);
-        prompts = data.prompts;
-        total = data.total;
-    } catch (error) {
-        console.error("Failed to fetch prompts:", error);
-        // Fallback to empty state
-        prompts = [];
-        total = 0;
-    }
+    const { prompts, total } = await getPrompts(resolvedParams);
 
     return (
         <div className="min-h-screen">
