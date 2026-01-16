@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -147,9 +148,13 @@ export function Navbar() {
                                         <Button
                                             variant="ghost"
                                             size="icon"
-                                            className="rounded-lg hover:bg-muted hover:text-foreground transition-colors text-base"
+                                            className="rounded-lg hover:bg-muted hover:text-foreground transition-colors"
                                         >
-                                            {language === "en" ? "🇦🇺" : "🇸🇾"}
+                                            {language === "en" ? (
+                                                <span className="text-base">🇦🇺</span>
+                                            ) : (
+                                                <Image src="/Flags/sy.webp" alt="Syrian flag" width={20} height={15} className="rounded-sm" />
+                                            )}
                                         </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end" className="w-36">
@@ -160,8 +165,8 @@ export function Navbar() {
                                             <DropdownMenuRadioItem value="en">
                                                 <span className="mr-2">🇦🇺</span> English
                                             </DropdownMenuRadioItem>
-                                            <DropdownMenuRadioItem value="ar">
-                                                <span className="mr-2">🇸🇾</span> العربية
+                                            <DropdownMenuRadioItem value="ar" className="flex items-center">
+                                                <Image src="/Flags/sy.webp" alt="Syrian flag" width={16} height={12} className="mr-2 rounded-sm" /> العربية
                                             </DropdownMenuRadioItem>
                                         </DropdownMenuRadioGroup>
                                     </DropdownMenuContent>
@@ -331,7 +336,7 @@ export function Navbar() {
                                                     : "text-muted-foreground hover:text-foreground hover:bg-muted"
                                             )}
                                         >
-                                            <span>🇸🇾</span> AR
+                                            <Image src="/Flags/sy.webp" alt="Syrian flag" width={16} height={12} className="rounded-sm" /> AR
                                         </button>
                                     </div>
                                 </div>
