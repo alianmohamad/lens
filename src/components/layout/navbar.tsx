@@ -26,12 +26,15 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
+    DropdownMenuRadioGroup,
+    DropdownMenuRadioItem,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { useCartStore } from "@/stores/cart-store";
+import { useLanguageStore } from "@/stores/language-store";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
@@ -48,6 +51,7 @@ export function Navbar() {
     const { data: session, status } = useSession();
     const { theme, setTheme } = useTheme();
     const { items, openCart } = useCartStore();
+    const { language, setLanguage } = useLanguageStore();
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
@@ -134,6 +138,34 @@ export function Navbar() {
                                         <Moon className="h-5 w-5" />
                                     )}
                                 </Button>
+                            )}
+
+                            {/* Language Switcher */}
+                            {mounted && (
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="rounded-lg hover:bg-muted hover:text-foreground transition-colors text-base"
+                                        >
+                                            {language === "en" ? "🇦🇺" : "🇸🇾"}
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end" className="w-36">
+                                        <DropdownMenuRadioGroup
+                                            value={language}
+                                            onValueChange={(value) => setLanguage(value as "en" | "ar")}
+                                        >
+                                            <DropdownMenuRadioItem value="en">
+                                                <span className="mr-2">🇦🇺</span> English
+                                            </DropdownMenuRadioItem>
+                                            <DropdownMenuRadioItem value="ar">
+                                                <span className="mr-2">🇸🇾</span> العربية
+                                            </DropdownMenuRadioItem>
+                                        </DropdownMenuRadioGroup>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
                             )}
 
                             {/* Cart Button */}
@@ -273,6 +305,36 @@ export function Navbar() {
                                         </Link>
                                     );
                                 })}
+
+                                {/* Language Switcher - Mobile */}
+                                <div className="my-2 border-t border-border" />
+                                <div className="flex items-center gap-2 px-4 py-2">
+                                    <span className="text-sm text-muted-foreground">Language:</span>
+                                    <div className="flex gap-2 ml-auto">
+                                        <button
+                                            onClick={() => setLanguage("en")}
+                                            className={cn(
+                                                "px-3 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-1.5",
+                                                language === "en"
+                                                    ? "bg-primary/10 text-primary"
+                                                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                                            )}
+                                        >
+                                            <span>🇦🇺</span> EN
+                                        </button>
+                                        <button
+                                            onClick={() => setLanguage("ar")}
+                                            className={cn(
+                                                "px-3 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-1.5",
+                                                language === "ar"
+                                                    ? "bg-primary/10 text-primary"
+                                                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                                            )}
+                                        >
+                                            <span>🇸🇾</span> AR
+                                        </button>
+                                    </div>
+                                </div>
 
                                 {!session && (
                                     <>

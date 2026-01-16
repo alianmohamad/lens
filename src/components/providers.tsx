@@ -5,6 +5,7 @@ import { SessionProvider } from "next-auth/react";
 import { ThemeProvider } from "next-themes";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "sonner";
+import { LanguageProvider } from "@/components/providers/language-provider";
 
 interface ProvidersProps {
     children: ReactNode;
@@ -32,7 +33,9 @@ export function Providers({ children }: ProvidersProps) {
                     enableSystem
                     disableTransitionOnChange
                 >
-                    {children}
+                    <LanguageProvider>
+                        {children}
+                    </LanguageProvider>
                     <Toaster
                         position="bottom-right"
                         richColors
