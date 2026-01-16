@@ -9,13 +9,12 @@ import {
     ShoppingBag,
     TrendingUp,
     Settings,
-    Image,
+    Image as ImageIcon,
     Store,
     DollarSign,
     Star,
     Package,
     ArrowRight,
-    ArrowUpRight,
     Clock,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -257,7 +256,7 @@ export default function DashboardPage() {
                         ) : (
                             <Button className="btn-premium" asChild>
                                 <Link href="/studio">
-                                    <Image className="h-4 w-4 mr-2" />
+                                    <ImageIcon className="h-4 w-4 mr-2" />
                                     Go to Studio
                                 </Link>
                             </Button>
@@ -451,7 +450,7 @@ export default function DashboardPage() {
                                                 <p className="text-2xl font-bold">{buyerStats?.totalGenerations || 0}</p>
                                             </div>
                                             <div className="h-12 w-12 rounded-xl bg-cyan-500/10 flex items-center justify-center">
-                                                <Image className="h-6 w-6 text-cyan-500" />
+                                                <ImageIcon className="h-6 w-6 text-cyan-500" />
                                             </div>
                                         </div>
                                         <Link
@@ -610,7 +609,7 @@ export default function DashboardPage() {
                                     href="/studio"
                                     className="p-4 rounded-xl border border-border hover:border-primary/50 hover:bg-muted/50 transition-all group"
                                 >
-                                    <Image className="h-8 w-8 text-primary mb-3" />
+                                    <ImageIcon className="h-8 w-8 text-primary mb-3" />
                                     <h3 className="font-semibold mb-1 group-hover:text-primary transition-colors">
                                         Open Studio
                                     </h3>

@@ -129,7 +129,7 @@ function CartContent() {
                                 Checkout Canceled
                             </h3>
                             <p className="text-sm text-muted-foreground">
-                                Your cart items are still saved. Continue when you're ready.
+                                Your cart items are still saved. Continue when you&apos;re ready.
                             </p>
                         </div>
                     </div>

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Sparkles, Github, Twitter, Linkedin, Mail } from "lucide-react";
+import { Github, Twitter, Linkedin, Mail } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
 const footerLinks = {

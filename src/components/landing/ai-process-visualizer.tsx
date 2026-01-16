@@ -104,7 +104,9 @@ export function AIProcessVisualizer() {
     if (!isPlaying || currentStep < 0) return;
 
     if (currentStep >= processSteps.length) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsPlaying(false);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsComplete(true);
       return;
     }

@@ -92,7 +92,7 @@ export default function ForgotPasswordPage() {
                                 Check your email
                             </h1>
                             <p className="text-muted-foreground mb-6">
-                                If an account exists with that email address, we've sent you
+                                If an account exists with that email address, we&apos;ve sent you
                                 instructions to reset your password.
                             </p>
                             <div className="space-y-3">
@@ -100,7 +100,7 @@ export default function ForgotPasswordPage() {
                                     <Link href="/sign-in">Return to Sign In</Link>
                                 </Button>
                                 <p className="text-sm text-muted-foreground">
-                                    Didn't receive the email?{" "}
+                                    Didn&apos;t receive the email?{" "}
                                     <button
                                         onClick={() => setIsSubmitted(false)}
                                         className="text-primary hover:underline"
@@ -118,7 +118,7 @@ export default function ForgotPasswordPage() {
                                     Forgot your password?
                                 </h1>
                                 <p className="text-muted-foreground">
-                                    Enter your email address and we'll send you instructions to
+                                    Enter your email address and we&apos;ll send you instructions to
                                     reset your password.
                                 </p>
                             </div>
@@ -198,7 +198,7 @@ export default function ForgotPasswordPage() {
                         Secure Password Reset
                     </h2>
                     <p className="text-white/80 max-w-md">
-                        We'll send you a secure link to reset your password. The link
+                        We&apos;ll send you a secure link to reset your password. The link
                         will expire after 24 hours for your security.
                     </p>
                 </div>

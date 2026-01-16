@@ -374,7 +374,7 @@ export default function SignUpPage() {
                         Join Our Community
                     </h2>
                     <p className="text-white/80 max-w-md mb-8">
-                        Whether you're buying prompts to enhance your product photos or selling
+                        Whether you&apos;re buying prompts to enhance your product photos or selling
                         your expertise to earn passive income, ZeroLens is your platform.
                     </p>
 

@@ -587,7 +587,7 @@ export default function SellPage() {
                                         <div>
                                             <h2 className="text-xl font-semibold mb-1">Set Your Price</h2>
                                             <p className="text-sm text-muted-foreground">
-                                                You'll earn 70% of every sale
+                                                You&apos;ll earn 70% of every sale
                                             </p>
                                         </div>
 

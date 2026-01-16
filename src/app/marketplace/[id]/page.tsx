@@ -159,7 +159,7 @@ export default async function PromptDetailPage({ params }: PromptDetailPageProps
                         {/* What's Included */}
                         <Card>
                             <CardHeader>
-                                <CardTitle>What's Included</CardTitle>
+                                <CardTitle>What&apos;s Included</CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <ul className="space-y-3">

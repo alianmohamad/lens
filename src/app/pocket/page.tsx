@@ -9,11 +9,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
     Bookmark,
     Trash2,
-    ExternalLink,
     ShoppingCart,
     Sparkles,
     Star,
-    Clock,
     Plus,
     Copy,
     PenTool,
@@ -21,14 +19,13 @@ import {
     Lock,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { useCartStore } from "@/stores/cart-store";
-import { formatPrice } from "@/lib/stripe";
 import { CATEGORY_LABELS } from "@/types";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -75,6 +72,11 @@ interface CustomPromptData {
     image?: string | null;
     isPublic: boolean;
     createdAt: string;
+}
+
+interface HistoryImage {
+    id: string;
+    generatedUrl: string;
 }
 
 function formatTimeAgo(dateString: string): string {
@@ -137,7 +139,7 @@ export default function PocketPage() {
 
     // Image Generation/Selection State
     const [activeImageTab, setActiveImageTab] = useState("upload");
-    const [historyImages, setHistoryImages] = useState<any[]>([]);
+    const [historyImages, setHistoryImages] = useState<HistoryImage[]>([]);
     const [isLoadingHistory, setIsLoadingHistory] = useState(false);
     const [isGenerating, setIsGenerating] = useState(false);
     const [generationReferenceImage, setGenerationReferenceImage] = useState("");
@@ -747,9 +749,9 @@ export default function PocketPage() {
                                                     <div className="flex flex-col sm:flex-row gap-4 p-4">
                                                         {/* Thumbnail Image */}
                                                         <div className="shrink-0 relative h-32 w-full sm:w-48 rounded-lg overflow-hidden bg-muted border border-border/50">
-                                                            {(custom as any).image ? (
+                                                            {custom.image ? (
                                                                 <Image
-                                                                    src={(custom as any).image}
+                                                                    src={custom.image}
                                                                     alt={custom.title}
                                                                     fill
                                                                     className="object-cover transition-transform duration-500 group-hover:scale-110"

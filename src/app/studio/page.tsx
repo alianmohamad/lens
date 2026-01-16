@@ -493,15 +493,15 @@ export default function StudioPage() {
                 <div className="space-y-3">
                     <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Aspect Ratio</label>
                     <div className="grid grid-cols-4 gap-2">
-                        {[
+                        {([
                             { id: "1:1", label: "1:1", icon: "▢" },
                             { id: "4:5", label: "4:5", icon: "▯" },
                             { id: "16:9", label: "16:9", icon: "▭" },
                             { id: "9:16", label: "9:16", icon: "▮" },
-                        ].map((ratio) => (
+                        ] as const).map((ratio) => (
                             <button
                                 key={ratio.id}
-                                onClick={() => setAspectRatio(ratio.id as any)}
+                                onClick={() => setAspectRatio(ratio.id)}
                                 className={cn(
                                     "flex flex-col items-center justify-center p-3 rounded-xl border text-xs transition-all duration-200",
                                     aspectRatio === ratio.id

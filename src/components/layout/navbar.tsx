@@ -9,7 +9,6 @@ import {
     Menu,
     X,
     ShoppingCart,
-    User,
     LogOut,
     Settings,
     LayoutDashboard,
@@ -52,6 +51,7 @@ export function Navbar() {
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setMounted(true);
     }, []);
 
@@ -66,6 +66,7 @@ export function Navbar() {
 
     // Close mobile menu on route change
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setIsMobileMenuOpen(false);
     }, [pathname]);
 

@@ -190,7 +190,8 @@ export async function POST(request: NextRequest) {
                         text: `You are a professional product photographer AI. ${integrityInstruction} Generate a high-quality product photograph based on the provided product image, applying the styling, background, lighting, and composition described in the prompt. The output should be suitable for e-commerce use. Output resolution: ${quality === 'hd' ? 'high definition' : 'standard'}.`
                     }]
                 },
-            } as any);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any);
 
             const response = await result.response;
 
@@ -205,6 +206,7 @@ export async function POST(request: NextRequest) {
             }
 
             // Find the image part
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const imagePart = candidate.content.parts.find((part: any) => part.inlineData);
             if (!imagePart || !imagePart.inlineData) {
                 throw new Error("No image data in response");

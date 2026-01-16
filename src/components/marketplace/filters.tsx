@@ -7,7 +7,6 @@ import {
     Search,
     SlidersHorizontal,
     X,
-    ChevronDown,
     Star,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
