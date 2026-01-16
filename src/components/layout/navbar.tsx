@@ -151,9 +151,9 @@ export function Navbar() {
                                             className="rounded-lg hover:bg-muted hover:text-foreground transition-colors"
                                         >
                                             {language === "en" ? (
-                                                <span className="text-base">🇦🇺</span>
+                                                <Image src="/Flags/au.svg" alt="Australian flag" width={24} height={16} />
                                             ) : (
-                                                <Image src="/Flags/sy.png" alt="Syrian flag" width={24} height={16} className="" />
+                                                <Image src="/Flags/sy.png" alt="Syrian flag" width={24} height={16} />
                                             )}
                                         </Button>
                                     </DropdownMenuTrigger>
@@ -162,8 +162,8 @@ export function Navbar() {
                                             value={language}
                                             onValueChange={(value) => setLanguage(value as "en" | "ar")}
                                         >
-                                            <DropdownMenuRadioItem value="en">
-                                                <span className="mr-2">🇦🇺</span> English
+                                            <DropdownMenuRadioItem value="en" className="flex items-center">
+                                                <Image src="/Flags/au.svg" alt="Australian flag" width={18} height={12} className="mr-2" /> English
                                             </DropdownMenuRadioItem>
                                             <DropdownMenuRadioItem value="ar" className="flex items-center">
                                                 <Image src="/Flags/sy.png" alt="Syrian flag" width={18} height={12} className="mr-2" /> العربية
@@ -325,7 +325,7 @@ export function Navbar() {
                                                     : "text-muted-foreground hover:text-foreground hover:bg-muted"
                                             )}
                                         >
-                                            <span>🇦🇺</span> EN
+                                            <Image src="/Flags/au.svg" alt="Australian flag" width={18} height={12} /> EN
                                         </button>
                                         <button
                                             onClick={() => setLanguage("ar")}
