@@ -153,7 +153,7 @@ export function Navbar() {
                                             {language === "en" ? (
                                                 <span className="text-base">🇦🇺</span>
                                             ) : (
-                                                <Image src="/Flags/sy.webp" alt="Syrian flag" width={20} height={15} className="rounded-sm" />
+                                                <Image src="/Flags/sy.png" alt="Syrian flag" width={20} height={15} className="rounded-sm" />
                                             )}
                                         </Button>
                                     </DropdownMenuTrigger>
@@ -166,7 +166,7 @@ export function Navbar() {
                                                 <span className="mr-2">🇦🇺</span> English
                                             </DropdownMenuRadioItem>
                                             <DropdownMenuRadioItem value="ar" className="flex items-center">
-                                                <Image src="/Flags/sy.webp" alt="Syrian flag" width={16} height={12} className="mr-2 rounded-sm" /> العربية
+                                                <Image src="/Flags/sy.png" alt="Syrian flag" width={16} height={12} className="mr-2 rounded-sm" /> العربية
                                             </DropdownMenuRadioItem>
                                         </DropdownMenuRadioGroup>
                                     </DropdownMenuContent>
@@ -336,7 +336,7 @@ export function Navbar() {
                                                     : "text-muted-foreground hover:text-foreground hover:bg-muted"
                                             )}
                                         >
-                                            <Image src="/Flags/sy.webp" alt="Syrian flag" width={16} height={12} className="rounded-sm" /> AR
+                                            <Image src="/Flags/sy.png" alt="Syrian flag" width={16} height={12} className="rounded-sm" /> AR
                                         </button>
                                     </div>
                                 </div>
