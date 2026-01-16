@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState, useRef, useCallback, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Brain, Scan, Palette, Sparkles, Check, Cpu } from "lucide-react";
+import { Brain, Scan, Palette, Sparkles, Check, Play, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // Process steps
@@ -10,72 +10,78 @@ const processSteps = [
   {
     id: "analyze",
     icon: Scan,
-    title: "Analyzing Image",
-    description: "Detecting product boundaries, materials & lighting",
-    duration: 2000,
+    title: "Analyzing",
+    description: "Detecting product boundaries & materials",
+    duration: 1200,
   },
   {
     id: "understand",
     icon: Brain,
-    title: "Understanding Context",
-    description: "Identifying product type, texture & optimal angles",
-    duration: 2000,
+    title: "Understanding",
+    description: "Identifying texture & optimal angles",
+    duration: 1200,
   },
   {
     id: "enhance",
     icon: Palette,
-    title: "Applying Enhancements",
-    description: "Studio lighting, shadow correction & color grading",
-    duration: 2000,
+    title: "Enhancing",
+    description: "Applying studio lighting & color grading",
+    duration: 1200,
   },
   {
     id: "generate",
     icon: Sparkles,
-    title: "Generating Output",
-    description: "Rendering final studio-quality photograph",
-    duration: 2000,
+    title: "Generating",
+    description: "Rendering final studio-quality image",
+    duration: 1200,
   },
 ];
 
-// Fixed binary grid overlay - no overflow issues
+// Demo images
+const demoImages = {
+  before: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop&q=80",
+  after: "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=400&h=400&fit=crop&q=80",
+};
+
+// Binary Scanner Effect
 function BinaryOverlay({ isActive }: { isActive: boolean }) {
   const [tick, setTick] = useState(0);
 
   useEffect(() => {
     if (!isActive) return;
-    const interval = setInterval(() => setTick(t => t + 1), 150);
+    const interval = setInterval(() => setTick((t) => t + 1), 80);
     return () => clearInterval(interval);
   }, [isActive]);
 
-  // Generate stable grid based on tick
   const grid = useMemo(() => {
-    const rows = 12;
-    const cols = 16;
+    const rows = 8;
+    const cols = 12;
     const result: string[][] = [];
     for (let i = 0; i < rows; i++) {
       result[i] = [];
       for (let j = 0; j < cols; j++) {
-        // Use tick to create deterministic randomness
-        const seed = (tick + i * cols + j) % 7;
-        result[i][j] = seed > 3 ? "1" : "0";
+        const seed = (tick + i * cols + j) * 9301 + 49297;
+        result[i][j] = (seed % 233280) % 2 === 0 ? "1" : "0";
       }
     }
     return result;
   }, [tick]);
 
+  if (!isActive) return null;
+
   return (
-    <div className="absolute inset-0 flex flex-col justify-center items-center overflow-hidden pointer-events-none p-4">
-      <div className="font-mono text-xs md:text-sm leading-relaxed">
+    <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+      <div className="font-mono text-xs leading-relaxed tracking-[0.3em] text-center select-none opacity-60">
         {grid.map((row, i) => (
-          <div key={i} className="flex justify-center gap-1 md:gap-2">
+          <div key={i} className="flex justify-center gap-0.5">
             {row.map((char, j) => {
-              const isHighlight = ((tick + i + j) % 5) === 0;
+              const isHighlight = Math.random() > 0.92;
               return (
                 <span
                   key={j}
                   className={cn(
-                    "transition-colors duration-150 w-3 text-center",
-                    isHighlight ? "text-neon" : "text-neon/30"
+                    "w-4 h-4 flex items-center justify-center transition-colors duration-75",
+                    isHighlight ? "text-primary font-bold" : "text-primary/30"
                   )}
                 >
                   {char}
@@ -89,312 +95,274 @@ function BinaryOverlay({ isActive }: { isActive: boolean }) {
   );
 }
 
-// Product placeholder visual
-function ProductVisual({ isComplete }: { isComplete: boolean }) {
-  return (
-    <div className={cn(
-      "absolute inset-0 flex items-center justify-center transition-all duration-1000",
-      isComplete
-        ? "bg-gradient-to-br from-cyan-400 via-blue-500 to-purple-500"
-        : "bg-gradient-to-br from-zinc-600 via-zinc-700 to-zinc-800"
-    )}>
-      {/* Product shape */}
-      <div className={cn(
-        "relative w-32 h-32 md:w-48 md:h-48 rounded-3xl transition-all duration-1000",
-        isComplete
-          ? "bg-white/40 backdrop-blur-md shadow-2xl scale-105"
-          : "bg-white/20 backdrop-blur-sm shadow-lg"
-      )}>
-        <div className={cn(
-          "absolute inset-3 md:inset-4 rounded-2xl transition-all duration-1000",
-          isComplete
-            ? "bg-gradient-to-br from-white/40 to-white/20"
-            : "bg-gradient-to-br from-white/10 to-white/5"
-        )}>
-          <Cpu className={cn(
-            "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transition-all duration-1000",
-            isComplete ? "w-10 h-10 md:w-12 md:h-12 text-white/80" : "w-8 h-8 md:w-10 md:h-10 text-white/40"
-          )} />
-        </div>
-      </div>
-
-      {/* Grain effect when not complete */}
-      {!isComplete && (
-        <div className="absolute inset-0 opacity-20 mix-blend-overlay"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`
-          }}
-        />
-      )}
-
-      {/* Shine effect when complete */}
-      {isComplete && (
-        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-white/30" />
-      )}
-    </div>
-  );
-}
-
 export function AIProcessVisualizer() {
-  const [currentStep, setCurrentStep] = useState(0);
+  const [currentStep, setCurrentStep] = useState(-1);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [hasStarted, setHasStarted] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  const advanceStep = useCallback(() => {
-    if (currentStep < processSteps.length - 1) {
-      setCurrentStep((prev) => prev + 1);
-    } else {
-      setTimeout(() => {
-        setCurrentStep(0);
-        setIsPlaying(false);
-      }, 2000);
-    }
-  }, [currentStep]);
+  const [isComplete, setIsComplete] = useState(false);
 
   useEffect(() => {
-    if (!isPlaying) return;
-    const timer = setTimeout(advanceStep, processSteps[currentStep].duration);
-    return () => clearTimeout(timer);
-  }, [currentStep, isPlaying, advanceStep]);
+    if (!isPlaying || currentStep < 0) return;
 
-  const startAnimation = () => {
-    setHasStarted(true);
-    setIsPlaying(true);
+    if (currentStep >= processSteps.length) {
+      setIsPlaying(false);
+      setIsComplete(true);
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setCurrentStep((prev) => prev + 1);
+    }, processSteps[currentStep]?.duration || 1000);
+
+    return () => clearTimeout(timer);
+  }, [currentStep, isPlaying]);
+
+  const startSimulation = () => {
     setCurrentStep(0);
+    setIsPlaying(true);
+    setIsComplete(false);
   };
 
-  const isComplete = hasStarted && !isPlaying;
+  const resetSimulation = () => {
+    setCurrentStep(-1);
+    setIsPlaying(false);
+    setIsComplete(false);
+  };
 
   return (
-    <section className="relative py-24 md:py-32 overflow-hidden">
-      <div className="section-container relative z-10">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-12 md:mb-16"
-        >
-          <span className="pill mb-6 inline-flex">
-            <Brain className="w-4 h-4" />
-            AI Processing
-          </span>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold mb-4">
-            How the <span className="text-neon-subtle">magic</span> happens
-          </h2>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-            Watch our AI analyze, understand, and transform your product photos in real-time.
-          </p>
-        </motion.div>
+    <section className="py-16 md:py-24">
+      <div className="section-container">
+        {/* Section Header */}
+        <div className="text-center mb-12">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4"
+          >
+            <Sparkles className="w-4 h-4" />
+            Interactive Demo
+          </motion.div>
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="text-3xl md:text-4xl font-bold mb-3"
+          >
+            Watch AI Transform Your Photos
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            className="text-muted-foreground max-w-xl mx-auto"
+          >
+            See how our AI analyzes and enhances your product images in seconds
+          </motion.p>
+        </div>
 
-        <motion.div
-          ref={containerRef}
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.2 }}
-          className="grid lg:grid-cols-2 gap-8 md:gap-12 items-center"
-        >
-          {/* Left Side - Image Preview */}
-          <div className="relative order-2 lg:order-1">
-            <div className="relative aspect-square max-w-md mx-auto lg:max-w-none rounded-3xl overflow-hidden bento-card">
-              {/* Product Visual */}
-              <ProductVisual isComplete={isComplete} />
-
-              {/* Binary Overlay - Active during processing */}
-              <AnimatePresence>
-                {isPlaying && currentStep < 3 && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="absolute inset-0 bg-black/70 overflow-hidden"
-                  >
-                    <BinaryOverlay isActive={isPlaying} />
-                  </motion.div>
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-stretch">
+          {/* Left: Image Preview */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+          >
+            <div className="group relative w-full h-full min-h-[400px] rounded-2xl overflow-hidden border border-border bg-card shadow-xl">
+              {/* Before Image */}
+              <div
+                className={cn(
+                  "absolute inset-0 transition-all duration-700",
+                  isComplete ? "opacity-0 scale-95" : "opacity-100 scale-100"
                 )}
-              </AnimatePresence>
+              >
+                <img
+                  src={demoImages.before}
+                  alt="Before transformation"
+                  className={cn(
+                    "w-full h-full object-cover transition-all duration-300",
+                    isPlaying && "blur-[2px] brightness-75"
+                  )}
+                />
 
-              {/* Scan Line Effect */}
-              <AnimatePresence>
-                {isPlaying && currentStep === 0 && (
-                  <motion.div
-                    initial={{ y: 0 }}
-                    animate={{ y: "100%" }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 2, ease: "linear" }}
-                    className="absolute left-0 right-0 top-0 h-1 bg-neon z-20"
-                    style={{ boxShadow: "0 0 20px #05B6D4, 0 0 40px #05B6D4" }}
-                  />
-                )}
-              </AnimatePresence>
+                {/* Binary Scanner Overlay */}
+                <BinaryOverlay isActive={isPlaying} />
 
-              {/* Grid Overlay */}
-              <AnimatePresence>
-                {isPlaying && currentStep === 1 && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="absolute inset-0 pointer-events-none"
-                    style={{
-                      backgroundImage: `
-                        linear-gradient(rgba(5, 182, 212, 0.3) 1px, transparent 1px),
-                        linear-gradient(90deg, rgba(5, 182, 212, 0.3) 1px, transparent 1px)
-                      `,
-                      backgroundSize: '30px 30px'
-                    }}
-                  />
-                )}
-              </AnimatePresence>
-
-              {/* Processing Indicator */}
-              <div className="absolute bottom-4 md:bottom-6 left-4 md:left-6 right-4 md:right-6 z-30">
-                <div className="bg-black/80 backdrop-blur-sm rounded-xl md:rounded-2xl p-3 md:p-4">
-                  <div className="flex items-center justify-between mb-2 md:mb-3">
-                    <span className="text-xs md:text-sm text-white/70">Processing</span>
-                    <span className="text-xs md:text-sm font-mono text-neon">
-                      {isPlaying
-                        ? `${Math.round(((currentStep + 1) / processSteps.length) * 100)}%`
-                        : hasStarted
-                        ? "100%"
-                        : "0%"}
-                    </span>
-                  </div>
-                  <div className="h-1 md:h-1.5 bg-white/10 rounded-full overflow-hidden">
+                {/* Scanning Line */}
+                <AnimatePresence>
+                  {isPlaying && (
                     <motion.div
-                      className="h-full bg-neon rounded-full"
-                      initial={{ width: 0 }}
-                      animate={{
-                        width: isPlaying
-                          ? `${((currentStep + 1) / processSteps.length) * 100}%`
-                          : hasStarted
-                          ? "100%"
-                          : "0%",
-                      }}
-                      transition={{ duration: 0.5 }}
+                      className="absolute inset-x-0 h-0.5 bg-primary shadow-[0_0_20px_4px] shadow-primary"
+                      initial={{ top: 0 }}
+                      animate={{ top: "100%" }}
+                      transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
                     />
+                  )}
+                </AnimatePresence>
+
+                {/* Processing Status Overlay */}
+                <AnimatePresence>
+                  {isPlaying && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="absolute bottom-0 inset-x-0 p-4 bg-linear-to-t from-background/90 to-transparent"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+                          {currentStep >= 0 && currentStep < processSteps.length && (
+                            (() => {
+                              const Icon = processSteps[currentStep].icon;
+                              return <Icon className="w-4 h-4 text-primary" />;
+                            })()
+                          )}
+                        </div>
+                        <span className="text-sm font-medium">
+                          {currentStep >= 0 && currentStep < processSteps.length
+                            ? processSteps[currentStep].title + "..."
+                            : "Starting..."}
+                        </span>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Before Label */}
+                {!isPlaying && !isComplete && (
+                  <div className="absolute bottom-3 left-3 px-2.5 py-1 bg-background/80 backdrop-blur-sm rounded-md text-xs font-medium">
+                    Before
                   </div>
+                )}
+              </div>
+
+              {/* After Image */}
+              <div
+                className={cn(
+                  "absolute inset-0 transition-all duration-700",
+                  isComplete ? "opacity-100 scale-100" : "opacity-0 scale-105"
+                )}
+              >
+                <img
+                  src={demoImages.after}
+                  alt="After transformation"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute bottom-3 left-3 px-2.5 py-1 bg-primary text-primary-foreground rounded-md text-xs font-medium flex items-center gap-1">
+                  <Sparkles className="w-3 h-3" />
+                  Studio Quality
                 </div>
               </div>
 
-              {/* Corner Brackets */}
-              <div className="absolute top-3 left-3 md:top-4 md:left-4 w-6 h-6 md:w-8 md:h-8 border-l-2 border-t-2 border-neon/50 z-20" />
-              <div className="absolute top-3 right-3 md:top-4 md:right-4 w-6 h-6 md:w-8 md:h-8 border-r-2 border-t-2 border-neon/50 z-20" />
-              <div className="absolute bottom-20 md:bottom-24 left-3 md:left-4 w-6 h-6 md:w-8 md:h-8 border-l-2 border-b-2 border-neon/50 z-20" />
-              <div className="absolute bottom-20 md:bottom-24 right-3 md:right-4 w-6 h-6 md:w-8 md:h-8 border-r-2 border-b-2 border-neon/50 z-20" />
-            </div>
-          </div>
-
-          {/* Right Side - Steps */}
-          <div className="space-y-3 md:space-y-4 order-1 lg:order-2">
-            {processSteps.map((step, index) => {
-              const Icon = step.icon;
-              const isActive = currentStep === index && isPlaying;
-              const isStepCompleted = currentStep > index || (hasStarted && !isPlaying);
-
-              return (
+              {/* Hover Overlay with Start Button */}
+              {!isPlaying && !isComplete && (
+                <div className="absolute inset-0 flex items-center justify-center bg-background/0 opacity-0 group-hover:bg-background/40 group-hover:opacity-100 group-hover:backdrop-blur-[3px] transition-all duration-300 cursor-pointer" onClick={startSimulation}>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-full font-semibold shadow-xl shadow-primary/30 hover:shadow-2xl transition-all"
+                  >
+                    <Play className="w-5 h-5" />
+                    Start Demo
+                  </motion.button>
+                </div>
+              )}
+              {isComplete && (
                 <motion.div
-                  key={step.id}
-                  initial={{ opacity: 0, x: 20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                  className={cn(
-                    "relative p-4 md:p-6 rounded-xl md:rounded-2xl border transition-all duration-500",
-                    isActive
-                      ? "bg-neon/10 border-neon"
-                      : isStepCompleted
-                      ? "bg-card/50 border-neon/30"
-                      : "bg-card/30 border-border"
-                  )}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="absolute bottom-4 right-4"
                 >
-                  <div className="flex items-start gap-3 md:gap-4">
-                    {/* Step Icon */}
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={resetSimulation}
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-background/90 backdrop-blur-sm text-foreground rounded-full text-sm font-medium hover:bg-background transition-all"
+                  >
+                    <RotateCcw className="w-4 h-4" />
+                    Replay
+                  </motion.button>
+                </motion.div>
+              )}
+            </div>
+          </motion.div>
+
+          {/* Right: Steps */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            className="flex flex-col justify-between h-full"
+          >
+            <div className="flex flex-col gap-4">
+              {processSteps.map((step, index) => {
+                const Icon = step.icon;
+                const isActive = isPlaying && currentStep === index;
+                const isCompleted = currentStep > index || isComplete;
+
+                return (
+                  <div
+                    key={step.id}
+                    className={cn(
+                      "flex items-center gap-4 p-4 rounded-xl border transition-all duration-300",
+                      isActive
+                        ? "bg-primary/10 border-primary"
+                        : isCompleted
+                          ? "bg-card border-border"
+                          : "bg-transparent border-border/50 opacity-50"
+                    )}
+                  >
                     <div
                       className={cn(
-                        "w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl flex items-center justify-center shrink-0 transition-all duration-500",
+                        "w-12 h-12 rounded-full flex items-center justify-center shrink-0 transition-all",
                         isActive
-                          ? "bg-neon text-black"
-                          : isStepCompleted
-                          ? "bg-neon/20 text-neon"
-                          : "bg-muted text-muted-foreground"
+                          ? "bg-primary text-primary-foreground"
+                          : isCompleted
+                            ? "bg-primary/20 text-primary"
+                            : "bg-muted text-muted-foreground"
                       )}
                     >
-                      {isStepCompleted && !isActive ? (
-                        <Check className="w-4 h-4 md:w-5 md:h-5" />
+                      {isCompleted && !isActive ? (
+                        <Check className="w-5 h-5" />
                       ) : (
-                        <Icon className="w-4 h-4 md:w-5 md:h-5" />
+                        <Icon className="w-5 h-5" />
                       )}
                     </div>
-
-                    {/* Content */}
                     <div className="flex-1 min-w-0">
-                      <h3
-                        className={cn(
-                          "text-base md:text-lg font-semibold mb-0.5 md:mb-1 transition-colors",
-                          isActive && "text-neon"
-                        )}
-                      >
+                      <h3 className={cn("font-semibold text-base", isActive ? "text-primary" : isCompleted ? "text-foreground" : "text-muted-foreground")}>
                         {step.title}
                       </h3>
-                      <p className="text-xs md:text-sm text-muted-foreground">
-                        {step.description}
-                      </p>
+                      <p className="text-sm text-muted-foreground">{step.description}</p>
                     </div>
-
-                    {/* Status */}
-                    <div className="shrink-0">
-                      {isActive && (
-                        <motion.div
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          className="w-2.5 h-2.5 md:w-3 md:h-3 rounded-full bg-neon animate-pulse"
-                        />
-                      )}
-                    </div>
+                    {isActive && <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />}
                   </div>
+                );
+              })}
+            </div>
 
-                  {/* Progress bar for active step */}
-                  {isActive && (
-                    <motion.div
-                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-neon/20 rounded-b-xl md:rounded-b-2xl overflow-hidden"
-                    >
-                      <motion.div
-                        className="h-full bg-neon"
-                        initial={{ width: 0 }}
-                        animate={{ width: "100%" }}
-                        transition={{ duration: step.duration / 1000, ease: "linear" }}
-                      />
-                    </motion.div>
-                  )}
-                </motion.div>
-              );
-            })}
-
-            {/* Start Button */}
-            <motion.button
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              onClick={startAnimation}
-              disabled={isPlaying}
-              className={cn(
-                "w-full py-3 md:py-4 rounded-xl md:rounded-2xl font-semibold transition-all duration-300 text-sm md:text-base",
-                isPlaying
-                  ? "bg-muted text-muted-foreground cursor-not-allowed"
-                  : "btn-cta"
-              )}
-            >
-              {isPlaying
-                ? "Processing..."
-                : hasStarted
-                ? "Run Again"
-                : "See It In Action"}
-            </motion.button>
-          </div>
-        </motion.div>
-      </div>
-    </section>
+            {/* Progress */}
+            <div className="pt-4">
+              <div className="flex justify-between text-sm text-muted-foreground mb-2">
+                <span className="font-medium">Progress</span>
+                <span className="font-semibold">
+                  {isComplete ? "100%" : currentStep >= 0 ? `${Math.round(((currentStep + 1) / processSteps.length) * 100)}%` : "0%"}
+                </span>
+              </div>
+              <div className="h-2.5 bg-muted rounded-full overflow-hidden">
+                <motion.div
+                  className="h-full bg-primary rounded-full"
+                  initial={{ width: "0%" }}
+                  animate={{
+                    width: isComplete ? "100%" : currentStep >= 0 ? `${((currentStep + 1) / processSteps.length) * 100}%` : "0%",
+                  }}
+                  transition={{ duration: 0.3 }}
+                />
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </div >
+    </section >
   );
 }
