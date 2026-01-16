@@ -15,14 +15,12 @@ import {
 } from "lucide-react";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
-import { BeforeAfterShowcase, AIProcessVisualizer, ResultsGallery } from "@/components/landing";
+import { BeforeAfterShowcase, AIProcessVisualizer, ResultsGallery, InteractiveHeroBackground } from "@/components/landing";
+import { TypeWriter } from "@/components/ui/typewriter";
 
-// Stats
-const stats = [
-  { value: "50K+", label: "Generated" },
-  { value: "<30s", label: "Per Image" },
-  { value: "98%", label: "Satisfaction" },
-];
+
+// Dynamic words for typewriter effect
+const heroWords = ["reimagined.", "transformed.", "elevated.", "perfected."];
 
 // Testimonials
 const testimonials = [
@@ -50,141 +48,88 @@ export default function HomePage() {
     <div ref={containerRef} className="min-h-screen bg-background text-foreground overflow-x-hidden">
       <Navbar />
 
-      {/* Background Mesh */}
-      <div
-        className="fixed inset-0 pointer-events-none opacity-60 dark:opacity-100"
-        style={{
-          background: `
-            radial-gradient(at 40% 20%, rgba(6, 182, 212, 0.12) 0px, transparent 50%),
-            radial-gradient(at 80% 0%, rgba(6, 182, 212, 0.08) 0px, transparent 50%),
-            radial-gradient(at 0% 50%, rgba(6, 182, 212, 0.06) 0px, transparent 50%),
-            radial-gradient(at 0% 100%, rgba(6, 182, 212, 0.08) 0px, transparent 50%)
-          `
-        }}
-      />
-      {/* Background Grid */}
-      <div
-        className="fixed inset-0 pointer-events-none opacity-50 dark:opacity-60"
-        style={{
-          backgroundImage: `
-            linear-gradient(var(--grid-color) 1px, transparent 1px),
-            linear-gradient(90deg, var(--grid-color) 1px, transparent 1px)
-          `,
-          backgroundSize: '50px 50px'
-        }}
-      />
-
-      {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center pt-8">
-        <div className="section-container w-full relative z-10 py-12 flex flex-col xl:flex-row xl:items-center xl:justify-between gap-12">
-          <div className="max-w-4xl">
-            {/* Eyebrow */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="mb-8"
-            >
-              <span className="pill">
-                <Sparkles className="w-4 h-4" />
-                AI-Powered Generation
-              </span>
-            </motion.div>
-
-            {/* Main Headline - Super Bold */}
-            <motion.h1
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-display font-bold leading-[0.9] tracking-tight mb-8"
-            >
-              <span className="block">Product photos</span>
-              <span className="block text-neon">reimagined.</span>
-            </motion.h1>
-
-            {/* Subheadline */}
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="text-xl md:text-2xl text-muted-foreground max-w-xl mb-12"
-            >
-              Transform any product image into studio-quality photography.
-              No photographer. No studio. Just AI.
-            </motion.p>
-
-            {/* CTA Buttons */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-              className="flex flex-wrap gap-4 mb-16"
-            >
-              <Link href="/studio">
-                <button className="btn-cta flex items-center gap-2 text-lg">
-                  Start Creating
-                  <ArrowRight className="w-5 h-5" />
-                </button>
-              </Link>
-              <Link href="/marketplace">
-                <button className="btn-ghost flex items-center gap-2 text-lg">
-                  <Play className="w-5 h-5" />
-                  See Examples
-                </button>
-              </Link>
-            </motion.div>
-
-            {/* Stats Row */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-              className="flex flex-wrap gap-6 sm:gap-8 md:gap-12"
-            >
-              {stats.map((stat) => (
-                <div key={stat.label} className="stat-card p-0 text-left">
-                  <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-neon-subtle mb-1">
-                    {stat.value}
-                  </div>
-                  <div className="text-xs sm:text-sm text-muted-foreground uppercase tracking-wider">
-                    {stat.label}
-                  </div>
-                </div>
-              ))}
-            </motion.div>
-          </div>
-
-          {/* Floating badge - Desktop only */}
+      {/* Hero Section - Centered */}
+      <section className="relative min-h-screen flex items-center justify-center pt-8 overflow-hidden">
+        {/* Interactive Hero Background */}
+        <InteractiveHeroBackground />
+        <div className="section-container w-full relative z-10 py-12 text-center">
+          {/* Eyebrow */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, delay: 0.6 }}
-            className="hidden xl:block shrink-0"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="mb-8 flex justify-center"
           >
-            <div className="bento-card p-6 w-72">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-full bg-neon/20 flex items-center justify-center">
-                  <Star className="w-5 h-5 text-neon" />
-                </div>
-                <div>
-                  <div className="font-semibold">4.9/5 Rating</div>
-                  <div className="text-sm text-muted-foreground">2,000+ reviews</div>
-                </div>
-              </div>
-              <div className="flex -space-x-2">
-                {["SC", "MW", "ET", "JD", "AK"].map((initials) => (
-                  <div
-                    key={initials}
-                    className="w-8 h-8 rounded-full bg-muted border-2 border-background flex items-center justify-center text-xs font-medium"
-                  >
-                    {initials}
-                  </div>
-                ))}
-                <div className="w-8 h-8 rounded-full bg-neon/20 border-2 border-background flex items-center justify-center text-xs text-neon">
-                  +2k
-                </div>
-              </div>
-            </div>
+            <span className="pill">
+              <Sparkles className="w-4 h-4" />
+              AI-Powered Generation
+            </span>
+          </motion.div>
+
+          {/* Main Headline - Centered with TypeWriter */}
+          <motion.h1
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-display font-bold leading-[0.9] tracking-tight mb-8 mx-auto max-w-5xl"
+          >
+            <span className="block">Product photos</span>
+            <span className="block">
+              <TypeWriter words={heroWords} interval={3000} className="hero-gradient-text" />
+            </span>
+          </motion.h1>
+
+          {/* Subheadline */}
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto mb-12"
+          >
+            Transform any product image into studio-quality photography.
+            No photographer. No studio. Just AI.
+          </motion.p>
+
+          {/* CTA Buttons - Centered */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="flex flex-wrap justify-center gap-4 mb-16"
+          >
+            <Link href="/studio">
+              <button className="btn-cta flex items-center gap-2 text-lg">
+                Try It Free
+                <ArrowRight className="w-5 h-5" />
+              </button>
+            </Link>
+            <Link href="/marketplace">
+              <button className="btn-ghost flex items-center gap-2 text-lg">
+                <Play className="w-5 h-5" />
+                See How It Works
+              </button>
+            </Link>
+          </motion.div>
+
+          {/* Honest value proposition instead of fake stats */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="flex flex-wrap justify-center gap-6 sm:gap-8 text-sm text-muted-foreground"
+          >
+            <span className="flex items-center gap-2">
+              <CircleCheck className="w-4 h-4 text-neon" />
+              Free to start
+            </span>
+            <span className="flex items-center gap-2">
+              <CircleCheck className="w-4 h-4 text-neon" />
+              No credit card required
+            </span>
+            <span className="flex items-center gap-2">
+              <CircleCheck className="w-4 h-4 text-neon" />
+              Results in seconds
+            </span>
           </motion.div>
         </div>
       </section>
@@ -196,7 +141,11 @@ export default function HomePage() {
       <AIProcessVisualizer />
 
       {/* Bento Grid Section */}
-      <section className="relative py-32">
+      <section className="relative py-32 overflow-hidden">
+        {/* Cohesive gradient accent - top right */}
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] pointer-events-none" style={{ background: 'radial-gradient(circle at center, rgba(251, 146, 60, 0.08) 0%, rgba(139, 92, 246, 0.04) 40%, transparent 70%)' }} />
+        {/* Cohesive gradient accent - bottom left */}
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] pointer-events-none" style={{ background: 'radial-gradient(circle at center, rgba(6, 182, 212, 0.06) 0%, rgba(99, 102, 241, 0.03) 40%, transparent 70%)' }} />
         <div className="section-container">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -296,7 +245,9 @@ export default function HomePage() {
       <ResultsGallery />
 
       {/* How It Works */}
-      <section className="relative py-32">
+      <section className="relative py-32 overflow-hidden">
+        {/* Cohesive gradient accent - center */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] pointer-events-none" style={{ background: 'radial-gradient(ellipse at center, rgba(251, 146, 60, 0.05) 0%, rgba(139, 92, 246, 0.03) 30%, rgba(6, 182, 212, 0.02) 50%, transparent 70%)' }} />
         <div className="section-container">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -338,7 +289,9 @@ export default function HomePage() {
       </section>
 
       {/* Testimonials */}
-      <section className="relative py-32">
+      <section className="relative py-32 overflow-hidden">
+        {/* Cohesive gradient accent */}
+        <div className="absolute top-0 left-1/4 w-[600px] h-[300px] pointer-events-none" style={{ background: 'radial-gradient(circle at center, rgba(139, 92, 246, 0.06) 0%, rgba(251, 146, 60, 0.03) 40%, transparent 70%)' }} />
         <div className="section-container">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -386,8 +339,8 @@ export default function HomePage() {
             viewport={{ once: true }}
             className="bento-card p-12 md:p-20 text-center relative overflow-hidden"
           >
-            {/* Glow effect */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-neon/20 rounded-full blur-[100px]" />
+            {/* Glow effect - warm/cool gradient blend */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full blur-[100px]" style={{ background: 'linear-gradient(90deg, rgba(251, 146, 60, 0.15) 0%, rgba(139, 92, 246, 0.2) 50%, rgba(6, 182, 212, 0.15) 100%)' }} />
 
             <div className="relative">
               <h2 className="text-4xl md:text-6xl font-display font-bold mb-6">

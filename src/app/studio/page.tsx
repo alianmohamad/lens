@@ -9,25 +9,17 @@ import {
     Sparkles,
     Image as ImageIcon,
     Wand2,
-    Download,
     RefreshCw,
-    ChevronRight,
     Lock,
     Check,
     AlertCircle,
     Settings2,
-    Share2,
-    Copy,
-    Maximize2,
     Zap,
-    SplitSquareHorizontal,
 } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
 import {
     Select,
@@ -38,7 +30,7 @@ import {
 } from "@/components/ui/select";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
-import { ComparisonSlider } from "@/components/studio/comparison-slider";
+import { InteractiveCanvas } from "@/components/studio/interactive-canvas";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { useSearchParams } from "next/navigation";
@@ -94,6 +86,7 @@ export default function StudioPage() {
     const [error, setError] = useState<string | null>(null);
     const [isDragging, setIsDragging] = useState(false);
     const [demoMode, setDemoMode] = useState(false);
+    const [forceDemoMode, setForceDemoMode] = useState(true); // Toggle for testing without API
 
     // Advanced Settings State
     const [showSettings, setShowSettings] = useState(false);
@@ -147,9 +140,14 @@ export default function StudioPage() {
                 // Process saved/bookmarked prompts
                 if (savedRes.ok) {
                     const data = await savedRes.json();
+                    console.log("[Studio] Saved prompts response:", data);
                     if (data.savedPrompts) {
+                        console.log("[Studio] Setting saved prompts:", data.savedPrompts.length, "items");
+                        console.log("[Studio] First saved prompt structure:", JSON.stringify(data.savedPrompts[0], null, 2));
                         setSavedPrompts(data.savedPrompts);
                     }
+                } else {
+                    console.error("[Studio] Failed to fetch saved prompts:", savedRes.status);
                 }
             } catch (err) {
                 console.error("Failed to fetch prompts:", err);
@@ -283,7 +281,8 @@ export default function StudioPage() {
                     productStrength,
                     quality,
                     negativePrompt: negativePrompt.trim() || undefined,
-                    numImages
+                    numImages,
+                    demoMode: forceDemoMode, // Use demo mode for testing
                 }),
             });
 
@@ -421,12 +420,9 @@ export default function StudioPage() {
     }
 
 
-    // [HELPER COMPONENT FOR CONTROLS TO AVOID DUPLICATION]
-    const StudioSidebar = ({
-        inputId = "file-upload",
-        className = ""
-    }: { inputId?: string, className?: string }) => (
-        <div className={cn("space-y-8", className)}>
+    // [HELPER FUNCTION FOR CONTROLS TO AVOID DUPLICATION - not a component to prevent re-renders]
+    const renderSidebar = (inputId = "file-upload") => (
+        <div className="space-y-8">
             {/* Header */}
             <div>
                 <Badge className="mb-3 px-3 py-1 bg-primary/10 text-primary border-primary/20 hover:bg-primary/20">AI Studio Workspace</Badge>
@@ -545,14 +541,9 @@ export default function StudioPage() {
                                         <Wand2 className="h-3 w-3" /> My Custom Prompts
                                     </p>
                                     {customPrompts.map((cp) => (
-                                        <div
-                                            key={`custom-${cp.id}`}
-                                            onClick={() => setSelectedPrompt(`custom-${cp.id}`)}
-                                            className={cn("text-sm px-3 py-2 rounded-md cursor-pointer hover:bg-muted flex items-center justify-between transition-colors", selectedPrompt === `custom-${cp.id}` && "bg-primary/5 text-primary")}
-                                        >
-                                            <span className="truncate">{cp.title}</span>
-                                            {selectedPrompt === `custom-${cp.id}` && <Check className="h-3.5 w-3.5 shrink-0" />}
-                                        </div>
+                                        <SelectItem key={`custom-${cp.id}`} value={`custom-${cp.id}`}>
+                                            {cp.title}
+                                        </SelectItem>
                                     ))}
                                 </div>
                             )}
@@ -564,14 +555,9 @@ export default function StudioPage() {
                                         <Sparkles className="h-3 w-3" /> Bookmarked
                                     </p>
                                     {savedPrompts.map((sp) => (
-                                        <div
-                                            key={`saved-${sp.prompt.id}`}
-                                            onClick={() => setSelectedPrompt(`saved-${sp.prompt.id}`)}
-                                            className={cn("text-sm px-3 py-2 rounded-md cursor-pointer hover:bg-muted flex items-center justify-between transition-colors", selectedPrompt === `saved-${sp.prompt.id}` && "bg-primary/5 text-primary")}
-                                        >
-                                            <span className="truncate">{sp.prompt.title}</span>
-                                            {selectedPrompt === `saved-${sp.prompt.id}` && <Check className="h-3.5 w-3.5 shrink-0" />}
-                                        </div>
+                                        <SelectItem key={`saved-${sp.prompt.id}`} value={`saved-${sp.prompt.id}`}>
+                                            {sp.prompt.title}
+                                        </SelectItem>
                                     ))}
                                 </div>
                             )}
@@ -582,14 +568,9 @@ export default function StudioPage() {
                                     <Zap className="h-3 w-3" /> Quick Try
                                 </p>
                                 {QUICK_PROMPTS.map(qp => (
-                                    <div
-                                        key={qp.id}
-                                        onClick={() => setSelectedPrompt(qp.id)}
-                                        className={cn("text-sm px-3 py-2 rounded-md cursor-pointer hover:bg-muted flex items-center justify-between transition-colors", selectedPrompt === qp.id && "bg-primary/5 text-primary")}
-                                    >
-                                        <span className="truncate">{qp.title}</span>
-                                        {selectedPrompt === qp.id && <Check className="h-3.5 w-3.5 shrink-0" />}
-                                    </div>
+                                    <SelectItem key={qp.id} value={qp.id}>
+                                        {qp.title}
+                                    </SelectItem>
                                 ))}
                             </div>
                         </SelectContent>
@@ -709,6 +690,28 @@ export default function StudioPage() {
                                         className="h-20 text-xs resize-none bg-background/50"
                                     />
                                 </div>
+
+                                {/* Demo Mode Toggle */}
+                                <div className="flex items-center justify-between p-3 rounded-xl bg-amber-500/5 border border-amber-500/20">
+                                    <div className="flex-1">
+                                        <p className="text-xs font-medium text-amber-600 dark:text-amber-400">Demo Mode</p>
+                                        <p className="text-[10px] text-muted-foreground">Use sample images instead of API</p>
+                                    </div>
+                                    <button
+                                        onClick={() => setForceDemoMode(!forceDemoMode)}
+                                        className={cn(
+                                            "relative w-11 h-6 rounded-full transition-colors duration-200",
+                                            forceDemoMode ? "bg-amber-500" : "bg-muted"
+                                        )}
+                                    >
+                                        <span
+                                            className={cn(
+                                                "absolute top-1 left-1 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200",
+                                                forceDemoMode && "translate-x-5"
+                                            )}
+                                        />
+                                    </button>
+                                </div>
                             </motion.div>
                         )}
                     </AnimatePresence>
@@ -737,7 +740,17 @@ export default function StudioPage() {
                 </Button>
                 <div className="mt-2 h-6 flex items-center justify-center">
                     <AnimatePresence mode="wait">
-                        {isGenerating ? (
+                        {forceDemoMode && !isGenerating ? (
+                            <motion.p
+                                key="demo"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                className="text-[10px] text-amber-500 font-medium flex items-center gap-1.5"
+                            >
+                                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                                Demo mode active - no API costs
+                            </motion.p>
+                        ) : isGenerating ? (
                             <motion.p
                                 key="status"
                                 initial={{ opacity: 0, y: 5 }}
@@ -770,7 +783,7 @@ export default function StudioPage() {
             <main className="flex-1 flex overflow-hidden">
                 {/* LEFT SIDEBAR - CONTROLS (Common) */}
                 <div className="w-[420px] flex-none overflow-y-auto border-r border-border bg-sidebar/50 backdrop-blur-xl p-6 custom-scrollbar relative z-20 shadow-xl lg:block hidden">
-                    <StudioSidebar inputId="desktop-upload" />
+                    {renderSidebar("desktop-upload")}
                 </div>
 
                 {/* RIGHT CANVAS - MAIN WORKSPACE */}
@@ -788,7 +801,7 @@ export default function StudioPage() {
                                 </Button>
                             </SheetTrigger>
                             <SheetContent side="left" className="w-[90%] sm:w-[420px] overflow-y-auto p-6 pt-10">
-                                <StudioSidebar inputId="mobile-upload" />
+                                {renderSidebar("mobile-upload")}
                             </SheetContent>
                         </Sheet>
                     </div>
@@ -867,50 +880,14 @@ export default function StudioPage() {
                                 </div>
                             </motion.div>
                         ) : generatedImage ? (
-                            <motion.div
-                                initial={{ opacity: 0, scale: 0.9, rotateX: 10 }}
-                                animate={{ opacity: 1, scale: 1, rotateX: 0 }}
-                                transition={{ type: "spring", bounce: 0.2, duration: 0.8 }}
-                                className="relative w-full h-full flex flex-col items-center justify-center"
-                            >
-                                <div
-                                    className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl border border-border/50 bg-card/40 backdrop-blur-xl ring-1 ring-white/10"
-                                    style={{ maxHeight: 'calc(100vh - 160px)' }}
-                                >
-                                    {uploadedImage && showComparison ? (
-                                        <ComparisonSlider original={uploadedImage || ""} generated={generatedImage || ""} />
-                                    ) : (
-                                        <img src={generatedImage || ""} alt="Result" className="w-full h-full object-contain" />
-                                    )}
-                                </div>
-
-                                {/* Floating Toolbar */}
-                                <motion.div
-                                    initial={{ y: 40, opacity: 0 }}
-                                    animate={{ y: 0, opacity: 1 }}
-                                    transition={{ delay: 0.4, type: "spring" }}
-                                    className="absolute bottom-8 flex items-center gap-1.5 p-1.5 rounded-full bg-background/90 backdrop-blur-xl border border-border shadow-2xl ring-1 ring-white/5"
-                                >
-                                    <Button size="sm" onClick={handleDownload} className="rounded-full px-5 btn-premium h-10 font-medium shadow-lg shadow-primary/20">
-                                        <Download className="h-4 w-4 mr-2" /> Download
-                                    </Button>
-                                    <div className="w-px h-4 bg-border/50 mx-1.5" />
-                                    {uploadedImage && (
-                                        <Button
-                                            variant={showComparison ? "secondary" : "ghost"}
-                                            size="icon"
-                                            onClick={() => setShowComparison(!showComparison)}
-                                            className={cn("rounded-full h-10 w-10 transition-colors", showComparison ? "bg-muted text-foreground" : "text-muted-foreground hover:text-foreground")}
-                                            title="Toggle Comparison"
-                                        >
-                                            <SplitSquareHorizontal className="h-4 w-4" />
-                                        </Button>
-                                    )}
-                                    <Button variant="ghost" size="icon" onClick={handleCopyImage} className="rounded-full h-10 w-10 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"><Copy className="h-4 w-4" /></Button>
-                                    <Button variant="ghost" size="icon" className="rounded-full h-10 w-10 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"><Share2 className="h-4 w-4" /></Button>
-                                    <Button variant="ghost" size="icon" className="rounded-full h-10 w-10 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"><Maximize2 className="h-4 w-4" /></Button>
-                                </motion.div>
-                            </motion.div>
+                            <InteractiveCanvas
+                                originalImage={uploadedImage}
+                                generatedImage={generatedImage}
+                                onDownload={handleDownload}
+                                onCopy={handleCopyImage}
+                                showComparison={showComparison}
+                                setShowComparison={setShowComparison}
+                            />
                         ) : (
                             /* Empty State / Drop Zone */
                             <div
