@@ -182,7 +182,7 @@ export function AIProcessVisualizer() {
                   alt="Before transformation"
                   className={cn(
                     "w-full h-full object-cover transition-all duration-300",
-                    isPlaying && "blur-[2px] brightness-75"
+                    isPlaying ? "blur-[2px] brightness-75" : "group-hover:blur-[2px] group-hover:brightness-75"
                   )}
                 />
 
