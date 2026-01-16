@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import { useRef } from "react";
 import {
   ArrowRight,
@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
+import { BeforeAfterShowcase, AIProcessVisualizer, ResultsGallery } from "@/components/landing";
 
 // Stats
 const stats = [
@@ -44,8 +45,6 @@ const testimonials = [
 
 export default function HomePage() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll();
-  const y = useTransform(scrollYProgress, [0, 1], [0, -100]);
 
   return (
     <div ref={containerRef} className="min-h-screen bg-background text-foreground overflow-x-hidden">
@@ -190,6 +189,12 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Before & After Showcase - NEW */}
+      <BeforeAfterShowcase />
+
+      {/* AI Process Visualizer - NEW */}
+      <AIProcessVisualizer />
+
       {/* Bento Grid Section */}
       <section className="relative py-32">
         <div className="section-container">
@@ -286,6 +291,9 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Results Gallery - NEW */}
+      <ResultsGallery />
 
       {/* How It Works */}
       <section className="relative py-32">
