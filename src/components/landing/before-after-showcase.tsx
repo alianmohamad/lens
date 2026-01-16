@@ -130,22 +130,22 @@ export function BeforeAfterShowcase() {
   };
 
   return (
-    <section className="relative py-32 overflow-hidden">
+    <section className="relative py-24 md:py-32 overflow-hidden">
       <div className="section-container">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          className="text-center mb-12 md:mb-16"
         >
           <span className="pill mb-6 inline-flex">
             <ArrowLeftRight className="w-4 h-4" />
             Before & After
           </span>
-          <h2 className="text-5xl md:text-6xl font-display font-bold mb-4">
-            See the <span className="text-neon-subtle">transformation</span>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-bold mb-4">
+            See the <span className="text-neon-subtle block sm:inline">transformation</span>
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-base md:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
             From amateur snapshots to professional studio shots. Drag the slider to see the magic.
           </p>
         </motion.div>
@@ -204,15 +204,15 @@ export function BeforeAfterShowcase() {
           </div>
 
           {/* Example Info & Navigation */}
-          <div className="flex items-center justify-between mt-8">
-            <div>
-              <p className="text-sm text-muted-foreground uppercase tracking-wider mb-1">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mt-6 md:mt-8 gap-4">
+            <div className="text-center sm:text-left">
+              <p className="text-xs md:text-sm text-muted-foreground uppercase tracking-wider mb-1">
                 {activeExample.category}
               </p>
-              <h3 className="text-2xl font-bold">{activeExample.title}</h3>
+              <h3 className="text-xl md:text-2xl font-bold">{activeExample.title}</h3>
             </div>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center justify-center sm:justify-end gap-3 md:gap-4">
               {/* Dots */}
               <div className="flex gap-2">
                 {examples.map((_, i) => (
@@ -223,10 +223,10 @@ export function BeforeAfterShowcase() {
                       setSliderPosition(50);
                     }}
                     className={cn(
-                      "w-2 h-2 rounded-full transition-all duration-300",
+                      "h-2 rounded-full transition-all duration-300",
                       i === activeIndex
-                        ? "w-8 bg-neon"
-                        : "bg-muted-foreground/30 hover:bg-muted-foreground/50"
+                        ? "w-6 md:w-8 bg-neon"
+                        : "w-2 bg-muted-foreground/30 hover:bg-muted-foreground/50"
                     )}
                   />
                 ))}
@@ -236,15 +236,15 @@ export function BeforeAfterShowcase() {
               <div className="flex gap-2">
                 <button
                   onClick={prevExample}
-                  className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:border-neon hover:text-neon transition-colors"
+                  className="w-9 h-9 md:w-10 md:h-10 rounded-full border border-border flex items-center justify-center hover:border-neon hover:text-neon transition-colors"
                 >
-                  <ChevronLeft className="w-5 h-5" />
+                  <ChevronLeft className="w-4 h-4 md:w-5 md:h-5" />
                 </button>
                 <button
                   onClick={nextExample}
-                  className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:border-neon hover:text-neon transition-colors"
+                  className="w-9 h-9 md:w-10 md:h-10 rounded-full border border-border flex items-center justify-center hover:border-neon hover:text-neon transition-colors"
                 >
-                  <ChevronRight className="w-5 h-5" />
+                  <ChevronRight className="w-4 h-4 md:w-5 md:h-5" />
                 </button>
               </div>
             </div>
