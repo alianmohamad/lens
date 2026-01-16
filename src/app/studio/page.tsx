@@ -50,6 +50,22 @@ interface PurchasedPrompt {
     exampleImages: string[];
 }
 
+interface CustomPrompt {
+    id: string;
+    title: string;
+    promptText: string;
+    image: string | null;
+}
+
+interface SavedPrompt {
+    id: string;
+    prompt: {
+        id: string;
+        title: string;
+        category: string;
+    };
+}
+
 export default function StudioPage() {
     const { data: session, status } = useSession();
     const router = useRouter();
@@ -63,6 +79,8 @@ export default function StudioPage() {
     ];
 
     const [purchasedPrompts, setPurchasedPrompts] = useState<PurchasedPrompt[]>([]);
+    const [customPrompts, setCustomPrompts] = useState<CustomPrompt[]>([]);
+    const [savedPrompts, setSavedPrompts] = useState<SavedPrompt[]>([]);
     const [isLoadingPrompts, setIsLoadingPrompts] = useState(true);
     const [uploadedImage, setUploadedImage] = useState<string | null>(null);
     const [selectedPrompt, setSelectedPrompt] = useState<string>("");
@@ -95,29 +113,52 @@ export default function StudioPage() {
         { id: "Minimal", label: "Minimalist", color: "bg-gray-500/10 text-gray-500 border-gray-200" },
     ];
 
-    // Fetch purchased prompts
+    // Fetch all prompts (purchased, custom, saved)
     useEffect(() => {
-        async function fetchPurchasedPrompts() {
+        async function fetchAllPrompts() {
             if (!session?.user) return;
 
             try {
-                const response = await fetch("/api/user/purchases");
-                if (response.ok) {
-                    const data = await response.json();
+                // Fetch all prompt sources in parallel
+                const [purchasesRes, customRes, savedRes] = await Promise.all([
+                    fetch("/api/user/purchases"),
+                    fetch("/api/pocket/custom"),
+                    fetch("/api/pocket"),
+                ]);
+
+                // Process purchased prompts
+                if (purchasesRes.ok) {
+                    const data = await purchasesRes.json();
                     if (data.success && data.data) {
                         setPurchasedPrompts(
                             data.data.map((purchase: { prompt: PurchasedPrompt }) => purchase.prompt)
                         );
                     }
                 }
+
+                // Process custom prompts
+                if (customRes.ok) {
+                    const data = await customRes.json();
+                    if (data.customPrompts) {
+                        setCustomPrompts(data.customPrompts);
+                    }
+                }
+
+                // Process saved/bookmarked prompts
+                if (savedRes.ok) {
+                    const data = await savedRes.json();
+                    if (data.savedPrompts) {
+                        setSavedPrompts(data.savedPrompts);
+                    }
+                }
             } catch (err) {
-                console.error("Failed to fetch purchased prompts:", err);
+                console.error("Failed to fetch prompts:", err);
             } finally {
                 setIsLoadingPrompts(false);
             }
         }
 
-        fetchPurchasedPrompts();
+        fetchAllPrompts();
     }, [session]);
 
     // Check for query param prompt
@@ -205,18 +246,37 @@ export default function StudioPage() {
             });
         }, 500);
 
+        // Determine promptId and customPrompt based on selection type
+        let promptIdToSend: string | undefined;
+        let customPromptToSend: string | undefined;
+
+        if (useCustomPrompt) {
+            // User typed custom text
+            customPromptToSend = customPrompt;
+        } else if (selectedPrompt.startsWith("quick-")) {
+            // Quick demo prompt
+            customPromptToSend = QUICK_PROMPTS.find(p => p.id === selectedPrompt)?.text;
+        } else if (selectedPrompt.startsWith("custom-")) {
+            // Custom prompt from Pocket
+            const customPromptId = selectedPrompt.replace("custom-", "");
+            const cp = customPrompts.find(c => c.id === customPromptId);
+            customPromptToSend = cp?.promptText;
+        } else if (selectedPrompt.startsWith("saved-")) {
+            // Saved/bookmarked marketplace prompt - use the actual prompt ID
+            promptIdToSend = selectedPrompt.replace("saved-", "");
+        } else {
+            // Purchased prompt
+            promptIdToSend = selectedPrompt;
+        }
+
         try {
             const response = await fetch("/api/generate", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     productImageUrl: uploadedImage,
-                    promptId: useCustomPrompt && !String(selectedPrompt).startsWith("quick-") ? undefined : selectedPrompt,
-                    customPrompt: useCustomPrompt
-                        ? customPrompt
-                        : String(selectedPrompt).startsWith("quick-")
-                            ? QUICK_PROMPTS.find(p => p.id === selectedPrompt)?.text
-                            : undefined,
+                    promptId: promptIdToSend,
+                    customPrompt: customPromptToSend,
                     // Advanced Parameters
                     aspectRatio,
                     stylePreset: stylePreset === "None" ? undefined : stylePreset,
@@ -463,14 +523,64 @@ export default function StudioPage() {
                 ) : (
                     <Select value={selectedPrompt} onValueChange={setSelectedPrompt}>
                         <SelectTrigger className="w-full h-12 bg-background/50">
-                            <SelectValue placeholder="Select a saved prompt" />
+                            <SelectValue placeholder="Select a prompt" />
                         </SelectTrigger>
-                        <SelectContent>
-                            {purchasedPrompts.map((prompt) => (
-                                <SelectItem key={prompt.id} value={prompt.id}>{prompt.title}</SelectItem>
-                            ))}
-                            <div className="p-2 border-t border-border mt-1">
-                                <p className="text-[10px] text-muted-foreground mb-2 px-2 uppercase tracking-wider font-bold">Quick Try</p>
+                        <SelectContent className="max-h-[400px]">
+                            {/* Purchased Prompts */}
+                            {purchasedPrompts.length > 0 && (
+                                <div className="p-2">
+                                    <p className="text-[10px] text-muted-foreground mb-2 px-2 uppercase tracking-wider font-bold flex items-center gap-1.5">
+                                        <Lock className="h-3 w-3" /> Purchased
+                                    </p>
+                                    {purchasedPrompts.map((prompt) => (
+                                        <SelectItem key={prompt.id} value={prompt.id}>{prompt.title}</SelectItem>
+                                    ))}
+                                </div>
+                            )}
+
+                            {/* Custom Prompts from Pocket */}
+                            {customPrompts.length > 0 && (
+                                <div className={cn("p-2", purchasedPrompts.length > 0 && "border-t border-border")}>
+                                    <p className="text-[10px] text-muted-foreground mb-2 px-2 uppercase tracking-wider font-bold flex items-center gap-1.5">
+                                        <Wand2 className="h-3 w-3" /> My Custom Prompts
+                                    </p>
+                                    {customPrompts.map((cp) => (
+                                        <div
+                                            key={`custom-${cp.id}`}
+                                            onClick={() => setSelectedPrompt(`custom-${cp.id}`)}
+                                            className={cn("text-sm px-3 py-2 rounded-md cursor-pointer hover:bg-muted flex items-center justify-between transition-colors", selectedPrompt === `custom-${cp.id}` && "bg-primary/5 text-primary")}
+                                        >
+                                            <span className="truncate">{cp.title}</span>
+                                            {selectedPrompt === `custom-${cp.id}` && <Check className="h-3.5 w-3.5 shrink-0" />}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
+                            {/* Saved/Bookmarked Prompts */}
+                            {savedPrompts.length > 0 && (
+                                <div className={cn("p-2", (purchasedPrompts.length > 0 || customPrompts.length > 0) && "border-t border-border")}>
+                                    <p className="text-[10px] text-muted-foreground mb-2 px-2 uppercase tracking-wider font-bold flex items-center gap-1.5">
+                                        <Sparkles className="h-3 w-3" /> Bookmarked
+                                    </p>
+                                    {savedPrompts.map((sp) => (
+                                        <div
+                                            key={`saved-${sp.prompt.id}`}
+                                            onClick={() => setSelectedPrompt(`saved-${sp.prompt.id}`)}
+                                            className={cn("text-sm px-3 py-2 rounded-md cursor-pointer hover:bg-muted flex items-center justify-between transition-colors", selectedPrompt === `saved-${sp.prompt.id}` && "bg-primary/5 text-primary")}
+                                        >
+                                            <span className="truncate">{sp.prompt.title}</span>
+                                            {selectedPrompt === `saved-${sp.prompt.id}` && <Check className="h-3.5 w-3.5 shrink-0" />}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
+                            {/* Quick Try Prompts */}
+                            <div className={cn("p-2", (purchasedPrompts.length > 0 || customPrompts.length > 0 || savedPrompts.length > 0) && "border-t border-border")}>
+                                <p className="text-[10px] text-muted-foreground mb-2 px-2 uppercase tracking-wider font-bold flex items-center gap-1.5">
+                                    <Zap className="h-3 w-3" /> Quick Try
+                                </p>
                                 {QUICK_PROMPTS.map(qp => (
                                     <div
                                         key={qp.id}
