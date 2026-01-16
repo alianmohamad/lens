@@ -255,15 +255,16 @@ export function AIProcessVisualizer() {
                 </div>
               </div>
 
-              {/* Start Button Overlay */}
+              {/* Start Button */}
               {!isPlaying && !isComplete && (
-                <div className="absolute inset-0 flex items-center justify-center hover:bg-black/30 hover:backdrop-blur-[2px] transition-all duration-300 cursor-pointer" onClick={startSimulation}>
+                <div className="absolute bottom-4 right-4">
                   <motion.button
+                    onClick={startSimulation}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-full font-semibold shadow-xl shadow-primary/30 hover:shadow-2xl transition-all"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-full font-semibold shadow-xl shadow-primary/30 hover:shadow-2xl transition-all"
                   >
-                    <Play className="w-5 h-5" />
+                    <Play className="w-4 h-4" />
                     Start Demo
                   </motion.button>
                 </div>
