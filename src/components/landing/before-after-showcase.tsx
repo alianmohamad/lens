@@ -2,101 +2,41 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeftRight, ChevronLeft, ChevronRight, Camera, Sparkles } from "lucide-react";
+import { ArrowLeftRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 interface TransformExample {
   id: string;
   title: string;
   category: string;
-  beforeStyle: string;
-  afterStyle: string;
+  beforeImage: string;
+  afterImage: string;
 }
 
 const examples: TransformExample[] = [
   {
     id: "1",
-    title: "Minimalist Watch",
-    category: "Accessories",
-    beforeStyle: "from-zinc-400 via-zinc-500 to-zinc-600",
-    afterStyle: "from-amber-300 via-orange-400 to-rose-400",
+    title: "Premium Sneakers",
+    category: "Footwear",
+    beforeImage: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&h=600&fit=crop&q=80",
+    afterImage: "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=800&h=600&fit=crop&q=80",
   },
   {
     id: "2",
-    title: "Leather Sneaker",
-    category: "Footwear",
-    beforeStyle: "from-stone-400 via-stone-500 to-stone-600",
-    afterStyle: "from-cyan-300 via-blue-400 to-indigo-500",
+    title: "Luxury Headphones",
+    category: "Electronics",
+    beforeImage: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&h=600&fit=crop&q=80",
+    afterImage: "https://images.unsplash.com/photo-1583394838336-acd977736f90?w=800&h=600&fit=crop&q=80",
   },
   {
     id: "3",
-    title: "Perfume Bottle",
-    category: "Beauty",
-    beforeStyle: "from-slate-400 via-slate-500 to-slate-600",
-    afterStyle: "from-purple-300 via-pink-400 to-rose-400",
+    title: "Designer Watch",
+    category: "Accessories",
+    beforeImage: "https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=800&h=600&fit=crop&q=80",
+    afterImage: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&h=600&fit=crop&q=80",
   },
 ];
-
-// Visual placeholder component
-function PlaceholderImage({
-  type,
-  gradient,
-  title
-}: {
-  type: "before" | "after";
-  gradient: string;
-  title: string;
-}) {
-  const Icon = type === "before" ? Camera : Sparkles;
-
-  return (
-    <div className={cn(
-      "absolute inset-0 flex flex-col items-center justify-center",
-      `bg-gradient-to-br ${gradient}`
-    )}>
-      {/* Abstract product shape */}
-      <div className={cn(
-        "relative w-32 h-32 md:w-48 md:h-48 rounded-3xl",
-        type === "before"
-          ? "bg-white/20 backdrop-blur-sm shadow-lg"
-          : "bg-white/40 backdrop-blur-md shadow-2xl"
-      )}>
-        <div className={cn(
-          "absolute inset-4 rounded-2xl",
-          type === "before"
-            ? "bg-gradient-to-br from-white/10 to-white/5"
-            : "bg-gradient-to-br from-white/30 to-white/10"
-        )} />
-        <Icon className={cn(
-          "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2",
-          type === "before" ? "w-8 h-8 text-white/40" : "w-10 h-10 text-white/70"
-        )} />
-      </div>
-
-      {/* Product name hint */}
-      <p className={cn(
-        "mt-6 text-sm font-medium",
-        type === "before" ? "text-white/50" : "text-white/80"
-      )}>
-        {title}
-      </p>
-
-      {/* Visual noise/grain effect for before */}
-      {type === "before" && (
-        <div className="absolute inset-0 opacity-30 mix-blend-overlay"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`
-          }}
-        />
-      )}
-
-      {/* Shine effect for after */}
-      {type === "after" && (
-        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-white/20" />
-      )}
-    </div>
-  );
-}
 
 export function BeforeAfterShowcase() {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -166,27 +106,37 @@ export function BeforeAfterShowcase() {
             onMouseLeave={() => setIsDragging(false)}
             onTouchMove={handleTouchMove}
           >
-            {/* Before Image */}
-            <PlaceholderImage
-              type="before"
-              gradient={activeExample.beforeStyle}
-              title={activeExample.title}
-            />
-            <div className="absolute top-6 left-6 px-4 py-2 bg-black/70 backdrop-blur-sm rounded-full text-white text-sm font-medium z-20">
-              Before
+            {/* Before Image (full background) */}
+            <div className="absolute inset-0">
+              <Image
+                src={activeExample.beforeImage}
+                alt={`${activeExample.title} - Before`}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 800px"
+                unoptimized
+              />
+              {/* Before Label - clips with the before image */}
+              <div className="absolute top-6 left-6 px-4 py-2 bg-black/70 backdrop-blur-sm rounded-full text-white text-sm font-medium">
+                Before
+              </div>
             </div>
 
-            {/* After Image (Clipped) */}
+            {/* After Image (revealed from right) */}
             <div
               className="absolute inset-0"
-              style={{ clipPath: `inset(0 ${100 - sliderPosition}% 0 0)` }}
+              style={{ clipPath: `inset(0 0 0 ${sliderPosition}%)` }}
             >
-              <PlaceholderImage
-                type="after"
-                gradient={activeExample.afterStyle}
-                title={activeExample.title}
+              <Image
+                src={activeExample.afterImage}
+                alt={`${activeExample.title} - After`}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 800px"
+                unoptimized
               />
-              <div className="absolute top-6 right-6 px-4 py-2 bg-neon text-black rounded-full text-sm font-medium z-20">
+              {/* After Label - clips with the after image */}
+              <div className="absolute top-6 right-6 px-4 py-2 bg-neon text-black rounded-full text-sm font-medium">
                 After
               </div>
             </div>

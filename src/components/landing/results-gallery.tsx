@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Sparkles, ArrowRight, Star, Download } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 interface GalleryItem {
   id: string;
@@ -12,7 +13,7 @@ interface GalleryItem {
   style: string;
   rating: number;
   downloads: string;
-  gradient: string;
+  image: string;
 }
 
 const galleryItemsRow1: GalleryItem[] = [
@@ -23,7 +24,7 @@ const galleryItemsRow1: GalleryItem[] = [
     style: "Clean studio with soft shadows",
     rating: 4.9,
     downloads: "2.3k",
-    gradient: "from-amber-500 via-orange-600 to-red-600",
+    image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=500&fit=crop&q=80",
   },
   {
     id: "2",
@@ -32,7 +33,7 @@ const galleryItemsRow1: GalleryItem[] = [
     style: "Futuristic neon lighting",
     rating: 4.8,
     downloads: "1.8k",
-    gradient: "from-cyan-400 via-blue-500 to-purple-600",
+    image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=500&fit=crop&q=80",
   },
   {
     id: "3",
@@ -41,7 +42,7 @@ const galleryItemsRow1: GalleryItem[] = [
     style: "Botanical garden setting",
     rating: 4.9,
     downloads: "3.1k",
-    gradient: "from-emerald-400 via-green-500 to-teal-600",
+    image: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400&h=500&fit=crop&q=80",
   },
   {
     id: "4",
@@ -50,7 +51,7 @@ const galleryItemsRow1: GalleryItem[] = [
     style: "Dramatic shadows & contrast",
     rating: 4.7,
     downloads: "1.5k",
-    gradient: "from-slate-600 via-zinc-700 to-neutral-800",
+    image: "https://images.unsplash.com/photo-1583394838336-acd977736f90?w=400&h=500&fit=crop&q=80",
   },
   {
     id: "5",
@@ -59,7 +60,7 @@ const galleryItemsRow1: GalleryItem[] = [
     style: "Soft pastel backgrounds",
     rating: 4.8,
     downloads: "2.7k",
-    gradient: "from-pink-400 via-rose-400 to-fuchsia-500",
+    image: "https://images.unsplash.com/photo-1560343090-f0409e92791a?w=400&h=500&fit=crop&q=80",
   },
 ];
 
@@ -71,7 +72,7 @@ const galleryItemsRow2: GalleryItem[] = [
     style: "Sunset warm tones",
     rating: 4.9,
     downloads: "2.1k",
-    gradient: "from-yellow-400 via-amber-500 to-orange-500",
+    image: "https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=400&h=500&fit=crop&q=80",
   },
   {
     id: "7",
@@ -80,7 +81,7 @@ const galleryItemsRow2: GalleryItem[] = [
     style: "Icy blue minimalism",
     rating: 4.8,
     downloads: "1.9k",
-    gradient: "from-sky-300 via-blue-400 to-indigo-500",
+    image: "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=400&h=500&fit=crop&q=80",
   },
   {
     id: "8",
@@ -89,7 +90,7 @@ const galleryItemsRow2: GalleryItem[] = [
     style: "Classic film grain look",
     rating: 4.7,
     downloads: "2.4k",
-    gradient: "from-amber-600 via-yellow-700 to-orange-800",
+    image: "https://images.unsplash.com/photo-1600003014755-ba31aa59c4b6?w=400&h=500&fit=crop&q=80",
   },
   {
     id: "9",
@@ -98,7 +99,7 @@ const galleryItemsRow2: GalleryItem[] = [
     style: "Pure white backdrop",
     rating: 4.9,
     downloads: "4.2k",
-    gradient: "from-gray-200 via-slate-300 to-zinc-400",
+    image: "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=400&h=500&fit=crop&q=80",
   },
   {
     id: "10",
@@ -107,7 +108,7 @@ const galleryItemsRow2: GalleryItem[] = [
     style: "Bold neon gradients",
     rating: 4.8,
     downloads: "1.6k",
-    gradient: "from-violet-500 via-purple-600 to-fuchsia-600",
+    image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=500&fit=crop&q=80",
   },
 ];
 
@@ -116,14 +117,18 @@ function ShowcaseCard({ item }: { item: GalleryItem }) {
   return (
     <div className="group relative shrink-0 w-[260px] md:w-[300px]">
       <div className="relative rounded-2xl overflow-hidden aspect-[4/5] transition-transform duration-500 group-hover:scale-[1.02]">
-        {/* Background gradient */}
-        <div className={cn(
-          "absolute inset-0 bg-gradient-to-br transition-all duration-700",
-          item.gradient
-        )} />
+        {/* Product Image */}
+        <Image
+          src={item.image}
+          alt={item.title}
+          fill
+          className="object-cover transition-transform duration-700 group-hover:scale-105"
+          sizes="(max-width: 768px) 260px, 300px"
+          unoptimized
+        />
 
         {/* Ambient light overlay */}
-        <div className="absolute inset-0 opacity-40"
+        <div className="absolute inset-0 opacity-30"
           style={{
             backgroundImage: `
               radial-gradient(circle at 20% 80%, rgba(255,255,255,0.15) 0%, transparent 50%),
@@ -131,19 +136,6 @@ function ShowcaseCard({ item }: { item: GalleryItem }) {
             `
           }}
         />
-
-        {/* Product mockup */}
-        <div className="absolute inset-0 flex items-center justify-center p-6">
-          <div className="relative w-full max-w-[65%] aspect-square group-hover:-translate-y-2 transition-transform duration-500">
-            {/* Main product shape */}
-            <div className="absolute inset-0 rounded-2xl bg-white/25 backdrop-blur-sm shadow-2xl" />
-            <div className="absolute inset-3 rounded-xl bg-gradient-to-br from-white/35 to-white/15" />
-
-            {/* Decorative floating elements */}
-            <div className="absolute -top-2 -right-2 w-10 h-10 rounded-xl bg-white/30 backdrop-blur-md shadow-lg group-hover:-translate-y-1 transition-transform duration-700 delay-75" />
-            <div className="absolute -bottom-1 -left-1 w-6 h-6 rounded-lg bg-white/25 backdrop-blur-sm shadow-md group-hover:-translate-y-2 transition-transform duration-700 delay-150" />
-          </div>
-        </div>
 
         {/* Top badges */}
         <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
@@ -157,7 +149,7 @@ function ShowcaseCard({ item }: { item: GalleryItem }) {
         </div>
 
         {/* Bottom info */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 via-black/40 to-transparent">
+        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 via-black/50 to-transparent">
           <h3 className="text-white font-bold text-base mb-0.5">{item.title}</h3>
           <p className="text-white/70 text-xs mb-2">{item.style}</p>
           <div className="flex items-center gap-1.5 text-white/60 text-xs">
