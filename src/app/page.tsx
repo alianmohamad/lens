@@ -11,6 +11,8 @@ import {
   Play,
   Star,
   ArrowUpRight,
+  Gift,
+  Clock,
   CircleCheck,
 } from "lucide-react";
 import { Navbar } from "@/components/layout/navbar";
@@ -49,7 +51,7 @@ export default function HomePage() {
       <Navbar />
 
       {/* Hero Section - Centered */}
-      <section className="relative h-dvh flex items-center justify-center pt-0 md:pt-8 overflow-hidden">
+      <section className="relative h-dvh flex items-center justify-center pt-0 md:pt-8 overflow-hidden -mt-16">
         {/* Interactive Hero Background */}
         <InteractiveHeroBackground />
         <div className="mx-auto max-w-6xl w-full px-2 sm:px-6 relative z-10 py-0 md:py-12 text-center">
@@ -58,7 +60,7 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="mb-3 md:mb-8 flex justify-center"
+            className="mb-3 md:mb-4 flex justify-center"
           >
             <span className="pill text-xs md:text-sm">
               <Sparkles className="w-3 h-3 md:w-4 md:h-4" />
@@ -71,10 +73,10 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="font-display font-bold leading-[1.1] tracking-tight mb-3 md:mb-8 mx-auto max-w-5xl"
+            className="text-5xl sm:text-6xl md:text-6xl lg:text-7xl xl:text-8xl font-display font-bold leading-[1.1] tracking-tight mb-3 md:mb-8 mx-auto max-w-5xl"
           >
-            <span className="block text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl">Product photos</span>
-            <span className="block pb-2 text-5xl sm:text-6xl md:text-6xl lg:text-7xl xl:text-8xl">
+            <span className="block">Product photos</span>
+            <span className="block pb-2">
               <TypeWriter words={heroWords} interval={3000} className="hero-gradient-text" />
             </span>
           </motion.h1>
@@ -95,7 +97,7 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="flex flex-row flex-wrap justify-center gap-3 sm:gap-4 mb-6 md:mb-16"
+            className="flex flex-row flex-wrap justify-center gap-3 sm:gap-4 mb-4 md:mb-8"
           >
             <Link href="/studio">
               <button className="btn-cta flex items-center justify-center gap-2 text-sm sm:text-base md:text-lg">
@@ -119,15 +121,15 @@ export default function HomePage() {
             className="flex flex-row flex-wrap justify-center gap-4 sm:gap-6 md:gap-8 text-xs sm:text-sm text-muted-foreground"
           >
             <span className="flex items-center gap-1 sm:gap-2">
-              <CircleCheck className="w-4 h-4 text-neon" />
-              <span>Try free</span>
+              <Gift className="w-4 h-4 text-neon" />
+              <span>Free credits</span>
             </span>
             <span className="flex items-center gap-1 sm:gap-2">
-              <CircleCheck className="w-4 h-4 text-neon" />
+              <Zap className="w-4 h-4 text-neon" />
               <span>Easy start</span>
             </span>
             <span className="flex items-center gap-1 sm:gap-2">
-              <CircleCheck className="w-4 h-4 text-neon" />
+              <Clock className="w-4 h-4 text-neon" />
               <span>30s results</span>
             </span>
           </motion.div>
