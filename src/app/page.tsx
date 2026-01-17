@@ -49,19 +49,19 @@ export default function HomePage() {
       <Navbar />
 
       {/* Hero Section - Centered */}
-      <section className="relative min-h-screen flex items-center justify-center pt-8 overflow-hidden">
+      <section className="relative min-h-screen flex items-center justify-center pt-20 md:pt-8 overflow-hidden px-4">
         {/* Interactive Hero Background */}
         <InteractiveHeroBackground />
-        <div className="section-container w-full relative z-10 py-12 text-center">
+        <div className="section-container w-full relative z-10 py-8 md:py-12 text-center">
           {/* Eyebrow */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="mb-8 flex justify-center"
+            className="mb-6 md:mb-8 flex justify-center"
           >
-            <span className="pill">
-              <Sparkles className="w-4 h-4" />
+            <span className="pill text-xs md:text-sm">
+              <Sparkles className="w-3 h-3 md:w-4 md:h-4" />
               AI-Powered Generation
             </span>
           </motion.div>
@@ -71,10 +71,10 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-display font-bold leading-[0.9] tracking-tight mb-8 mx-auto max-w-5xl"
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-display font-bold leading-[1.1] tracking-tight mb-6 md:mb-8 mx-auto max-w-5xl"
           >
             <span className="block">Product photos</span>
-            <span className="block">
+            <span className="block pb-2">
               <TypeWriter words={heroWords} interval={3000} className="hero-gradient-text" />
             </span>
           </motion.h1>
@@ -84,7 +84,7 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto mb-12"
+            className="text-base sm:text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-2xl mx-auto mb-8 md:mb-12 px-4"
           >
             Transform any product image into studio-quality photography.
             No photographer. No studio. Just AI.
@@ -95,17 +95,17 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="flex flex-wrap justify-center gap-4 mb-16"
+            className="flex flex-col sm:flex-row flex-wrap justify-center gap-3 sm:gap-4 mb-10 md:mb-16 px-4"
           >
-            <Link href="/studio">
-              <button className="btn-cta flex items-center gap-2 text-lg">
+            <Link href="/studio" className="w-full sm:w-auto">
+              <button className="btn-cta flex items-center justify-center gap-2 text-base md:text-lg w-full sm:w-auto">
                 Try It Free
-                <ArrowRight className="w-5 h-5" />
+                <ArrowRight className="w-4 h-4 md:w-5 md:h-5" />
               </button>
             </Link>
-            <Link href="/marketplace">
-              <button className="btn-ghost flex items-center gap-2 text-lg">
-                <Play className="w-5 h-5" />
+            <Link href="/marketplace" className="w-full sm:w-auto">
+              <button className="btn-ghost flex items-center justify-center gap-2 text-base md:text-lg w-full sm:w-auto">
+                <Play className="w-4 h-4 md:w-5 md:h-5" />
                 See How It Works
               </button>
             </Link>
@@ -116,17 +116,17 @@ export default function HomePage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.4 }}
-            className="flex flex-wrap justify-center gap-6 sm:gap-8 text-sm text-muted-foreground"
+            className="flex flex-col sm:flex-row flex-wrap justify-center gap-3 sm:gap-6 md:gap-8 text-xs sm:text-sm text-muted-foreground"
           >
-            <span className="flex items-center gap-2">
+            <span className="flex items-center justify-center gap-2">
               <CircleCheck className="w-4 h-4 text-neon" />
               Free to start
             </span>
-            <span className="flex items-center gap-2">
+            <span className="flex items-center justify-center gap-2">
               <CircleCheck className="w-4 h-4 text-neon" />
               No credit card required
             </span>
-            <span className="flex items-center gap-2">
+            <span className="flex items-center justify-center gap-2">
               <CircleCheck className="w-4 h-4 text-neon" />
               Results in seconds
             </span>
