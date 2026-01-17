@@ -49,10 +49,10 @@ export default function HomePage() {
       <Navbar />
 
       {/* Hero Section - Centered */}
-      <section className="relative h-screen flex items-center justify-center pt-0 md:pt-8 overflow-hidden px-1 sm:px-3">
+      <section className="relative h-screen flex items-center justify-center pt-0 md:pt-8 overflow-hidden">
         {/* Interactive Hero Background */}
         <InteractiveHeroBackground />
-        <div className="section-container w-full relative z-10 py-0 md:py-12 text-center">
+        <div className="mx-auto max-w-6xl w-full px-2 sm:px-4 relative z-10 py-0 md:py-12 text-center">
           {/* Eyebrow */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -116,19 +116,19 @@ export default function HomePage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.4 }}
-            className="hidden sm:flex sm:flex-row sm:flex-wrap sm:justify-center sm:gap-6 md:gap-8 text-xs sm:text-sm text-muted-foreground px-2"
+            className="flex flex-row flex-wrap justify-center gap-4 sm:gap-6 md:gap-8 text-xs sm:text-sm text-muted-foreground"
           >
-            <span className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2">
+            <span className="flex items-center gap-1 sm:gap-2">
               <CircleCheck className="w-4 h-4 text-neon" />
-              <span>Free to start</span>
+              <span>Free</span>
             </span>
-            <span className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2">
+            <span className="flex items-center gap-1 sm:gap-2">
               <CircleCheck className="w-4 h-4 text-neon" />
-              <span>No credit card</span>
+              <span>No card</span>
             </span>
-            <span className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2">
+            <span className="flex items-center gap-1 sm:gap-2">
               <CircleCheck className="w-4 h-4 text-neon" />
-              <span>Fast results</span>
+              <span>Fast</span>
             </span>
           </motion.div>
         </div>
