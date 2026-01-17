@@ -49,7 +49,7 @@ export default function HomePage() {
       <Navbar />
 
       {/* Hero Section - Centered */}
-      <section className="relative min-h-screen flex items-center justify-center pt-16 md:pt-8 overflow-hidden px-4">
+      <section className="relative min-h-screen flex items-center justify-center pt-8 md:pt-8 overflow-hidden px-4">
         {/* Interactive Hero Background */}
         <InteractiveHeroBackground />
         <div className="section-container w-full relative z-10 py-4 md:py-12 text-center">
@@ -337,7 +337,7 @@ export default function HomePage() {
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            className="bento-card p-6 sm:p-8 md:p-16 lg:p-20 text-center relative overflow-hidden"
+            className="bento-card p-8 md:p-12 lg:p-20 text-center relative overflow-hidden"
           >
             {/* Glow effect - warm/cool gradient blend */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full blur-[100px]" style={{ background: 'linear-gradient(90deg, rgba(251, 146, 60, 0.15) 0%, rgba(139, 92, 246, 0.2) 50%, rgba(6, 182, 212, 0.15) 100%)' }} />

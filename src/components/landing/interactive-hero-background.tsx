@@ -67,13 +67,47 @@ export function InteractiveHeroBackground() {
             className="absolute inset-0 pointer-events-none overflow-hidden"
             style={{ zIndex: 0 }}
         >
+            {/* Mobile: Fixed simple chevrons (2 per corner) */}
+            <svg
+                className="absolute inset-0 w-full h-full sm:hidden"
+                viewBox="0 0 100 100"
+                preserveAspectRatio="none"
+            >
+                <defs>
+                    <linearGradient id="mobileGradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="rgba(147, 51, 234, 0.4)" />
+                        <stop offset="100%" stopColor="rgba(59, 130, 246, 0.3)" />
+                    </linearGradient>
+                    <linearGradient id="mobileGradient2" x1="100%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" stopColor="rgba(59, 130, 246, 0.3)" />
+                        <stop offset="100%" stopColor="rgba(251, 191, 136, 0.3)" />
+                    </linearGradient>
+                </defs>
+
+                {/* Top-left */}
+                <path d="M 0,8 L 4,4 L 0,0" fill="none" stroke="url(#mobileGradient1)" strokeWidth="0.3" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M 0,14 L 7,7 L 0,0" fill="none" stroke="url(#mobileGradient2)" strokeWidth="0.2" strokeLinecap="round" strokeLinejoin="round" />
+
+                {/* Top-right */}
+                <path d="M 100,8 L 96,4 L 100,0" fill="none" stroke="url(#mobileGradient2)" strokeWidth="0.3" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M 100,14 L 93,7 L 100,0" fill="none" stroke="url(#mobileGradient1)" strokeWidth="0.2" strokeLinecap="round" strokeLinejoin="round" />
+
+                {/* Bottom-left */}
+                <path d="M 0,92 L 4,96 L 0,100" fill="none" stroke="url(#mobileGradient2)" strokeWidth="0.3" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M 0,86 L 7,93 L 0,100" fill="none" stroke="url(#mobileGradient1)" strokeWidth="0.2" strokeLinecap="round" strokeLinejoin="round" />
+
+                {/* Bottom-right */}
+                <path d="M 100,92 L 96,96 L 100,100" fill="none" stroke="url(#mobileGradient1)" strokeWidth="0.3" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M 100,86 L 93,93 L 100,100" fill="none" stroke="url(#mobileGradient2)" strokeWidth="0.2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+
+            {/* Desktop: Animated chevrons (3 per corner) */}
             <svg
                 className="absolute inset-0 w-full h-full hidden sm:block"
                 viewBox="0 0 100 100"
                 preserveAspectRatio="none"
             >
                 <defs>
-                    {/* Multi-color gradient - purple, blue, orange, white */}
                     <linearGradient
                         id="heroGradient"
                         x1={`${100 - gradientX}%`}
@@ -103,120 +137,24 @@ export function InteractiveHeroBackground() {
                 </defs>
 
                 {/* Top-left corner chevrons */}
-                <path
-                    d="M 0,20 L 10,10 L 0,0"
-                    fill="none"
-                    stroke="url(#heroGradient)"
-                    strokeWidth="0.4"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    style={{ transition: "stroke 0.3s ease-out" }}
-                />
-                <path
-                    d="M 0,35 L 17.5,17.5 L 0,0"
-                    fill="none"
-                    stroke="url(#heroGradient2)"
-                    strokeWidth="0.3"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    style={{ transition: "stroke 0.3s ease-out" }}
-                />
-                <path
-                    d="M 0,50 L 25,25 L 0,0"
-                    fill="none"
-                    stroke="url(#heroGradient)"
-                    strokeWidth="0.2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    style={{ transition: "stroke 0.3s ease-out" }}
-                />
+                <path d="M 0,20 L 10,10 L 0,0" fill="none" stroke="url(#heroGradient)" strokeWidth="0.4" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M 0,35 L 17.5,17.5 L 0,0" fill="none" stroke="url(#heroGradient2)" strokeWidth="0.3" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M 0,50 L 25,25 L 0,0" fill="none" stroke="url(#heroGradient)" strokeWidth="0.2" strokeLinecap="round" strokeLinejoin="round" />
 
                 {/* Top-right corner chevrons */}
-                <path
-                    d="M 100,20 L 90,10 L 100,0"
-                    fill="none"
-                    stroke="url(#heroGradient2)"
-                    strokeWidth="0.4"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    style={{ transition: "stroke 0.3s ease-out" }}
-                />
-                <path
-                    d="M 100,35 L 82.5,17.5 L 100,0"
-                    fill="none"
-                    stroke="url(#heroGradient)"
-                    strokeWidth="0.3"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    style={{ transition: "stroke 0.3s ease-out" }}
-                />
-                <path
-                    d="M 100,50 L 75,25 L 100,0"
-                    fill="none"
-                    stroke="url(#heroGradient2)"
-                    strokeWidth="0.2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    style={{ transition: "stroke 0.3s ease-out" }}
-                />
+                <path d="M 100,20 L 90,10 L 100,0" fill="none" stroke="url(#heroGradient2)" strokeWidth="0.4" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M 100,35 L 82.5,17.5 L 100,0" fill="none" stroke="url(#heroGradient)" strokeWidth="0.3" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M 100,50 L 75,25 L 100,0" fill="none" stroke="url(#heroGradient2)" strokeWidth="0.2" strokeLinecap="round" strokeLinejoin="round" />
 
                 {/* Bottom-left corner chevrons */}
-                <path
-                    d="M 0,80 L 10,90 L 0,100"
-                    fill="none"
-                    stroke="url(#heroGradient2)"
-                    strokeWidth="0.4"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    style={{ transition: "stroke 0.3s ease-out" }}
-                />
-                <path
-                    d="M 0,65 L 17.5,82.5 L 0,100"
-                    fill="none"
-                    stroke="url(#heroGradient)"
-                    strokeWidth="0.3"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    style={{ transition: "stroke 0.3s ease-out" }}
-                />
-                <path
-                    d="M 0,50 L 25,75 L 0,100"
-                    fill="none"
-                    stroke="url(#heroGradient2)"
-                    strokeWidth="0.2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    style={{ transition: "stroke 0.3s ease-out" }}
-                />
+                <path d="M 0,80 L 10,90 L 0,100" fill="none" stroke="url(#heroGradient2)" strokeWidth="0.4" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M 0,65 L 17.5,82.5 L 0,100" fill="none" stroke="url(#heroGradient)" strokeWidth="0.3" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M 0,50 L 25,75 L 0,100" fill="none" stroke="url(#heroGradient2)" strokeWidth="0.2" strokeLinecap="round" strokeLinejoin="round" />
 
                 {/* Bottom-right corner chevrons */}
-                <path
-                    d="M 100,80 L 90,90 L 100,100"
-                    fill="none"
-                    stroke="url(#heroGradient)"
-                    strokeWidth="0.4"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    style={{ transition: "stroke 0.3s ease-out" }}
-                />
-                <path
-                    d="M 100,65 L 82.5,82.5 L 100,100"
-                    fill="none"
-                    stroke="url(#heroGradient2)"
-                    strokeWidth="0.3"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    style={{ transition: "stroke 0.3s ease-out" }}
-                />
-                <path
-                    d="M 100,50 L 75,75 L 100,100"
-                    fill="none"
-                    stroke="url(#heroGradient)"
-                    strokeWidth="0.2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    style={{ transition: "stroke 0.3s ease-out" }}
-                />
+                <path d="M 100,80 L 90,90 L 100,100" fill="none" stroke="url(#heroGradient)" strokeWidth="0.4" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M 100,65 L 82.5,82.5 L 100,100" fill="none" stroke="url(#heroGradient2)" strokeWidth="0.3" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M 100,50 L 75,75 L 100,100" fill="none" stroke="url(#heroGradient)" strokeWidth="0.2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
 
             {/* Ambient glow following cursor */}
