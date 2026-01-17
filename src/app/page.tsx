@@ -49,7 +49,7 @@ export default function HomePage() {
       <Navbar />
 
       {/* Hero Section - Centered */}
-      <section className="relative min-h-screen flex items-center justify-center pt-0 md:pt-8 overflow-hidden px-4">
+      <section className="relative h-screen flex items-center justify-center pt-0 md:pt-8 overflow-hidden px-1 sm:px-3">
         {/* Interactive Hero Background */}
         <InteractiveHeroBackground />
         <div className="section-container w-full relative z-10 py-0 md:py-12 text-center">
@@ -116,7 +116,7 @@ export default function HomePage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.4 }}
-            className="grid grid-cols-3 gap-2 sm:flex sm:flex-row sm:flex-wrap sm:justify-center sm:gap-6 md:gap-8 text-xs sm:text-sm text-muted-foreground px-2"
+            className="hidden sm:flex sm:flex-row sm:flex-wrap sm:justify-center sm:gap-6 md:gap-8 text-xs sm:text-sm text-muted-foreground px-2"
           >
             <span className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2">
               <CircleCheck className="w-4 h-4 text-neon" />

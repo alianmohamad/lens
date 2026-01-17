@@ -19,7 +19,20 @@ interface GenerateImageRequest {
     quality?: "standard" | "hd";
     negativePrompt?: string;
     numImages?: number;
+    demoMode?: boolean; // Force demo mode for testing
 }
+
+// Sample demo images for testing (high-quality product photography)
+const DEMO_IMAGES = [
+    "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&q=80", // Watch on marble
+    "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80", // Headphones
+    "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=800&q=80", // Sunglasses
+    "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=800&q=80", // Camera
+    "https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=800&q=80", // Perfume
+    "https://images.unsplash.com/photo-1491553895911-0055uj89a?w=800&q=80", // Cosmetics
+    "https://images.unsplash.com/photo-1560343090-f0409e92791a?w=800&q=80", // Sneaker
+    "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&q=80", // Red Nike shoe
+];
 
 export async function POST(request: NextRequest) {
     try {
@@ -33,7 +46,7 @@ export async function POST(request: NextRequest) {
         }
 
         const body: GenerateImageRequest = await request.json();
-        const { productImageUrl, promptId, customPrompt, aspectRatio = "1:1", stylePreset, productStrength = 80, quality = "standard", negativePrompt, numImages = 1 } = body;
+        const { productImageUrl, promptId, customPrompt, aspectRatio = "1:1", stylePreset, productStrength = 80, quality = "standard", negativePrompt, numImages = 1, demoMode = false } = body;
 
         if (!productImageUrl) {
             return NextResponse.json(
@@ -112,10 +125,16 @@ export async function POST(request: NextRequest) {
         // Combine for Final Prompt
         const finalPrompt = `${promptText}${styleInstruction}. ${ratioInstruction}. ${negativeInstruction}`.replace(/\[product\]/gi, "the product in the image");
 
-        // Check if Gemini API is configured
-        if (!GEMINI_API_KEY) {
-            // Return mock response for development
-            console.log("Gemini API not configured, returning demo response");
+        // Check if demo mode is requested or API not configured
+        if (demoMode || !GEMINI_API_KEY) {
+            // Return mock response for development/testing
+            console.log("Demo mode active, returning sample image");
+
+            // Simulate realistic generation delay (2-4 seconds)
+            await new Promise(resolve => setTimeout(resolve, 2000 + Math.random() * 2000));
+
+            // Pick a random demo image
+            const randomDemoImage = DEMO_IMAGES[Math.floor(Math.random() * DEMO_IMAGES.length)];
 
             // Create a record in the database
             const generatedImage = await prisma.generatedImage.create({
@@ -123,18 +142,18 @@ export async function POST(request: NextRequest) {
                     userId: session.user.id,
                     promptId: promptId || null,
                     originalUrl: productImageUrl,
-                    generatedUrl: productImageUrl, // Demo: return same image
+                    generatedUrl: randomDemoImage,
                     status: "COMPLETED",
                 },
             });
 
             return NextResponse.json({
                 success: true,
-                message: "Demo mode - configure GEMINI_API_KEY for actual generation",
+                message: demoMode ? "Demo mode enabled - using sample images" : "Demo mode - configure GEMINI_API_KEY for actual generation",
                 data: {
                     id: generatedImage.id,
                     originalUrl: productImageUrl,
-                    generatedUrl: productImageUrl,
+                    generatedUrl: randomDemoImage,
                     status: "COMPLETED",
                 },
             });
