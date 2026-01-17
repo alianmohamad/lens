@@ -49,16 +49,16 @@ export default function HomePage() {
       <Navbar />
 
       {/* Hero Section - Centered */}
-      <section className="relative min-h-screen flex items-center justify-center pt-8 md:pt-8 overflow-hidden px-4">
+      <section className="relative min-h-screen flex items-center justify-center pt-0 md:pt-8 overflow-hidden px-4">
         {/* Interactive Hero Background */}
         <InteractiveHeroBackground />
-        <div className="section-container w-full relative z-10 py-4 md:py-12 text-center">
+        <div className="section-container w-full relative z-10 py-0 md:py-12 text-center">
           {/* Eyebrow */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="mb-4 md:mb-8 flex justify-center"
+            className="mb-3 md:mb-8 flex justify-center"
           >
             <span className="pill text-xs md:text-sm">
               <Sparkles className="w-3 h-3 md:w-4 md:h-4" />
@@ -71,7 +71,7 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-5xl sm:text-6xl md:text-6xl lg:text-7xl xl:text-8xl font-display font-bold leading-[1.1] tracking-tight mb-4 md:mb-8 mx-auto max-w-5xl"
+            className="text-5xl sm:text-6xl md:text-6xl lg:text-7xl xl:text-8xl font-display font-bold leading-[1.1] tracking-tight mb-3 md:mb-8 mx-auto max-w-5xl"
           >
             <span className="block">Product photos</span>
             <span className="block pb-2">
@@ -84,7 +84,7 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-base sm:text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-2xl mx-auto mb-6 md:mb-12 px-4"
+            className="text-base sm:text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-2xl mx-auto mb-5 md:mb-12"
           >
             Transform any product image into studio-quality photography.
             No photographer. No studio. Just AI.
@@ -95,16 +95,16 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="flex flex-col sm:flex-row flex-wrap justify-center gap-3 sm:gap-4 mb-8 md:mb-16 px-4"
+            className="flex flex-row flex-wrap justify-center gap-3 sm:gap-4 mb-6 md:mb-16"
           >
-            <Link href="/studio" className="w-full sm:w-auto">
-              <button className="btn-cta flex items-center justify-center gap-2 text-base md:text-lg w-full sm:w-auto">
+            <Link href="/studio">
+              <button className="btn-cta flex items-center justify-center gap-2 text-sm sm:text-base md:text-lg">
                 Try It Free
                 <ArrowRight className="w-4 h-4 md:w-5 md:h-5" />
               </button>
             </Link>
-            <Link href="/marketplace" className="w-full sm:w-auto">
-              <button className="btn-ghost flex items-center justify-center gap-2 text-base md:text-lg w-full sm:w-auto">
+            <Link href="/marketplace">
+              <button className="btn-ghost flex items-center justify-center gap-2 text-sm sm:text-base md:text-lg">
                 <Play className="w-4 h-4 md:w-5 md:h-5" />
                 See How It Works
               </button>
