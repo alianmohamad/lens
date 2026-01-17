@@ -489,7 +489,7 @@
 
   /* Premium CTA Button - Gradient */
   .btn-cta {
-    @apply relative px-8 py-4 font-semibold text-white rounded-full;
+    @apply relative px-6 py-3 sm:px-8 sm:py-4 font-semibold text-white rounded-full;
     @apply transition-all duration-300;
     @apply hover:scale-105;
     background: linear-gradient(135deg, #9333EA 0%, #3B82F6 50%, #FBBF88 100%);
@@ -508,7 +508,7 @@
 
   /* Ghost Button - Animated gradient border on hover */
   .btn-ghost {
-    @apply relative px-8 py-4 font-semibold rounded-full;
+    @apply relative px-6 py-3 sm:px-8 sm:py-4 font-semibold rounded-full;
     @apply border border-foreground/20 text-foreground;
     @apply transition-all duration-300;
     background: var(--background);

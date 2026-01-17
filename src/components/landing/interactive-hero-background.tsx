@@ -68,7 +68,7 @@ export function InteractiveHeroBackground() {
             style={{ zIndex: 0 }}
         >
             <svg
-                className="absolute inset-0 w-full h-full"
+                className="absolute inset-0 w-full h-full hidden sm:block"
                 viewBox="0 0 100 100"
                 preserveAspectRatio="none"
             >

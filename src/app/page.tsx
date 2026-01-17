@@ -49,16 +49,16 @@ export default function HomePage() {
       <Navbar />
 
       {/* Hero Section - Centered */}
-      <section className="relative min-h-screen flex items-center justify-center pt-20 md:pt-8 overflow-hidden px-4">
+      <section className="relative min-h-screen flex items-center justify-center pt-16 md:pt-8 overflow-hidden px-4">
         {/* Interactive Hero Background */}
         <InteractiveHeroBackground />
-        <div className="section-container w-full relative z-10 py-8 md:py-12 text-center">
+        <div className="section-container w-full relative z-10 py-4 md:py-12 text-center">
           {/* Eyebrow */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="mb-6 md:mb-8 flex justify-center"
+            className="mb-4 md:mb-8 flex justify-center"
           >
             <span className="pill text-xs md:text-sm">
               <Sparkles className="w-3 h-3 md:w-4 md:h-4" />
@@ -71,7 +71,7 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-display font-bold leading-[1.1] tracking-tight mb-6 md:mb-8 mx-auto max-w-5xl"
+            className="text-5xl sm:text-6xl md:text-6xl lg:text-7xl xl:text-8xl font-display font-bold leading-[1.1] tracking-tight mb-4 md:mb-8 mx-auto max-w-5xl"
           >
             <span className="block">Product photos</span>
             <span className="block pb-2">
@@ -84,7 +84,7 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-base sm:text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-2xl mx-auto mb-8 md:mb-12 px-4"
+            className="text-base sm:text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-2xl mx-auto mb-6 md:mb-12 px-4"
           >
             Transform any product image into studio-quality photography.
             No photographer. No studio. Just AI.
@@ -95,7 +95,7 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="flex flex-col sm:flex-row flex-wrap justify-center gap-3 sm:gap-4 mb-10 md:mb-16 px-4"
+            className="flex flex-col sm:flex-row flex-wrap justify-center gap-3 sm:gap-4 mb-8 md:mb-16 px-4"
           >
             <Link href="/studio" className="w-full sm:w-auto">
               <button className="btn-cta flex items-center justify-center gap-2 text-base md:text-lg w-full sm:w-auto">
@@ -116,19 +116,19 @@ export default function HomePage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.4 }}
-            className="flex flex-col sm:flex-row flex-wrap justify-center gap-3 sm:gap-6 md:gap-8 text-xs sm:text-sm text-muted-foreground"
+            className="grid grid-cols-3 gap-2 sm:flex sm:flex-row sm:flex-wrap sm:justify-center sm:gap-6 md:gap-8 text-xs sm:text-sm text-muted-foreground px-2"
           >
-            <span className="flex items-center justify-center gap-2">
+            <span className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2">
               <CircleCheck className="w-4 h-4 text-neon" />
-              Free to start
+              <span>Free to start</span>
             </span>
-            <span className="flex items-center justify-center gap-2">
+            <span className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2">
               <CircleCheck className="w-4 h-4 text-neon" />
-              No credit card required
+              <span>No credit card</span>
             </span>
-            <span className="flex items-center justify-center gap-2">
+            <span className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2">
               <CircleCheck className="w-4 h-4 text-neon" />
-              Results in seconds
+              <span>Fast results</span>
             </span>
           </motion.div>
         </div>
@@ -331,51 +331,51 @@ export default function HomePage() {
       </section>
 
       {/* Final CTA */}
-      <section className="relative py-32">
+      <section className="relative py-16 md:py-32">
         <div className="section-container">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            className="bento-card p-12 md:p-20 text-center relative overflow-hidden"
+            className="bento-card p-6 sm:p-8 md:p-16 lg:p-20 text-center relative overflow-hidden"
           >
             {/* Glow effect - warm/cool gradient blend */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full blur-[100px]" style={{ background: 'linear-gradient(90deg, rgba(251, 146, 60, 0.15) 0%, rgba(139, 92, 246, 0.2) 50%, rgba(6, 182, 212, 0.15) 100%)' }} />
 
             <div className="relative">
-              <h2 className="text-4xl md:text-6xl font-display font-bold mb-6">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-bold mb-4 md:mb-6">
                 Start creating <span className="text-neon">today</span>
               </h2>
-              <p className="text-xl text-muted-foreground mb-10 max-w-lg mx-auto">
+              <p className="text-base md:text-xl text-muted-foreground mb-6 md:mb-10 max-w-lg mx-auto">
                 Join thousands of creators using ZeroLens. Free to start.
               </p>
 
-              <div className="flex flex-wrap justify-center gap-4 mb-10">
+              <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-3 sm:gap-4 mb-6 md:mb-10">
                 <Link href="/sign-up">
-                  <button className="btn-cta flex items-center gap-2 text-lg glow-neon-pulse">
+                  <button className="btn-cta flex items-center justify-center gap-2 text-sm sm:text-base md:text-lg w-full sm:w-auto glow-neon-pulse">
                     Get Started Free
-                    <ArrowRight className="w-5 h-5" />
+                    <ArrowRight className="w-4 h-4 md:w-5 md:h-5" />
                   </button>
                 </Link>
                 <Link href="/marketplace">
-                  <button className="btn-ghost flex items-center gap-2 text-lg">
+                  <button className="btn-ghost flex items-center justify-center gap-2 text-sm sm:text-base md:text-lg w-full sm:w-auto">
                     Browse Prompts
                   </button>
                 </Link>
               </div>
 
-              <div className="flex flex-wrap justify-center gap-6 text-sm text-muted-foreground">
-                <span className="flex items-center gap-2">
+              <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap sm:justify-center sm:gap-6 text-xs sm:text-sm text-muted-foreground">
+                <span className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2">
                   <CircleCheck className="w-4 h-4 text-neon" />
-                  Free to start
+                  <span>Free to start</span>
                 </span>
-                <span className="flex items-center gap-2">
+                <span className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2">
                   <CircleCheck className="w-4 h-4 text-neon" />
-                  No watermarks
+                  <span>No watermarks</span>
                 </span>
-                <span className="flex items-center gap-2">
+                <span className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2">
                   <CircleCheck className="w-4 h-4 text-neon" />
-                  Commercial license
+                  <span>Commercial use</span>
                 </span>
               </div>
             </div>
