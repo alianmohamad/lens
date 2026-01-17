@@ -49,10 +49,10 @@ export default function HomePage() {
       <Navbar />
 
       {/* Hero Section - Centered */}
-      <section className="relative h-screen flex items-center justify-center pt-0 md:pt-8 overflow-hidden">
+      <section className="relative h-dvh flex items-center justify-center pt-0 md:pt-8 overflow-hidden">
         {/* Interactive Hero Background */}
         <InteractiveHeroBackground />
-        <div className="mx-auto max-w-6xl w-full px-2 sm:px-4 relative z-10 py-0 md:py-12 text-center">
+        <div className="mx-auto max-w-6xl w-full px-2 sm:px-6 relative z-10 py-0 md:py-12 text-center">
           {/* Eyebrow */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -71,10 +71,10 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-5xl sm:text-6xl md:text-6xl lg:text-7xl xl:text-8xl font-display font-bold leading-[1.1] tracking-tight mb-3 md:mb-8 mx-auto max-w-5xl"
+            className="font-display font-bold leading-[1.1] tracking-tight mb-3 md:mb-8 mx-auto max-w-5xl"
           >
-            <span className="block">Product photos</span>
-            <span className="block pb-2">
+            <span className="block text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl">Product photos</span>
+            <span className="block pb-2 text-5xl sm:text-6xl md:text-6xl lg:text-7xl xl:text-8xl">
               <TypeWriter words={heroWords} interval={3000} className="hero-gradient-text" />
             </span>
           </motion.h1>
@@ -120,15 +120,15 @@ export default function HomePage() {
           >
             <span className="flex items-center gap-1 sm:gap-2">
               <CircleCheck className="w-4 h-4 text-neon" />
-              <span>Free</span>
+              <span>Try free</span>
             </span>
             <span className="flex items-center gap-1 sm:gap-2">
               <CircleCheck className="w-4 h-4 text-neon" />
-              <span>No card</span>
+              <span>Easy start</span>
             </span>
             <span className="flex items-center gap-1 sm:gap-2">
               <CircleCheck className="w-4 h-4 text-neon" />
-              <span>Fast</span>
+              <span>30s results</span>
             </span>
           </motion.div>
         </div>
