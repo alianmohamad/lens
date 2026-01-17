@@ -228,8 +228,8 @@ export const createConnector = (source: fabric.Object, target: fabric.Object) =>
         data: {
             type: "connector",
             id,
-            sourceId: source.data?.id,
-            targetId: target.data?.id
+            sourceId: (source as any).data?.id,
+            targetId: (target as any).data?.id
         }
     });
 

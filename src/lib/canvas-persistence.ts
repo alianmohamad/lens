@@ -43,7 +43,7 @@ export function useCanvasPersistence(canvas: fabric.Canvas | null, onLoaded?: ()
                 const snapshot = await loadCanvasFromApi();
                 if (!isMounted) return;
 
-                if (snapshot) {
+                if (snapshot && canvas) {
                     canvas.loadFromJSON(snapshot, () => {
                         canvas.requestRenderAll();
                         toast.info("Canvas loaded");
