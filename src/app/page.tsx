@@ -54,7 +54,7 @@ export default function HomePage() {
       <section className="relative h-dvh flex items-center justify-center pt-0 md:pt-8 overflow-hidden -mt-16">
         {/* Interactive Hero Background */}
         <InteractiveHeroBackground />
-        <div className="mx-auto max-w-6xl w-full px-2 sm:px-6 relative z-10 pt-8 md:pt-12 text-center">
+        <div className="mx-auto max-w-6xl w-full px-2 sm:px-6 relative z-10 pt-4 md:pt-8 text-center">
           {/* Eyebrow */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -73,10 +73,10 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-5xl sm:text-6xl md:text-6xl lg:text-7xl xl:text-8xl font-display font-bold leading-[1.1] tracking-tight mb-6 md:mb-10 mx-auto max-w-5xl"
+            className="text-5xl sm:text-6xl md:text-6xl lg:text-7xl xl:text-8xl font-display font-bold leading-[1.1] tracking-tight mb-2 md:mb-4 mx-auto max-w-5xl"
           >
             <span className="block">Product photos</span>
-            <span className="block pb-4 sm:pb-2">
+            <span className="block pb-6 sm:pb-4">
               <TypeWriter words={heroWords} interval={3000} className="hero-gradient-text" />
             </span>
           </motion.h1>
@@ -97,7 +97,7 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="flex flex-row flex-wrap justify-center gap-3 sm:gap-4 mb-4 md:mb-8"
+            className="flex flex-row flex-wrap justify-center gap-3 sm:gap-4 mb-8 md:mb-12"
           >
             <Link href="/studio">
               <button className="btn-cta flex items-center justify-center gap-2 text-sm sm:text-base md:text-lg">
