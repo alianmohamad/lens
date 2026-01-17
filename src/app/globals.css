@@ -506,18 +506,34 @@
     @apply scale-95;
   }
 
-  /* Ghost Button - Gradient border on hover */
+  /* Ghost Button - Animated gradient border on hover */
   .btn-ghost {
     @apply relative px-8 py-4 font-semibold rounded-full;
-    @apply bg-transparent border border-foreground/20 text-foreground;
+    @apply border border-foreground/20 text-foreground;
     @apply transition-all duration-300;
+    background: var(--background);
+    z-index: 1;
   }
 
   .btn-ghost:hover {
     border-color: transparent;
-    background: linear-gradient(var(--background), var(--background)) padding-box,
-                linear-gradient(135deg, #9333EA, #3B82F6, #FBBF88) border-box;
     box-shadow: 0 0 20px rgba(147, 51, 234, 0.2);
+    background:
+      linear-gradient(var(--background), var(--background)) padding-box,
+      conic-gradient(from var(--gradient-angle, 0deg), #9333EA, #3B82F6, #FBBF88, #9333EA) border-box;
+    animation: border-spin 2s linear infinite;
+  }
+
+  @keyframes border-spin {
+    to {
+      --gradient-angle: 360deg;
+    }
+  }
+
+  @property --gradient-angle {
+    syntax: "<angle>";
+    initial-value: 0deg;
+    inherits: false;
   }
 
   /* Section container */
@@ -525,30 +541,59 @@
     @apply mx-auto max-w-6xl px-6 sm:px-8 lg:px-12;
   }
 
-  /* Bento card */
+  /* Bento card - Animated gradient border on hover */
   .bento-card {
-    @apply relative overflow-hidden rounded-3xl;
-    @apply bg-card/80 backdrop-blur-xl;
+    @apply relative rounded-3xl;
+    @apply backdrop-blur-xl;
     @apply border border-border;
     @apply transition-all duration-500;
+    background: var(--card);
   }
 
   .bento-card:hover {
     border-color: transparent;
-    background: linear-gradient(var(--card), var(--card)) padding-box,
-                linear-gradient(135deg, rgba(147, 51, 234, 0.3), rgba(59, 130, 246, 0.2), rgba(251, 191, 136, 0.2)) border-box;
+    background:
+      linear-gradient(var(--card), var(--card)) padding-box,
+      conic-gradient(from var(--card-gradient-angle, 0deg), rgba(147, 51, 234, 0.6), rgba(59, 130, 246, 0.5), rgba(251, 191, 136, 0.5), rgba(147, 51, 234, 0.6)) border-box;
     box-shadow:
       0 0 60px rgba(147, 51, 234, 0.08),
       inset 0 0 60px rgba(147, 51, 234, 0.02);
+    animation: card-border-spin 4s linear infinite;
   }
 
-  /* Feature pill - Gradient border */
+  @keyframes card-border-spin {
+    to {
+      --card-gradient-angle: 360deg;
+    }
+  }
+
+  @property --card-gradient-angle {
+    syntax: "<angle>";
+    initial-value: 0deg;
+    inherits: false;
+  }
+
+  /* Feature pill - Animated gradient border */
   .pill {
     @apply inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium;
-    background: linear-gradient(var(--background), var(--background)) padding-box,
-                linear-gradient(135deg, #9333EA, #3B82F6, #FBBF88) border-box;
     border: 1px solid transparent;
     color: #9333EA;
+    background:
+      linear-gradient(var(--background), var(--background)) padding-box,
+      conic-gradient(from var(--pill-gradient-angle, 0deg), #9333EA, #3B82F6, #FBBF88, #9333EA) border-box;
+    animation: pill-border-spin 4s linear infinite;
+  }
+
+  @keyframes pill-border-spin {
+    to {
+      --pill-gradient-angle: 360deg;
+    }
+  }
+
+  @property --pill-gradient-angle {
+    syntax: "<angle>";
+    initial-value: 0deg;
+    inherits: false;
   }
 
   /* Stat card */
