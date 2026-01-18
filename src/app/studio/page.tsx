@@ -125,8 +125,8 @@ export default function StudioPage() {
                 <StudioNav />
             </div>
 
-            {/* L2: Tool Palette (Left) */}
-            <div className="absolute left-6 top-1/2 -translate-y-1/2 z-30 flex flex-col items-center">
+            {/* L2: Tool Palette (Left) - Hidden on Mobile */}
+            <div className="hidden md:flex absolute left-4 lg:left-6 top-1/2 -translate-y-1/2 z-30 flex-col items-center">
                 <StudioToolPalette
                     activeTool={activeTool}
                     setActiveTool={setActiveTool}
@@ -135,7 +135,7 @@ export default function StudioPage() {
             </div>
 
             {/* L3: Bottom Control Bar */}
-            <div className="absolute bottom-6 left-0 right-0 z-30 px-4 flex justify-center pointer-events-none">
+            <div className="absolute bottom-4 md:bottom-6 left-2 right-2 md:left-0 md:right-0 z-30 md:px-4 flex justify-center pointer-events-none">
                 <StudioBottomBar
                     onUpload={handleFileSelect}
                     onGenerate={handleGenerate}
