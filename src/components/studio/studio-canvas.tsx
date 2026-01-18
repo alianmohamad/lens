@@ -47,8 +47,9 @@ export function StudioCanvas({ onCanvasReady, generatedImage, originalImage, act
 
         canvas.on("mouse:wheel", updateGrid);
         canvas.on("mouse:up", updateGrid);
-        canvas.on("mouse:move", (e: any) => {
-            if (e.e.buttons === 1 && (e.e.altKey || e.e.code === "Space")) {
+        canvas.on("mouse:move", () => {
+            // Update grid during any panning (hand mode, alt+drag, etc.)
+            if ((canvas as any)._isDragging) {
                 updateGrid();
             }
         });
@@ -169,16 +170,94 @@ export function StudioCanvas({ onCanvasReady, generatedImage, originalImage, act
             return;
         }
 
-        const center = fabricCanvas.getVpCenter();
-
+        // Create card off-screen or at origin, then move it
         createGenerationCard(originalImage, {
-            left: center.x,
-            top: center.y,
+            left: 0,
+            top: 0,
             prompt: "Original Source"
         }).then(group => {
+            const existingCards = fabricCanvas.getObjects().filter((o: any) => o.data?.type === "generation-frame");
+
+            if (existingCards.length === 0) {
+                // First card: Center in viewport
+                // First card: Center in viewport
+                fabricCanvas.centerObject(group);
+                group.setCoords();
+            } else {
+                // New card: Place to the right of the rightmost card
+                let maxRight = -Infinity;
+                let refCard: any = null;
+
+                existingCards.forEach((card: any) => {
+                    const b = card.getBoundingRect();
+                    const rightEdge = b.left + b.width;
+
+                    if (rightEdge > maxRight) {
+                        maxRight = rightEdge;
+                        refCard = { top: b.top, height: b.height };
+                    }
+                });
+
+                if (refCard) {
+                    // Start 50px to the right
+                    const newLeft = maxRight + 50;
+
+                    // Align vertically (Center to Center)
+                    const refCenterY = refCard.top + refCard.height / 2;
+                    const myHeight = group.getScaledHeight();
+                    const newTop = refCenterY - myHeight / 2;
+
+                    group.set({ left: newLeft, top: newTop });
+                }
+            }
+
             fabricCanvas.add(group);
             fabricCanvas.setActiveObject(group);
             fabricCanvas.requestRenderAll();
+
+            // Auto-fit to show all content
+            setTimeout(() => {
+                const allCards = fabricCanvas.getObjects().filter((o: any) => o.data?.type === "generation-frame");
+                if (allCards.length > 1) {
+                    // Zoom out to fit all
+                    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+                    allCards.forEach((obj: any) => {
+                        // Use raw coords for model space bounding box
+                        const bLeft = obj.left ?? 0;
+                        const bTop = obj.top ?? 0;
+                        const bWidth = obj.getScaledWidth();
+                        const bHeight = obj.getScaledHeight();
+
+                        minX = Math.min(minX, bLeft);
+                        minY = Math.min(minY, bTop);
+                        maxX = Math.max(maxX, bLeft + bWidth);
+                        maxY = Math.max(maxY, bTop + bHeight);
+                    });
+
+                    const contentW = maxX - minX;
+                    const contentH = maxY - minY;
+                    const canvasW = fabricCanvas.getWidth();
+                    const canvasH = fabricCanvas.getHeight();
+
+                    // More padding (300px) and limit max zoom
+                    const padding = 300;
+                    const availW = canvasW - padding;
+                    const availH = canvasH - padding;
+
+                    let zoom = Math.min(availW / contentW, availH / contentH);
+                    zoom = Math.min(zoom, 0.8); // Cap max zoom
+
+                    const cx = (minX + maxX) / 2;
+                    const cy = (minY + maxY) / 2;
+
+                    fabricCanvas.setViewportTransform([
+                        zoom, 0, 0, zoom,
+                        canvasW / 2 - cx * zoom,
+                        canvasH / 2 - cy * zoom
+                    ]);
+                    fabricCanvas.requestRenderAll();
+                }
+            }, 100);
         });
     }, [fabricCanvas, originalImage]);
 

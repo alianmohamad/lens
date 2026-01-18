@@ -20,6 +20,7 @@ interface GenerateImageRequest {
     negativePrompt?: string;
     numImages?: number;
     demoMode?: boolean; // Force demo mode for testing
+    modelId?: string; // New: Model selection
 }
 
 // Sample demo images for testing (high-quality product photography)
@@ -34,6 +35,8 @@ const DEMO_IMAGES = [
     "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&q=80", // Red Nike shoe
 ];
 
+// ...
+
 export async function POST(request: NextRequest) {
     try {
         const session = await getServerSession(authOptions);
@@ -46,7 +49,19 @@ export async function POST(request: NextRequest) {
         }
 
         const body: GenerateImageRequest = await request.json();
-        const { productImageUrl, promptId, customPrompt, aspectRatio = "1:1", stylePreset, productStrength = 80, quality = "standard", negativePrompt, numImages = 1, demoMode = false } = body;
+        const {
+            productImageUrl,
+            promptId,
+            customPrompt,
+            aspectRatio = "1:1",
+            stylePreset,
+            productStrength = 80,
+            quality = "standard",
+            negativePrompt,
+            numImages = 1,
+            demoMode = false,
+            modelId = "gemini-3-pro"
+        } = body;
 
         if (!productImageUrl) {
             return NextResponse.json(
@@ -172,8 +187,18 @@ export async function POST(request: NextRequest) {
         try {
             // Initialize Gemini API client
             const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+
+            // Select Model
+            let targetModel = "gemini-3-pro-image-preview"; // Default
+            if (modelId === "imagen-3") {
+                targetModel = "imagen-3.0-generate-001";
+            } else if (modelId === "fast") {
+                // Use same model but maybe different config, or Flash if available
+                targetModel = "gemini-3-pro-image-preview";
+            }
+
             const model = genAI.getGenerativeModel({
-                model: MODEL_NAME,
+                model: targetModel,
             });
 
             // Parse the product image data URL to extract base64 and mime type
@@ -209,8 +234,8 @@ export async function POST(request: NextRequest) {
                         text: `You are a professional product photographer AI. ${integrityInstruction} Generate a high-quality product photograph based on the provided product image, applying the styling, background, lighting, and composition described in the prompt. The output should be suitable for e-commerce use. Output resolution: ${quality === 'hd' ? 'high definition' : 'standard'}.`
                     }]
                 },
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } as any);
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            } as any);
 
             const response = await result.response;
 

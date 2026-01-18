@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
@@ -15,6 +14,7 @@ import { StudioToolPalette } from "@/components/studio/studio-tool-palette";
 import { StudioBottomBar } from "@/components/studio/studio-bottom-bar";
 import { cn } from "@/lib/utils";
 import * as fabric from "fabric";
+import { createGenerationCard, createSkeletonCard } from "@/lib/fabric-utils";
 
 export default function StudioPage() {
     const { data: session, status } = useSession();
@@ -35,6 +35,7 @@ export default function StudioPage() {
     const [prompt, setPrompt] = useState("");
     const [stylePreset, setStylePreset] = useState("realistic");
     const [aspectRatio, setAspectRatio] = useState("1:1");
+    const [modelId, setModelId] = useState("gemini-3-pro");
 
     // --- Handlers ---
 
@@ -69,34 +70,163 @@ export default function StudioPage() {
     }, []);
 
     const handleGenerate = async () => {
-        if (!uploadedImage) return;
-        setIsGenerating(true);
-        setStatusText("Initializing...");
+        if (!uploadedImage) {
+            toast.error("Please upload an image first");
+            return;
+        }
 
-        // Simulate API
-        setTimeout(() => setStatusText("Analyzing image..."), 1000);
-        setTimeout(() => setStatusText("Generating variations..."), 2500);
-        setTimeout(() => {
-            setIsGenerating(false);
-            setGeneratedImage(uploadedImage); // Demo
-            setCanvas(prev => {
-                // Force re-render if needed
-                return prev;
+        setIsGenerating(true);
+        setStatusText(`Processing with ${modelId === 'imagen-3' ? 'Imagen 3' : 'Gemini 3 Pro'}...`);
+
+        // 1. Calculate Position (Model Space)
+        const center = canvas?.getVpCenter() || { x: 0, y: 0 };
+        let nextLeft = center.x + 200;
+        let nextCenterY = center.y;
+
+        if (canvas) {
+            const existingCards = canvas.getObjects().filter((o: any) => o.data?.type === "generation-frame" || o.data?.type === "skeleton");
+            if (existingCards.length > 0) {
+                let maxRight = -Infinity;
+                existingCards.forEach((c: any) => {
+                    const b = c.getBoundingRect();
+                    const rightEdge = b.left + b.width;
+
+                    if (rightEdge > maxRight) {
+                        maxRight = rightEdge;
+                        nextCenterY = b.top + b.height / 2;
+                    }
+                });
+                if (maxRight > -Infinity) nextLeft = maxRight + 50;
+            }
+        }
+
+        // 2. Add Skeleton Loader
+        const skeleton = canvas ? createSkeletonCard({
+            left: nextLeft,
+            top: nextCenterY - 256, // 512/2
+            scale: 1
+        }) : null;
+
+        if (canvas && skeleton) {
+            canvas.add(skeleton);
+            canvas.requestRenderAll();
+        }
+
+        try {
+            // 3. Prepare payload
+            const payload = {
+                productImageUrl: uploadedImage,
+                promptId: "", // Using custom prompt for now
+                customPrompt: prompt || "Professional product photography",
+                aspectRatio: aspectRatio,
+                stylePreset: stylePreset,
+                productStrength: 80, // Default integrity
+                demoMode: false, // Use real API
+                modelId: modelId
+            };
+
+            // 2. Call API
+            const response = await fetch("/api/generate", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
             });
-            toast.success("Generation Complete!");
-        }, 4000);
+
+            const data = await response.json();
+
+            // Remove skeleton if exists
+            if (!response.ok) {
+                throw new Error(data.error || "Generation failed");
+            }
+
+            if (data.success && data.data?.generatedUrl) {
+                // 3. Handle Success
+                setGeneratedImage(data.data.generatedUrl);
+                setStatusText("Rendering...");
+
+                // Add to canvas
+                if (canvas) {
+                    const group = await createGenerationCard(data.data.generatedUrl, {
+                        left: nextLeft,
+                        top: nextCenterY, // Will adjust Y below
+                        prompt: prompt || stylePreset,
+                        label: `Gen: ${modelId === 'imagen-3' ? 'Img3' : 'Gem3'}`
+                    });
+
+                    // Adjust top to center vertically
+                    const myHeight = group.getScaledHeight();
+                    group.set({ top: nextCenterY - myHeight / 2 });
+
+                    // SWAP: Remove skeleton NOW, preventing race conditions
+                    if (skeleton) canvas.remove(skeleton);
+
+                    canvas.add(group);
+                    canvas.setActiveObject(group);
+                    canvas.requestRenderAll();
+
+                    toast.success("Generation Complete!");
+                }
+            } else {
+                throw new Error("No image data received");
+            }
+
+        } catch (error) {
+            console.error("Generation error:", error);
+            if (canvas && skeleton) canvas.remove(skeleton);
+            canvas?.requestRenderAll();
+            toast.error(error instanceof Error ? error.message : "Failed to generate image");
+        } finally {
+            setIsGenerating(false);
+            setStatusText("Ready");
+        }
     };
 
     const handleFitToScreen = () => {
-        if (canvas) {
-            const vpt = canvas.viewportTransform;
-            if (vpt) {
-                vpt[4] = 0; // Reset Pan logic roughly
-                vpt[5] = 0;
-                canvas.setZoom(1);
-                canvas.requestRenderAll();
-            }
+        if (!canvas) return;
+
+        const objects = canvas.getObjects().filter((o: any) => o.data?.type !== "connector");
+
+        if (objects.length === 0) {
+            // No objects - just reset view
+            canvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
+            canvas.requestRenderAll();
+            return;
         }
+
+        // Get bounding box of all objects
+        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+        objects.forEach(obj => {
+            const bounds = obj.getBoundingRect();
+            minX = Math.min(minX, bounds.left);
+            minY = Math.min(minY, bounds.top);
+            maxX = Math.max(maxX, bounds.left + bounds.width);
+            maxY = Math.max(maxY, bounds.top + bounds.height);
+        });
+
+        const contentWidth = maxX - minX;
+        const contentHeight = maxY - minY;
+        const canvasWidth = canvas.getWidth();
+        const canvasHeight = canvas.getHeight();
+
+        // Calculate zoom to fit with margin
+        const margin = 150;
+        const scaleX = (canvasWidth - margin * 2) / contentWidth;
+        const scaleY = (canvasHeight - margin * 2) / contentHeight;
+        const zoom = Math.min(scaleX, scaleY, 0.8); // Cap at 0.8x for more zoomed-out view
+
+        // Calculate pan to center
+        const centerX = (minX + maxX) / 2;
+        const centerY = (minY + maxY) / 2;
+        const vpCenterX = canvasWidth / 2;
+        const vpCenterY = canvasHeight / 2;
+
+        canvas.setViewportTransform([
+            zoom, 0, 0, zoom,
+            vpCenterX - centerX * zoom,
+            vpCenterY - centerY * zoom
+        ]);
+        canvas.requestRenderAll();
+        toast.success("Centered on content");
     };
 
     useEffect(() => {
@@ -117,6 +247,7 @@ export default function StudioPage() {
                     onCanvasReady={setCanvas}
                     originalImage={uploadedImage}
                     generatedImage={generatedImage}
+                    activeTool={activeTool}
                 />
             </div>
 
@@ -147,6 +278,8 @@ export default function StudioPage() {
                     setStylePreset={setStylePreset}
                     aspectRatio={aspectRatio}
                     setAspectRatio={setAspectRatio}
+                    modelId={modelId}
+                    setModelId={setModelId}
                 />
             </div>
 

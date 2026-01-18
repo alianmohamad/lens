@@ -1,52 +1,64 @@
 
 import * as fabric from "fabric";
 
-// Colors (Slate Palette - Brand Aligned)
-const BG_COLOR = "#020617"; // slate-950 (Deep Blue/Black)
-const CARD_BG = "#0f172a"; // slate-900 (Brand Card Color)
-const CARD_BORDER = "#1e293b"; // slate-800
-const ACCENT_COLOR = "#a855f7"; // purple-500 (Brand Accent)
-const TEXT_COLOR = "#f8fafc"; // slate-50
-const SUBTEXT_COLOR = "#94a3b8"; // slate-400
+// Colors
+const CARD_BG = "#0f172a";
+const CARD_BORDER = "#334155";
+const ACCENT_COLOR = "#3b82f6";
+const TEXT_COLOR = "#f8fafc";
+
+// Card size limits
+const MAX_CARD_SIZE = 400;
+const MIN_CARD_SIZE = 150;
+const CORNER_RADIUS = 12;
 
 /**
  * Initializes the infinite canvas behavior (Zoom/Pan)
  */
 export function initInfiniteCanvas(canvas: fabric.Canvas) {
-    // Zoom with scroll
+    // Zoom with mouse wheel
     canvas.on("mouse:wheel", (opt: any) => {
-        const delta = opt.e.deltaY;
+        const e = opt.e;
+        const delta = e.deltaY;
         let zoom = canvas.getZoom();
+
+        // Smoother zoom factor
         zoom *= 0.999 ** delta;
 
-        // Limit zoom
-        if (zoom > 5) zoom = 5;
-        if (zoom < 0.2) zoom = 0.2;
+        // Clamp zoom
+        zoom = Math.min(Math.max(zoom, 0.1), 10);
 
-        canvas.zoomToPoint(new fabric.Point(opt.e.offsetX, opt.e.offsetY), zoom);
-        opt.e.preventDefault();
-        opt.e.stopPropagation();
+        canvas.zoomToPoint(new fabric.Point(e.offsetX, e.offsetY), zoom);
+        e.preventDefault();
+        e.stopPropagation();
     });
 
-    // Pan with Alt + Drag or Space + Drag
     let isDragging = false;
     let lastPosX = 0;
     let lastPosY = 0;
 
+    // Pan with Alt+drag, Space+drag, middle mouse, or hand tool
     canvas.on("mouse:down", (opt: any) => {
-        const evt = opt.e;
-        // Check for 'hand' mode (custom property we'll set on canvas)
-        const isHandMode = (canvas as any).isHandMode;
+        const e = opt.e;
+        const isHandMode = (canvas as any).isHandMode === true;
+        const isMiddleClick = e.button === 1;
+        const isLeftClick = e.button === 0;
+        const isPanKey = e.altKey === true;
 
-        if (evt.altKey || evt.code === "Space" || isHandMode) {
+        // Only allow pan if:
+        // 1. Hand mode is active (any click pans)
+        // 2. Middle mouse button (always pans)
+        // 3. Alt key + left click (pan shortcut)
+        const shouldPan = isHandMode || isMiddleClick || (isLeftClick && isPanKey);
+
+        if (shouldPan) {
             isDragging = true;
             canvas.selection = false;
-            canvas.setCursor(isHandMode ? 'grabbing' : 'default');
-
-            const clientX = evt.clientX || (evt.touches && evt.touches[0].clientX) || 0;
-            const clientY = evt.clientY || (evt.touches && evt.touches[0].clientY) || 0;
-            lastPosX = clientX;
-            lastPosY = clientY;
+            (canvas as any)._isDragging = true;
+            canvas.setCursor('grabbing');
+            lastPosX = e.clientX;
+            lastPosY = e.clientY;
+            e.preventDefault();
         }
     });
 
@@ -56,46 +68,70 @@ export function initInfiniteCanvas(canvas: fabric.Canvas) {
             const vpt = canvas.viewportTransform;
             if (!vpt) return;
 
-            const clientX = e.clientX || (e.touches && e.touches[0].clientX) || 0;
-            const clientY = e.clientY || (e.touches && e.touches[0].clientY) || 0;
+            const dx = e.clientX - lastPosX;
+            const dy = e.clientY - lastPosY;
 
-            vpt[4] += clientX - lastPosX;
-            vpt[5] += clientY - lastPosY;
+            // Calculate new position
+            let newX = vpt[4] + dx;
+            let newY = vpt[5] + dy;
+
+            // Pan limits - prevent going too far (2000px in each direction from center)
+            const PAN_LIMIT = 2000;
+            const canvasWidth = canvas.getWidth();
+            const canvasHeight = canvas.getHeight();
+            const zoom = canvas.getZoom();
+
+            // Clamp pan values
+            const minX = -PAN_LIMIT * zoom;
+            const maxX = canvasWidth + PAN_LIMIT * zoom;
+            const minY = -PAN_LIMIT * zoom;
+            const maxY = canvasHeight + PAN_LIMIT * zoom;
+
+            newX = Math.min(Math.max(newX, minX), maxX);
+            newY = Math.min(Math.max(newY, minY), maxY);
+
+            vpt[4] = newX;
+            vpt[5] = newY;
+
             canvas.requestRenderAll();
-            lastPosX = clientX;
-            lastPosY = clientY;
+            lastPosX = e.clientX;
+            lastPosY = e.clientY;
         }
     });
 
     canvas.on("mouse:up", () => {
-        const vpt = canvas.viewportTransform;
-        if (vpt) canvas.setViewportTransform(vpt);
-        isDragging = false;
-        canvas.selection = true;
+        if (isDragging) {
+            isDragging = false;
+            (canvas as any)._isDragging = false;
+            canvas.selection = !(canvas as any).isHandMode;
+            canvas.setCursor((canvas as any).isHandMode ? 'grab' : 'default');
+            canvas.setViewportTransform(canvas.viewportTransform!);
+        }
     });
 
-    // Custom selection style - Premium Look
+    // Selection style
     fabric.Object.prototype.set({
         transparentCorners: false,
         cornerColor: "#ffffff",
         cornerStrokeColor: ACCENT_COLOR,
         borderColor: ACCENT_COLOR,
         cornerSize: 10,
-        padding: 8,
+        padding: 4,
         cornerStyle: "circle",
-        borderDashArray: [0, 0], // Solid line
         borderScaleFactor: 2,
+        lockUniScaling: true,
     });
 }
 
 /**
- * Creates a "Studio Card" node
+ * Creates a Studio Card - Image with rounded corners and label
  */
 export const createGenerationCard = (imageUrl: string, options: {
     left: number;
     top: number;
-    prompt: string;
+    prompt?: string;
     id?: string;
+    label?: string;
 }) => {
     return new Promise<fabric.Group>((resolve) => {
         const imgEl = new Image();
@@ -103,100 +139,134 @@ export const createGenerationCard = (imageUrl: string, options: {
 
         imgEl.onload = () => {
             const img = new fabric.Image(imgEl);
+            const cardId = options.id || `card_${Date.now()}`;
 
-            // Config
-            const CARD_W = 320;
-            const CARD_H = 440;
-            const PADDING = 16;
-            const IMAGE_AREA_H = 300;
+            const origWidth = img.width || 400;
+            const origHeight = img.height || 300;
 
-            const maxWidth = CARD_W - (PADDING * 2);
-            const maxHeight = IMAGE_AREA_H - (PADDING * 2);
+            // Calculate scale to fit within max size while preserving aspect ratio
+            const maxDim = Math.max(origWidth, origHeight);
+            let scale = 1;
 
-            const scale = Math.min(maxWidth / (img.width || 1), maxHeight / (img.height || 1));
+            if (maxDim > MAX_CARD_SIZE) {
+                scale = MAX_CARD_SIZE / maxDim;
+            }
+            if (maxDim * scale < MIN_CARD_SIZE) {
+                scale = MIN_CARD_SIZE / maxDim;
+            }
 
-            img.scale(scale);
+            // Final displayed dimensions
+            const displayW = origWidth * scale;
+            const displayH = origHeight * scale;
 
-            const imgCenterY = (-CARD_H / 2) + (IMAGE_AREA_H / 2);
+            // ClipPath for rounded corners on the image
+            const clipRect = new fabric.Rect({
+                width: origWidth,
+                height: origHeight,
+                rx: CORNER_RADIUS / scale,
+                ry: CORNER_RADIUS / scale,
+                originX: 'center',
+                originY: 'center',
+            });
 
+            // Scale the image with clipPath for rounded corners
             img.set({
+                scaleX: scale,
+                scaleY: scale,
                 originX: 'center',
                 originY: 'center',
                 left: 0,
-                top: imgCenterY,
+                top: 0,
+                clipPath: clipRect,
             });
 
-            // Card Background (Frame)
+            // Border frame - exact same size as scaled image
             const frame = new fabric.Rect({
-                width: CARD_W,
-                height: CARD_H,
+                width: displayW,
+                height: displayH,
+                fill: "transparent",
+                stroke: "#475569", // More visible border (slate-600)
+                strokeWidth: 2,
+                rx: CORNER_RADIUS,
+                ry: CORNER_RADIUS,
+                originX: 'center',
+                originY: 'center',
+                left: 0,
+                top: 0,
+            });
+
+            // Label
+            const LABEL_H = 24;
+            const labelText = options.label || `Creation #${cardId.slice(-4)}`;
+            const labelW = Math.max(labelText.length * 7 + 24, 90);
+
+            const labelBg = new fabric.Rect({
+                width: labelW,
+                height: LABEL_H,
                 fill: CARD_BG,
                 stroke: CARD_BORDER,
                 strokeWidth: 1,
-                rx: 24,
-                ry: 24,
-                shadow: new fabric.Shadow({
-                    color: 'rgba(2, 6, 23, 0.5)', // slate-950 shadow
-                    blur: 40,
-                    offsetX: 0,
-                    offsetY: 20
-                }),
-                originX: 'center',
-                originY: 'center',
+                rx: 6,
+                ry: 6,
+                originX: 'left',
+                originY: 'bottom',
+                left: -displayW / 2,
+                top: -displayH / 2 - 6,
             });
 
-            // Divider Line
-            const divider = new fabric.Line([-CARD_W / 2 + PADDING, 0, CARD_W / 2 - PADDING, 0], {
-                stroke: CARD_BORDER,
-                strokeWidth: 1,
-                originX: 'center',
-                originY: 'center',
-                top: imgCenterY + IMAGE_AREA_H / 2 + 10 // Below image area
-            });
-
-            // Text
-            const promptText = new fabric.Textbox(options.prompt || "Start your creation...", {
-                fontSize: 14,
+            const label = new fabric.Text(labelText, {
+                fontSize: 11,
                 fontFamily: "Inter, sans-serif",
-                fill: SUBTEXT_COLOR,
-                width: CARD_W - (PADDING * 2),
-                splitByGrapheme: false,
-                originX: 'center',
-                originY: 'top',
-                top: imgCenterY + IMAGE_AREA_H / 2 + 20, // Bottom section
-                textAlign: 'left',
-                maxLines: 3
+                fontWeight: "500",
+                fill: TEXT_COLOR,
+                originX: 'left',
+                originY: 'center',
+                left: -displayW / 2 + 8,
+                top: -displayH / 2 - 6 - LABEL_H / 2,
             });
 
-            const group = new fabric.Group([frame, img, promptText], {
+            // Create group
+            const group = new fabric.Group([frame, img, labelBg, label], {
                 left: options.left,
                 top: options.top,
                 hasControls: true,
+                lockUniScaling: true,
+                lockScalingFlip: true,
                 subTargetCheck: true,
                 data: {
                     type: "generation-frame",
-                    id: options.id || Date.now().toString(),
+                    id: cardId,
                     originalUrl: imageUrl,
-                    prompt: options.prompt
+                    prompt: options.prompt,
+                    width: origWidth,
+                    height: origHeight
                 }
             } as any);
+
+            // Corner-only resize (remove side handles)
+            if (fabric.controlsUtils?.createObjectDefaultControls) {
+                group.controls = { ...fabric.controlsUtils.createObjectDefaultControls() };
+                delete (group.controls as any).mt;
+                delete (group.controls as any).mb;
+                delete (group.controls as any).ml;
+                delete (group.controls as any).mr;
+            }
 
             resolve(group);
         };
 
         imgEl.onerror = () => {
-            // Fallback
             const errorBox = new fabric.Rect({
-                width: 320, height: 440, fill: CARD_BG, rx: 24, ry: 24,
-                originX: 'center', originY: 'center', stroke: ACCENT_COLOR
+                width: 200, height: 150, fill: CARD_BG, rx: 12, ry: 12,
+                originX: 'center', originY: 'center', stroke: "#ef4444", strokeWidth: 2
             });
             const errorText = new fabric.Text("Image Error", {
-                fontSize: 20, fill: ACCENT_COLOR, originX: 'center', originY: 'center'
+                fontSize: 14, fill: "#ef4444", originX: 'center', originY: 'center'
             });
-            const group = new fabric.Group([errorBox, errorText], {
-                left: options.left, top: options.top
-            } as any);
-            resolve(group);
+            resolve(new fabric.Group([errorBox, errorText], {
+                left: options.left, top: options.top,
+                data: { type: "generation-frame", id: options.id || Date.now().toString() }
+            } as any));
         };
 
         imgEl.src = imageUrl;
@@ -204,23 +274,17 @@ export const createGenerationCard = (imageUrl: string, options: {
 };
 
 export function drawDotGrid(canvas: fabric.Canvas) {
-    // Legacy function - kept for compatibility, but canvas is now transparent
-    // canvas.backgroundColor = BG_COLOR; 
     canvas.requestRenderAll();
 }
 
-// --- Connector Lines ---
-
+// Connector functions
 export const createConnector = (source: fabric.Object, target: fabric.Object) => {
-    const id = `conn_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-
-    // Initial Path (Correct Bezier structure)
-    // We use a dummy path, it will be updated immediately.
+    const id = `conn_${Date.now()}`;
     const path = new fabric.Path("M 0 0 C 0 0 0 0 0 0", {
         fill: "",
-        stroke: "#94a3b8", // Slate 400
+        stroke: "#3b82f6",
         strokeWidth: 2,
-        strokeDashArray: [5, 5], // Dashed initially? Or solid? Solid looks cleaner.
+        strokeDashArray: [6, 4],
         strokeLineCap: 'round',
         objectCaching: false,
         selectable: false,
@@ -232,57 +296,88 @@ export const createConnector = (source: fabric.Object, target: fabric.Object) =>
             targetId: (target as any).data?.id
         }
     });
-
     updateConnector(path, source, target);
     return path;
 };
 
+export const createSkeletonCard = (options: {
+    left: number;
+    top: number;
+    scale?: number;
+}): fabric.Group => {
+    const defaultSize = 512 * (options.scale || 1);
+
+    const frame = new fabric.Rect({
+        width: defaultSize,
+        height: defaultSize,
+        fill: "#1e293b", // Slate-800
+        stroke: "#334155",
+        strokeWidth: 2,
+        rx: 16,
+        ry: 16,
+        originX: 'center',
+        originY: 'center',
+    });
+
+    // Loading Text
+    const text = new fabric.Text("Generating...", {
+        fontSize: 16,
+        fontFamily: "Inter, sans-serif",
+        fill: "#94a3b8",
+        originX: 'center',
+        originY: 'center',
+    });
+
+    const group = new fabric.Group([frame, text], {
+        left: options.left,
+        top: options.top,
+        selectable: false, // Not interactable
+        evented: false,
+        data: { type: "skeleton" }
+    } as any);
+
+    // Manual pulse loop helper
+    const pulse = () => {
+        frame.animate({ opacity: 0.5 }, {
+            duration: 800,
+            onChange: (group.canvas as any)?.requestRenderAll.bind(group.canvas),
+            onComplete: () => {
+                frame.animate({ opacity: 1 }, {
+                    duration: 800,
+                    onChange: (group.canvas as any)?.requestRenderAll.bind(group.canvas),
+                    onComplete: pulse
+                });
+            }
+        });
+    };
+    (group as any).pulse = pulse;
+    pulse();
+
+    return group;
+};
+
 export const updateConnector = (connector: fabric.Path, source: fabric.Object, target: fabric.Object) => {
-    // Robust absolute coordinates using getCenterPoint()
-    // This works even if objects are inside a Group/ActiveSelection
     const sCenter = source.getCenterPoint();
     const tCenter = target.getCenterPoint();
+    const sW = source.getScaledWidth();
+    const tW = target.getScaledWidth();
 
-    // Fabric.js v6+ safe width retrieval (getBoundingRect might be group-relative)
-    // We actually know the card size (320x440) but let's be dynamic if possible.
-    // getBoundingRect(true) forces absolute coords in recent versions? 
-    // Let's stick to Center + Width/2 logic which is safer if rotation is 0.
+    const p0 = { x: sCenter.x + sW / 2, y: sCenter.y };
+    const p3 = { x: tCenter.x - tW / 2, y: tCenter.y };
+    const cpOffset = Math.max(Math.abs(p3.x - p0.x) * 0.5, 50);
 
-    // Assume 0 rotation for now as cards are fixed upright.
-    const sWidth = source.getScaledWidth();
-    const tWidth = target.getScaledWidth();
-
-    // Calculate Edge Points
-    // Source Right
-    const p0 = { x: sCenter.x + sWidth / 2, y: sCenter.y };
-    // Target Left
-    const p3 = { x: tCenter.x - tWidth / 2, y: tCenter.y };
-
-    // Control Points (Curvature)
-    const dist = Math.abs(p3.x - p0.x);
-    // Ensure curve doesn't loop back weirdly if close
-    const cpOffset = Math.max(dist * 0.5, 40);
-
-    const p1 = { x: p0.x + cpOffset, y: p0.y };
-    const p2 = { x: p3.x - cpOffset, y: p3.y };
-
-    const newPathArray: any[] = [
+    const newPath: any[] = [
         ['M', p0.x, p0.y],
-        ['C', p1.x, p1.y, p2.x, p2.y, p3.x, p3.y]
+        ['C', p0.x + cpOffset, p0.y, p3.x - cpOffset, p3.y, p3.x, p3.y]
     ];
 
-    // Update Path
     // @ts-ignore
-    connector.path = newPathArray;
-
-    // Recalculate dimensions for the new path
-    // Fabric internal cache clean
-    // @ts-ignore
-    const pathObj = new fabric.Path(newPathArray);
+    connector.path = newPath;
+    const pathObj = new fabric.Path(newPath);
     const dims = pathObj.getBoundingRect();
 
     connector.set({
-        path: newPathArray,
+        path: newPath,
         width: dims.width,
         height: dims.height,
         left: dims.left + dims.width / 2,
@@ -292,4 +387,3 @@ export const updateConnector = (connector: fabric.Path, source: fabric.Object, t
     });
     connector.setCoords();
 };
-

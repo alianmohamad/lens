@@ -30,6 +30,9 @@ interface StudioBottomBarProps {
     setStylePreset: (v: string) => void;
     aspectRatio: string;
     setAspectRatio: (v: string) => void;
+    // New
+    modelId: string;
+    setModelId: (v: string) => void;
 }
 
 export function StudioBottomBar({
@@ -42,11 +45,13 @@ export function StudioBottomBar({
     stylePreset,
     setStylePreset,
     aspectRatio,
-    setAspectRatio
+    setAspectRatio,
+    modelId,
+    setModelId
 }: StudioBottomBarProps) {
     const fileInputRef = React.useRef<HTMLInputElement>(null);
-    const [isFocused, setIsFocused] = React.useState(false);
-    const [showTools, setShowTools] = React.useState(false);
+    const [isFocused, setIsFocused] = React.useState(false); // eslint-disable-line
+    const [showTools, setShowTools] = React.useState(false); // eslint-disable-line
     const textareaRef = React.useRef<HTMLTextAreaElement>(null);
 
     // Style Presets
@@ -56,6 +61,13 @@ export function StudioBottomBar({
         { id: "neon", label: "Neon" },
         { id: "moody", label: "Moody" },
         { id: "bw", label: "B&W" },
+    ];
+
+    // Models
+    const MODELS = [
+        { id: "gemini-3-pro", label: "Gemini 3 Pro" },
+        { id: "imagen-3", label: "Imagen 3" },
+        { id: "fast", label: "Fast (Turbo)" },
     ];
 
     // Ratio Presets
@@ -95,6 +107,23 @@ export function StudioBottomBar({
                         </TooltipTrigger>
                         <TooltipContent side="top" className="bg-zinc-900 border-zinc-800 text-xs">Upload Image</TooltipContent>
                     </Tooltip>
+
+                    <div className="h-5 w-px bg-zinc-800" />
+
+                    {/* Model Select */}
+                    <Select value={modelId} onValueChange={setModelId}>
+                        <SelectTrigger className="w-[110px] h-9 bg-zinc-950/50 border-zinc-800 text-xs text-zinc-300 focus:ring-0 rounded-lg">
+                            <div className="flex items-center gap-1.5">
+                                <Sparkles className="h-3 w-3 text-purple-400" />
+                                <SelectValue placeholder="Model" />
+                            </div>
+                        </SelectTrigger>
+                        <SelectContent className="bg-zinc-900 border-zinc-800 text-zinc-200">
+                            {MODELS.map(m => (
+                                <SelectItem key={m.id} value={m.id} className="text-xs">{m.label}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
 
                     <div className="h-5 w-px bg-zinc-800" />
 
@@ -185,6 +214,19 @@ export function StudioBottomBar({
                             className="w-56 bg-zinc-900 border-zinc-800 p-3 rounded-xl"
                         >
                             <div className="space-y-3">
+                                <div className="space-y-1">
+                                    <label className="text-[10px] text-zinc-500 uppercase font-bold">Model</label>
+                                    <Select value={modelId} onValueChange={setModelId}>
+                                        <SelectTrigger className="w-full h-9 bg-zinc-950/50 border-zinc-800 text-xs text-zinc-300 focus:ring-0">
+                                            <SelectValue placeholder="Model" />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-zinc-900 border-zinc-800 text-zinc-200">
+                                            {MODELS.map(m => (
+                                                <SelectItem key={m.id} value={m.id} className="text-xs">{m.label}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
                                 <div className="space-y-1">
                                     <label className="text-[10px] text-zinc-500 uppercase font-bold">Style</label>
                                     <Select value={stylePreset} onValueChange={setStylePreset}>

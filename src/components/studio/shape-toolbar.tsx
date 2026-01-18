@@ -3,11 +3,12 @@
 
 import { useEffect, useState } from "react";
 import * as fabric from "fabric";
-import { Download, Copy, SplitSquareHorizontal, Save, X, Link as LinkIcon } from "lucide-react";
+import { Download, Copy, SplitSquareHorizontal, Save, X, Link as LinkIcon, Trash2, CopyPlus, Replace } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { ComparisonSlider } from "./comparison-slider";
 import { motion, AnimatePresence } from "framer-motion";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface ShapeToolbarProps {
     canvas: fabric.Canvas;
@@ -40,8 +41,8 @@ export function ShapeToolbar({ canvas }: ShapeToolbarProps) {
                     screenY = 70 + PADDING;
                 }
 
-                const minX = 100;
-                const maxX = window.innerWidth - 100;
+                const minX = 150;
+                const maxX = window.innerWidth - 150;
                 if (screenX < minX) screenX = minX;
                 if (screenX > maxX) screenX = maxX;
 
@@ -100,76 +101,112 @@ export function ShapeToolbar({ canvas }: ShapeToolbarProps) {
         }
     };
 
+    const handleDelete = () => {
+        const activeObjects = canvas.getActiveObjects();
+        if (activeObjects.length > 0) {
+            activeObjects.forEach(obj => {
+                // Also remove any connectors attached to this object
+                const objId = (obj as any).data?.id;
+                if (objId) {
+                    canvas.getObjects().forEach((o: any) => {
+                        if (o.data?.type === "connector") {
+                            if (o.data.sourceId === objId || o.data.targetId === objId) {
+                                canvas.remove(o);
+                            }
+                        }
+                    });
+                }
+                canvas.remove(obj);
+            });
+            canvas.discardActiveObject();
+            canvas.requestRenderAll();
+            toast.success(`Deleted ${activeObjects.length} item(s)`);
+        }
+    };
+
+    const handleDuplicate = async () => {
+        const activeObjects = canvas.getActiveObjects();
+        if (activeObjects.length === 0) return;
+
+        for (const obj of activeObjects) {
+            const objData = (obj as any).data;
+            if (objData?.type === "generation-frame" && objData.originalUrl) {
+                // Re-create the card
+                const { createGenerationCard } = await import("@/lib/fabric-utils");
+                const newCard = await createGenerationCard(objData.originalUrl, {
+                    left: (obj.left || 0) + 50,
+                    top: (obj.top || 0) + 50,
+                    prompt: objData.prompt,
+                    label: `Copy of ${objData.id?.slice(-4) || "Card"}`
+                });
+                canvas.add(newCard);
+            }
+        }
+        canvas.requestRenderAll();
+        toast.success("Duplicated");
+    };
+
+    const handleLink = () => {
+        const active = canvas.getActiveObjects();
+        if (active.length >= 2) {
+            import("@/lib/fabric-utils").then(({ createConnector }) => {
+                const sorted = [...active].sort((a: any, b: any) => (a.left || 0) - (b.left || 0));
+
+                for (let i = 0; i < sorted.length - 1; i++) {
+                    const conn = createConnector(sorted[i], sorted[i + 1]);
+                    canvas.add(conn);
+                    (canvas as any).sendObjectToBack(conn);
+                }
+                canvas.requestRenderAll();
+                toast.success("Nodes Connected");
+            });
+        }
+    };
+
     return (
         <>
-            <div
-                className="absolute flex items-center gap-1 p-2 rounded-full bg-zinc-900/90 backdrop-blur-xl border border-zinc-800 shadow-2xl z-50 -translate-x-1/2 transition-transform duration-75 ease-out"
-                style={{
-                    left: toolbarPos.x,
-                    top: toolbarPos.y - 70,
-                }}
-                onMouseDown={e => e.stopPropagation()}
-            >
-                {/* Single Selection Tools */}
-                {!isMulti && data.originalUrl && (
-                    <>
-                        <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full hover:bg-zinc-800" onClick={handleDownload} title="Download">
-                            <Download className="h-4 w-4 text-zinc-200" />
-                        </Button>
-                        <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full hover:bg-zinc-800" onClick={handleCopy} title="Copy">
-                            <Copy className="h-4 w-4 text-zinc-200" />
-                        </Button>
-                    </>
-                )}
+            <TooltipProvider delayDuration={0}>
+                <div
+                    className="absolute flex items-center gap-1 p-1.5 rounded-2xl bg-zinc-900/95 backdrop-blur-xl border border-zinc-800 shadow-2xl z-50 -translate-x-1/2 transition-transform duration-75 ease-out"
+                    style={{
+                        left: toolbarPos.x,
+                        top: toolbarPos.y - 70,
+                    }}
+                    onMouseDown={e => e.stopPropagation()}
+                >
+                    {/* Single Selection Tools */}
+                    {!isMulti && data.originalUrl && (
+                        <>
+                            <ToolbarButton icon={<Download className="h-4 w-4" />} label="Download" onClick={handleDownload} />
+                            <ToolbarButton icon={<Copy className="h-4 w-4" />} label="Copy to Clipboard" onClick={handleCopy} />
+                            <ToolbarButton icon={<CopyPlus className="h-4 w-4" />} label="Duplicate" onClick={handleDuplicate} />
+                            <div className="w-px h-5 bg-zinc-700 mx-0.5" />
+                            <ToolbarButton icon={<SplitSquareHorizontal className="h-4 w-4" />} label="Compare" onClick={() => setShowComparison(true)} />
+                        </>
+                    )}
 
-                {/* Multi Selection Tools */}
-                {isMulti && (
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-9 w-9 rounded-full hover:bg-purple-500/20"
-                        onClick={() => {
-                            const active = canvas.getActiveObjects();
-                            if (active.length >= 2) {
-                                import("@/lib/fabric-utils").then(({ createConnector }) => {
-                                    const sorted = [...active].sort((a: any, b: any) => (a.left || 0) - (b.left || 0));
+                    {/* Multi Selection Tools */}
+                    {isMulti && (
+                        <>
+                            <ToolbarButton
+                                icon={<LinkIcon className="h-4 w-4 text-blue-400" />}
+                                label="Connect Nodes"
+                                onClick={handleLink}
+                            />
+                            <ToolbarButton icon={<CopyPlus className="h-4 w-4" />} label="Duplicate All" onClick={handleDuplicate} />
+                        </>
+                    )}
 
-                                    for (let i = 0; i < sorted.length - 1; i++) {
-                                        const conn = createConnector(sorted[i], sorted[i + 1]);
-                                        canvas.add(conn);
-                                        // FIX: Fabric v6+ uses sendObjectToBack. Types are v5.
-                                        (canvas as any).sendObjectToBack(conn);
-                                    }
-                                    canvas.requestRenderAll();
-                                    toast.success("Nodes Connected");
-                                });
-                            }
-                        }}
-                        title="Connect Nodes"
-                    >
-                        <LinkIcon className="h-4 w-4 text-purple-400" />
-                    </Button>
-                )}
-
-                <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full hover:bg-zinc-800" title="Save Prompt (Soon)">
-                    <Save className="h-4 w-4 text-zinc-200" />
-                </Button>
-
-                {!isMulti && data.originalUrl && (
-                    <>
-                        <div className="w-px h-4 bg-zinc-700 mx-1" />
-                        <Button
-                            variant={showComparison ? "secondary" : "ghost"}
-                            size="icon"
-                            className="h-9 w-9 rounded-full hover:bg-zinc-800"
-                            onClick={() => setShowComparison(true)}
-                            title="Compare"
-                        >
-                            <SplitSquareHorizontal className="h-4 w-4 text-zinc-200" />
-                        </Button>
-                    </>
-                )}
-            </div>
+                    {/* Common Actions */}
+                    <div className="w-px h-5 bg-zinc-700 mx-0.5" />
+                    <ToolbarButton
+                        icon={<Trash2 className="h-4 w-4 text-red-400" />}
+                        label="Delete"
+                        onClick={handleDelete}
+                        variant="destructive"
+                    />
+                </div>
+            </TooltipProvider>
 
             <AnimatePresence>
                 {showComparison && data.originalUrl && (
@@ -177,7 +214,7 @@ export function ShapeToolbar({ canvas }: ShapeToolbarProps) {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-2000 bg-background/95 backdrop-blur-md flex items-center justify-center p-8 pointer-events-auto"
+                        className="fixed inset-0 z-[2000] bg-background/95 backdrop-blur-md flex items-center justify-center p-8 pointer-events-auto"
                         onClick={() => setShowComparison(false)}
                     >
                         <div className="relative w-full max-w-5xl aspect-video bg-zinc-900 rounded-2xl overflow-hidden shadow-2xl border border-zinc-800" onClick={e => e.stopPropagation()}>
@@ -199,5 +236,36 @@ export function ShapeToolbar({ canvas }: ShapeToolbarProps) {
                 )}
             </AnimatePresence>
         </>
+    );
+}
+
+// Reusable toolbar button with tooltip
+function ToolbarButton({
+    icon,
+    label,
+    onClick,
+    variant
+}: {
+    icon: React.ReactNode;
+    label: string;
+    onClick: () => void;
+    variant?: "destructive";
+}) {
+    return (
+        <Tooltip>
+            <TooltipTrigger asChild>
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className={`h-8 w-8 rounded-xl hover:bg-zinc-800 ${variant === "destructive" ? "hover:bg-red-900/30" : ""}`}
+                    onClick={onClick}
+                >
+                    <span className="text-zinc-200">{icon}</span>
+                </Button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom" className="bg-zinc-900 border-zinc-800 text-xs">
+                {label}
+            </TooltipContent>
+        </Tooltip>
     );
 }

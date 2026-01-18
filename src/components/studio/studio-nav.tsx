@@ -1,8 +1,9 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, User, LayoutGrid, Download } from "lucide-react";
+import { ChevronLeft, Download } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ThemeSwitcher } from "@/components/theme-switcher";
 
 export function StudioNav() {
     return (
@@ -23,14 +24,17 @@ export function StudioNav() {
                 </div>
             </div>
 
-            {/* Center: Maybe Toolkit? (Optional) */}
-
             {/* Right: Actions */}
             <div className="flex items-center gap-3">
                 <Button variant="ghost" size="sm" className="h-9 gap-2 text-slate-300 hover:text-white hover:bg-slate-800">
                     <Download className="h-4 w-4" />
                     <span className="text-xs">Export</span>
                 </Button>
+                <div className="h-4 w-px bg-slate-800" />
+
+                {/* Theme Switcher */}
+                <ThemeSwitcher />
+
                 <div className="h-4 w-px bg-slate-800" />
                 <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full">
                     <Avatar className="h-8 w-8 border border-slate-700">

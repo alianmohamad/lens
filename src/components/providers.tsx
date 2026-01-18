@@ -2,10 +2,11 @@
 
 import { useState, type ReactNode } from "react";
 import { SessionProvider } from "next-auth/react";
-import { ThemeProvider } from "next-themes";
+import { ThemeProvider as NextThemeProvider } from "next-themes";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "sonner";
 import { LanguageProvider } from "@/components/providers/language-provider";
+import { ThemeProvider as AppThemeProvider } from "@/contexts/theme-context";
 
 interface ProvidersProps {
     children: ReactNode;
@@ -27,27 +28,29 @@ export function Providers({ children }: ProvidersProps) {
     return (
         <SessionProvider>
             <QueryClientProvider client={queryClient}>
-                <ThemeProvider
+                <NextThemeProvider
                     attribute="class"
                     defaultTheme="dark"
                     enableSystem
                     disableTransitionOnChange
                 >
-                    <LanguageProvider>
-                        {children}
-                    </LanguageProvider>
-                    <Toaster
-                        position="bottom-right"
-                        richColors
-                        toastOptions={{
-                            style: {
-                                background: "var(--card)",
-                                border: "1px solid var(--border)",
-                                color: "var(--foreground)",
-                            },
-                        }}
-                    />
-                </ThemeProvider>
+                    <AppThemeProvider>
+                        <LanguageProvider>
+                            {children}
+                        </LanguageProvider>
+                        <Toaster
+                            position="bottom-right"
+                            richColors
+                            toastOptions={{
+                                style: {
+                                    background: "var(--card)",
+                                    border: "1px solid var(--border)",
+                                    color: "var(--foreground)",
+                                },
+                            }}
+                        />
+                    </AppThemeProvider>
+                </NextThemeProvider>
             </QueryClientProvider>
         </SessionProvider>
     );
