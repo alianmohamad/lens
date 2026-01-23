@@ -16,6 +16,7 @@ import {
     Lock,
     CheckCircle2,
     XCircle,
+    Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,6 +27,7 @@ import { Footer } from "@/components/layout/footer";
 import { useCartStore } from "@/stores/cart-store";
 import { formatPrice } from "@/lib/stripe";
 import { CATEGORY_LABELS } from "@/types";
+import { toast } from "sonner";
 
 function CartContent() {
     const router = useRouter();
@@ -73,8 +75,7 @@ function CartContent() {
                 throw new Error(data.error || "Failed to create checkout session");
             }
         } catch (error) {
-            console.error("Checkout error:", error);
-            // Show error toast
+            toast.error("Failed to start checkout. Please try again.");
         } finally {
             setIsCheckingOut(false);
         }
@@ -137,12 +138,15 @@ function CartContent() {
             )}
 
             {/* Header */}
-            <div className="mb-8">
-                <Badge className="mb-4">Shopping Cart</Badge>
-                <h1 className="text-3xl md:text-4xl font-display font-bold mb-2">
-                    Your <span className="gradient-text">Cart</span>
+            <div className="mb-10">
+                <span className="pill text-xs md:text-sm mb-4 inline-flex">
+                    <Sparkles className="w-3 h-3 md:w-4 md:h-4" />
+                    Shopping Cart
+                </span>
+                <h1 className="text-4xl md:text-5xl font-display font-bold mb-3">
+                    Your <span className="hero-gradient-text">Cart</span>
                 </h1>
-                <p className="text-muted-foreground">
+                <p className="text-lg text-muted-foreground">
                     Review your selected prompts before checkout
                 </p>
             </div>
@@ -252,11 +256,9 @@ function CartContent() {
 
                     {/* Order Summary */}
                     <div className="lg:col-span-1">
-                        <Card className="sticky top-24">
-                            <CardHeader>
-                                <CardTitle>Order Summary</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
+                        <div className="bento-card sticky top-24 p-6">
+                            <h3 className="text-lg font-semibold mb-4">Order Summary</h3>
+                            <div className="space-y-4">
                                 <div className="space-y-3">
                                     <div className="flex justify-between text-sm">
                                         <span className="text-muted-foreground">
@@ -323,8 +325,8 @@ function CartContent() {
                                         <path d="M12 10h26v12H12z" fill="#1D3461" />
                                     </svg>
                                 </div>
-                            </CardContent>
-                        </Card>
+                            </div>
+                        </div>
                     </div>
                 </div>
             ) : null}
@@ -342,10 +344,14 @@ function CartLoading() {
 
 export default function CartPage() {
     return (
-        <div className="min-h-screen">
+        <div className="min-h-screen relative overflow-hidden">
+            {/* Background Gradient Accents */}
+            <div className="absolute top-0 right-0 w-[500px] h-[500px] pointer-events-none" style={{ background: 'radial-gradient(circle at center, rgba(147, 51, 234, 0.06) 0%, rgba(59, 130, 246, 0.03) 40%, transparent 70%)' }} />
+            <div className="absolute bottom-0 left-0 w-[400px] h-[400px] pointer-events-none" style={{ background: 'radial-gradient(circle at center, rgba(251, 191, 136, 0.05) 0%, transparent 60%)' }} />
+
             <Navbar />
 
-            <main className="section-container py-8">
+            <main className="section-container py-12 relative z-10">
                 <Suspense fallback={<CartLoading />}>
                     <CartContent />
                 </Suspense>

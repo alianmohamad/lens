@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, Upload, Settings2 } from "lucide-react";
+import { Sparkles, Upload, MousePointer2, Maximize, Menu } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 
@@ -12,6 +12,7 @@ import { StudioNav } from "@/components/studio/studio-nav";
 import { StudioCanvas } from "@/components/studio/studio-canvas";
 import { StudioToolPalette } from "@/components/studio/studio-tool-palette";
 import { StudioBottomBar } from "@/components/studio/studio-bottom-bar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import * as fabric from "fabric";
 import { createGenerationCard, createSkeletonCard } from "@/lib/fabric-utils";
@@ -27,15 +28,54 @@ export default function StudioPage() {
     const [isGenerating, setIsGenerating] = useState(false);
     const [statusText, setStatusText] = useState("Ready");
 
+    // Project State
+    const [projectName, setProjectName] = useState("Untitled Project");
+    const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
+    const [lastSaved, setLastSaved] = useState<Date | null>(null);
+    const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
     // UI State
     const [activeTool, setActiveTool] = useState<"select" | "hand">("select");
     const [isDragging, setIsDragging] = useState(false);
+    const [showMobileTools, setShowMobileTools] = useState(false);
 
     // Generation Params
     const [prompt, setPrompt] = useState("");
     const [stylePreset, setStylePreset] = useState("realistic");
     const [aspectRatio, setAspectRatio] = useState("1:1");
     const [modelId, setModelId] = useState("gemini-3-pro");
+
+    // Auto-save simulation (in a real app, this would persist to a backend)
+    useEffect(() => {
+        if (!canvas) return;
+
+        const handleCanvasModified = () => {
+            // Debounce save
+            if (saveTimeoutRef.current) {
+                clearTimeout(saveTimeoutRef.current);
+            }
+
+            setSaveStatus("saving");
+            saveTimeoutRef.current = setTimeout(() => {
+                // Simulate save (in real app, would call API)
+                setSaveStatus("saved");
+                setLastSaved(new Date());
+            }, 1000);
+        };
+
+        canvas.on("object:modified", handleCanvasModified);
+        canvas.on("object:added", handleCanvasModified);
+        canvas.on("object:removed", handleCanvasModified);
+
+        return () => {
+            canvas.off("object:modified", handleCanvasModified);
+            canvas.off("object:added", handleCanvasModified);
+            canvas.off("object:removed", handleCanvasModified);
+            if (saveTimeoutRef.current) {
+                clearTimeout(saveTimeoutRef.current);
+            }
+        };
+    }, [canvas]);
 
     // --- Handlers ---
 
@@ -171,7 +211,6 @@ export default function StudioPage() {
             }
 
         } catch (error) {
-            console.error("Generation error:", error);
             if (canvas && skeleton) canvas.remove(skeleton);
             canvas?.requestRenderAll();
             toast.error(error instanceof Error ? error.message : "Failed to generate image");
@@ -253,7 +292,14 @@ export default function StudioPage() {
 
             {/* L1: Navigation */}
             <div className="absolute top-0 left-0 right-0 z-40 pointer-events-none">
-                <StudioNav />
+                <StudioNav
+                    userImage={session?.user?.image}
+                    canvas={canvas}
+                    projectName={projectName}
+                    onProjectNameChange={setProjectName}
+                    saveStatus={saveStatus}
+                    lastSaved={lastSaved}
+                />
             </div>
 
             {/* L2: Tool Palette (Left) - Hidden on Mobile */}
@@ -263,6 +309,67 @@ export default function StudioPage() {
                     setActiveTool={setActiveTool}
                     onFitToScreen={handleFitToScreen}
                 />
+            </div>
+
+            {/* L2b: Mobile Tool FAB */}
+            <div className="md:hidden absolute left-3 bottom-20 z-30">
+                <Popover open={showMobileTools} onOpenChange={setShowMobileTools}>
+                    <PopoverTrigger asChild>
+                        <Button
+                            size="icon"
+                            className="h-12 w-12 rounded-full bg-zinc-900/90 backdrop-blur-xl border border-zinc-800 shadow-2xl text-zinc-300 hover:text-white hover:bg-zinc-800"
+                        >
+                            <Menu className="h-5 w-5" />
+                        </Button>
+                    </PopoverTrigger>
+                    <PopoverContent
+                        side="top"
+                        align="start"
+                        className="w-auto p-2 bg-zinc-900/95 backdrop-blur-xl border-zinc-800 rounded-2xl"
+                    >
+                        <div className="flex flex-col gap-1">
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => { setActiveTool("select"); setShowMobileTools(false); }}
+                                className={cn(
+                                    "justify-start gap-2 h-10 px-3 rounded-xl",
+                                    activeTool === "select" ? "bg-purple-600 text-white" : "text-zinc-300 hover:text-white hover:bg-zinc-800"
+                                )}
+                            >
+                                <MousePointer2 className="h-4 w-4" />
+                                <span>Select</span>
+                            </Button>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => { setActiveTool("hand"); setShowMobileTools(false); }}
+                                className={cn(
+                                    "justify-start gap-2 h-10 px-3 rounded-xl",
+                                    activeTool === "hand" ? "bg-purple-600 text-white" : "text-zinc-300 hover:text-white hover:bg-zinc-800"
+                                )}
+                            >
+                                <svg className="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M18 11V6a2 2 0 0 0-2-2 2 2 0 0 0-2 2v0" />
+                                    <path d="M14 10V4a2 2 0 0 0-2-2 2 2 0 0 0-2 2v6" />
+                                    <path d="M10 10.5V6a2 2 0 0 0-2-2 2 2 0 0 0-2 2v8" />
+                                    <path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.9-5.9-2.4L3.3 16a2 2 0 0 1 0-2.6 2 2 0 0 1 2.8 0L8 15" />
+                                </svg>
+                                <span>Pan</span>
+                            </Button>
+                            <div className="h-px bg-zinc-800 my-1" />
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => { handleFitToScreen(); setShowMobileTools(false); }}
+                                className="justify-start gap-2 h-10 px-3 rounded-xl text-zinc-300 hover:text-white hover:bg-zinc-800"
+                            >
+                                <Maximize className="h-4 w-4" />
+                                <span>Fit to Screen</span>
+                            </Button>
+                        </div>
+                    </PopoverContent>
+                </Popover>
             </div>
 
             {/* L3: Bottom Control Bar */}

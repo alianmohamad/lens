@@ -187,17 +187,17 @@ export default function ForgotPasswordPage() {
             {/* Right Panel - Decorative */}
             <div className="hidden lg:flex flex-1 relative overflow-hidden">
                 <div className="absolute inset-0 animated-gradient" />
-                <div className="absolute inset-0 bg-black/20" />
+                <div className="absolute inset-0 bg-gradient-to-br from-black/30 via-transparent to-black/20" />
                 <div className="absolute inset-0 grid-pattern opacity-20" />
 
                 <div className="relative z-10 flex flex-col items-center justify-center p-12 text-white text-center">
-                    <div className="h-20 w-20 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center mb-8">
+                    <div className="h-20 w-20 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center mb-8">
                         <Sparkles className="h-10 w-10" />
                     </div>
-                    <h2 className="text-3xl font-display font-bold mb-4">
+                    <h2 className="text-3xl md:text-4xl font-display font-bold mb-4 hero-gradient-text">
                         Secure Password Reset
                     </h2>
-                    <p className="text-white/80 max-w-md">
+                    <p className="text-white/80 max-w-md text-lg">
                         We&apos;ll send you a secure link to reset your password. The link
                         will expire after 24 hours for your security.
                     </p>

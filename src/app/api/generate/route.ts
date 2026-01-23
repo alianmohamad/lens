@@ -3,10 +3,11 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { rateLimiters, createRateLimitHeaders } from "@/lib/rate-limit";
+import type { GenerateRequest, ApiResponse, GenerateResponse } from "@/types/api";
 
 // Google Gemini API configuration
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const MODEL_NAME = "gemini-3-pro-image-preview"; // Nano Banana Pro
 
 interface GenerateImageRequest {
     productImageUrl: string;
@@ -45,6 +46,18 @@ export async function POST(request: NextRequest) {
             return NextResponse.json(
                 { success: false, error: "You must be signed in to generate images" },
                 { status: 401 }
+            );
+        }
+
+        // Rate limiting - 10 requests per minute per user
+        const rateLimitResult = rateLimiters.generation(session.user.id);
+        if (!rateLimitResult.success) {
+            return NextResponse.json(
+                { success: false, error: "Too many requests. Please wait before generating more images." },
+                {
+                    status: 429,
+                    headers: createRateLimitHeaders(rateLimitResult)
+                }
             );
         }
 
@@ -143,7 +156,6 @@ export async function POST(request: NextRequest) {
         // Check if demo mode is requested or API not configured
         if (demoMode || !GEMINI_API_KEY) {
             // Return mock response for development/testing
-            console.log("Demo mode active, returning sample image");
 
             // Simulate realistic generation delay (2-4 seconds)
             await new Promise(resolve => setTimeout(resolve, 2000 + Math.random() * 2000));
@@ -282,8 +294,6 @@ export async function POST(request: NextRequest) {
                 },
             });
         } catch (error) {
-            console.error("Gemini 3 Pro Image error:", error);
-
             // Update database to mark as failed
             await prisma.generatedImage.update({
                 where: { id: generatedImage.id },
@@ -299,9 +309,8 @@ export async function POST(request: NextRequest) {
             );
         }
     } catch (error) {
-        console.error("Generate image error:", error);
         return NextResponse.json(
-            { success: false, error: "Failed to generate image" },
+            { success: false, error: error instanceof Error ? error.message : "Failed to generate image" },
             { status: 500 }
         );
     }
@@ -369,9 +378,8 @@ export async function GET(request: NextRequest) {
             data: image,
         });
     } catch (error) {
-        console.error("Check generation status error:", error);
         return NextResponse.json(
-            { success: false, error: "Failed to check status" },
+            { success: false, error: error instanceof Error ? error.message : "Failed to check status" },
             { status: 500 }
         );
     }

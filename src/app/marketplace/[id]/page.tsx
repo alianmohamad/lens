@@ -88,10 +88,14 @@ export default async function PromptDetailPage({ params }: PromptDetailPageProps
     ];
 
     return (
-        <div className="min-h-screen">
+        <div className="min-h-screen relative overflow-hidden">
+            {/* Background Gradient Accents */}
+            <div className="absolute top-0 right-0 w-[600px] h-[600px] pointer-events-none" style={{ background: 'radial-gradient(circle at center, rgba(147, 51, 234, 0.06) 0%, rgba(59, 130, 246, 0.03) 40%, transparent 70%)' }} />
+            <div className="absolute bottom-0 left-0 w-[400px] h-[400px] pointer-events-none" style={{ background: 'radial-gradient(circle at center, rgba(251, 191, 136, 0.04) 0%, transparent 60%)' }} />
+
             <Navbar />
 
-            <main className="section-container py-8">
+            <main className="section-container py-12 relative z-10">
                 {/* Breadcrumb */}
                 <div className="mb-6">
                     <Link

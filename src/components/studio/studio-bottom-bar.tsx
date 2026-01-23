@@ -1,8 +1,7 @@
-
 "use client";
 
 import * as React from "react";
-import { Upload, Wand2, Settings2, Sparkles, Send, Layers, Ratio, Plus } from "lucide-react";
+import { Upload, Wand2, Settings2, Sparkles, Layers, Ratio, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,12 +15,14 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { motion, AnimatePresence } from "framer-motion";
 import { Textarea } from "@/components/ui/textarea";
+import { SettingsModal, type GenerationSettings } from "./settings-modal";
 
 interface StudioBottomBarProps {
     onUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
     onGenerate: () => void;
     isGenerating: boolean;
     uploadedImage: string | null;
+    generationStage?: "idle" | "uploading" | "generating" | "processing";
 
     // State
     prompt: string;
@@ -33,6 +34,9 @@ interface StudioBottomBarProps {
     // New
     modelId: string;
     setModelId: (v: string) => void;
+    // Advanced Settings
+    advancedSettings?: GenerationSettings;
+    onAdvancedSettingsChange?: (settings: GenerationSettings) => void;
 }
 
 export function StudioBottomBar({
@@ -40,6 +44,7 @@ export function StudioBottomBar({
     onGenerate,
     isGenerating,
     uploadedImage,
+    generationStage = "idle",
     prompt,
     setPrompt,
     stylePreset,
@@ -47,12 +52,23 @@ export function StudioBottomBar({
     aspectRatio,
     setAspectRatio,
     modelId,
-    setModelId
+    setModelId,
+    advancedSettings,
+    onAdvancedSettingsChange
 }: StudioBottomBarProps) {
     const fileInputRef = React.useRef<HTMLInputElement>(null);
-    const [isFocused, setIsFocused] = React.useState(false); // eslint-disable-line
-    const [showTools, setShowTools] = React.useState(false); // eslint-disable-line
+    const [isFocused, setIsFocused] = React.useState(false);
+    const [showTools, setShowTools] = React.useState(false);
     const textareaRef = React.useRef<HTMLTextAreaElement>(null);
+
+    // Default advanced settings
+    const defaultSettings: GenerationSettings = {
+        quality: "standard",
+        negativePrompt: "",
+        productStrength: 80,
+        modelId: modelId,
+    };
+    const settings = advancedSettings || defaultSettings;
 
     // Style Presets
     const STYLES = [
@@ -78,7 +94,7 @@ export function StudioBottomBar({
     ];
 
     return (
-        <div className="pointer-events-auto w-full max-w-4xl mx-auto flex flex-col md:flex-row items-center md:items-end justify-center gap-2 md:gap-3">
+        <div className="pointer-events-auto w-full max-w-4xl mx-auto flex flex-col md:flex-row items-center md:items-end justify-center gap-2 md:gap-3 px-1 md:px-0">
 
             {/* MOBILE: Unified Bar | DESKTOP: Split Pills */}
 
@@ -159,12 +175,20 @@ export function StudioBottomBar({
 
                     <div className="h-5 w-px bg-zinc-800" />
 
-                    {/* Advanced Toggle */}
+                    {/* Advanced Settings Modal */}
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-9 w-9 text-zinc-500 hover:text-white rounded-lg">
-                                <Settings2 className="h-4 w-4" />
-                            </Button>
+                            <div>
+                                <SettingsModal
+                                    settings={settings}
+                                    onSettingsChange={(newSettings) => {
+                                        onAdvancedSettingsChange?.(newSettings);
+                                        if (newSettings.modelId !== modelId) {
+                                            setModelId(newSettings.modelId);
+                                        }
+                                    }}
+                                />
+                            </div>
                         </TooltipTrigger>
                         <TooltipContent side="top" className="bg-zinc-900 border-zinc-800 text-xs">Advanced Settings</TooltipContent>
                     </Tooltip>

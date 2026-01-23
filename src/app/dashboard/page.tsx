@@ -211,25 +211,29 @@ export default function DashboardPage() {
     const isSeller = session.user.role === "SELLER" || session.user.role === "ADMIN";
 
     return (
-        <div className="min-h-screen">
+        <div className="min-h-screen relative overflow-hidden">
+            {/* Background Gradient Accents */}
+            <div className="absolute top-0 right-0 w-[500px] h-[500px] pointer-events-none" style={{ background: 'radial-gradient(circle at center, rgba(147, 51, 234, 0.06) 0%, rgba(59, 130, 246, 0.03) 40%, transparent 70%)' }} />
+            <div className="absolute bottom-1/2 left-0 w-[400px] h-[400px] pointer-events-none" style={{ background: 'radial-gradient(circle at center, rgba(251, 191, 136, 0.05) 0%, transparent 60%)' }} />
+
             <Navbar />
 
-            <main className="section-container py-8">
+            <main className="section-container py-12 relative z-10">
                 {/* Header */}
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-10">
                     <div className="flex items-center gap-4">
-                        <Avatar className="h-16 w-16">
+                        <Avatar className="h-16 w-16 ring-2 ring-neon/20">
                             <AvatarImage src={session.user.image || undefined} />
-                            <AvatarFallback className="text-xl gradient-bg text-white">
+                            <AvatarFallback className="text-xl bg-gradient-to-br from-neon to-cool-indigo text-white">
                                 {session.user.name?.[0]?.toUpperCase() || "U"}
                             </AvatarFallback>
                         </Avatar>
                         <div>
-                            <h1 className="text-2xl md:text-3xl font-display font-bold">
-                                Welcome back, {session.user.name?.split(" ")[0] || "there"}!
+                            <h1 className="text-3xl md:text-4xl font-display font-bold">
+                                Welcome back, <span className="hero-gradient-text">{session.user.name?.split(" ")[0] || "there"}!</span>
                             </h1>
-                            <div className="flex items-center gap-2 mt-1">
-                                <Badge variant="outline">{session.user.role}</Badge>
+                            <div className="flex items-center gap-2 mt-2">
+                                <span className="pill text-xs py-1 px-3">{session.user.role}</span>
                                 <span className="text-sm text-muted-foreground">
                                     {profile?.createdAt
                                         ? `Member since ${formatMemberSince(profile.createdAt)}`
@@ -240,26 +244,26 @@ export default function DashboardPage() {
                     </div>
 
                     <div className="flex gap-3">
-                        <Button variant="outline" asChild>
+                        <Button variant="outline" className="btn-ghost" asChild>
                             <Link href="/dashboard/settings">
                                 <Settings className="h-4 w-4 mr-2" />
                                 Settings
                             </Link>
                         </Button>
                         {isSeller ? (
-                            <Button className="btn-premium" asChild>
-                                <Link href="/sell">
-                                    <Store className="h-4 w-4 mr-2" />
+                            <button className="btn-cta flex items-center gap-2">
+                                <Link href="/sell" className="flex items-center gap-2">
+                                    <Store className="h-4 w-4" />
                                     Create Prompt
                                 </Link>
-                            </Button>
+                            </button>
                         ) : (
-                            <Button className="btn-premium" asChild>
-                                <Link href="/studio">
-                                    <ImageIcon className="h-4 w-4 mr-2" />
+                            <button className="btn-cta flex items-center gap-2">
+                                <Link href="/studio" className="flex items-center gap-2">
+                                    <ImageIcon className="h-4 w-4" />
                                     Go to Studio
                                 </Link>
-                            </Button>
+                            </button>
                         )}
                     </div>
                 </div>

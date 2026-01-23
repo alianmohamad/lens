@@ -22,6 +22,7 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { signInSchema, type SignInSchema } from "@/lib/validations";
 import { cn } from "@/lib/utils";
+import { InteractiveHeroBackground } from "@/components/landing/interactive-hero-background";
 
 function SignInForm() {
     const router = useRouter();
@@ -239,20 +240,19 @@ function SignInForm() {
                 </motion.div>
             </div>
 
-            {/* Right Panel - Decorative */}
+            {/* Right Panel - Interactive Hero Background */}
             <div className="hidden lg:flex flex-1 relative overflow-hidden">
-                <div className="absolute inset-0 animated-gradient" />
-                <div className="absolute inset-0 bg-black/20" />
-                <div className="absolute inset-0 grid-pattern opacity-20" />
+                <InteractiveHeroBackground />
+                <div className="absolute inset-0 bg-gradient-to-br from-black/30 via-transparent to-black/20 pointer-events-none" />
 
                 <div className="relative z-10 flex flex-col items-center justify-center p-12 text-white text-center">
-                    <div className="h-20 w-20 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center mb-8">
+                    <div className="h-20 w-20 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center mb-8">
                         <Sparkles className="h-10 w-10" />
                     </div>
-                    <h2 className="text-3xl font-display font-bold mb-4">
+                    <h2 className="text-3xl md:text-4xl font-display font-bold mb-4 hero-gradient-text">
                         Transform Your Product Photography
                     </h2>
-                    <p className="text-white/80 max-w-md">
+                    <p className="text-white/80 max-w-md text-lg">
                         Access thousands of expert-crafted AI prompts and generate stunning
                         product images in seconds.
                     </p>

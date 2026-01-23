@@ -259,17 +259,24 @@ export default function SellPage() {
     };
 
     return (
-        <div className="min-h-screen">
+        <div className="min-h-screen relative overflow-hidden">
+            {/* Background Gradient Accents */}
+            <div className="absolute top-0 right-0 w-[500px] h-[500px] pointer-events-none" style={{ background: 'radial-gradient(circle at center, rgba(147, 51, 234, 0.06) 0%, rgba(59, 130, 246, 0.03) 40%, transparent 70%)' }} />
+            <div className="absolute bottom-1/4 left-0 w-[400px] h-[400px] pointer-events-none" style={{ background: 'radial-gradient(circle at center, rgba(251, 191, 136, 0.05) 0%, transparent 60%)' }} />
+
             <Navbar />
 
-            <main className="section-container py-8">
+            <main className="section-container py-12 relative z-10">
                 {/* Header */}
-                <div className="mb-8">
-                    <Badge className="mb-4">Create Prompt</Badge>
-                    <h1 className="text-3xl md:text-4xl font-display font-bold mb-2">
-                        Sell Your <span className="gradient-text">Expertise</span>
+                <div className="mb-10">
+                    <span className="pill text-xs md:text-sm mb-4 inline-flex">
+                        <Sparkles className="w-3 h-3 md:w-4 md:h-4" />
+                        Create Prompt
+                    </span>
+                    <h1 className="text-4xl md:text-5xl font-display font-bold mb-3">
+                        Sell Your <span className="hero-gradient-text">Expertise</span>
                     </h1>
-                    <p className="text-muted-foreground">
+                    <p className="text-lg text-muted-foreground">
                         Create a prompt and start earning 70% on every sale
                     </p>
                 </div>
@@ -341,8 +348,7 @@ export default function SellPage() {
 
                 {/* Form Steps */}
                 <form onSubmit={handleSubmit(onSubmit)} className="max-w-2xl mx-auto">
-                    <Card className="min-h-[400px]">
-                        <CardContent className="p-6">
+                    <div className="bento-card min-h-[400px] p-6">
                             <AnimatePresence mode="wait">
                                 {/* Step 1: Details */}
                                 {currentStep === 1 && (
@@ -702,8 +708,7 @@ export default function SellPage() {
                                     </motion.div>
                                 )}
                             </AnimatePresence>
-                        </CardContent>
-                    </Card>
+                    </div>
 
                     {/* Navigation Buttons */}
                     <div className="flex justify-between mt-6">

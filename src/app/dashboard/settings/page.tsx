@@ -145,10 +145,13 @@ export default function SettingsPage() {
     const isSeller = session.user.role === "SELLER" || session.user.role === "ADMIN";
 
     return (
-        <div className="min-h-screen">
+        <div className="min-h-screen relative overflow-hidden">
+            {/* Background Gradient Accents */}
+            <div className="absolute top-0 right-0 w-[500px] h-[500px] pointer-events-none" style={{ background: 'radial-gradient(circle at center, rgba(147, 51, 234, 0.05) 0%, rgba(59, 130, 246, 0.02) 40%, transparent 70%)' }} />
+
             <Navbar />
 
-            <main className="section-container py-8">
+            <main className="section-container py-12 relative z-10">
                 {/* Header */}
                 <div className="mb-8">
                     <Link

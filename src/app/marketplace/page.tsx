@@ -4,8 +4,8 @@ import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { MarketplaceFilters } from "@/components/marketplace/filters";
 import { PromptGrid } from "@/components/marketplace/prompt-grid";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Sparkles } from "lucide-react";
 import type { PromptCardData } from "@/types";
 
 interface MarketplacePageProps {
@@ -133,17 +133,24 @@ export default async function MarketplacePage({ searchParams }: MarketplacePageP
     const { prompts, total } = await getPrompts(resolvedParams);
 
     return (
-        <div className="min-h-screen">
+        <div className="min-h-screen relative overflow-hidden">
+            {/* Background Gradient Accents */}
+            <div className="absolute top-0 right-0 w-[600px] h-[600px] pointer-events-none" style={{ background: 'radial-gradient(circle at center, rgba(147, 51, 234, 0.08) 0%, rgba(59, 130, 246, 0.04) 40%, transparent 70%)' }} />
+            <div className="absolute bottom-0 left-0 w-[400px] h-[400px] pointer-events-none" style={{ background: 'radial-gradient(circle at center, rgba(251, 191, 136, 0.06) 0%, rgba(147, 51, 234, 0.03) 40%, transparent 70%)' }} />
+
             <Navbar />
 
-            <main className="section-container py-8">
+            <main className="section-container py-12 relative z-10">
                 {/* Header */}
-                <div className="mb-8">
-                    <Badge className="mb-4">Marketplace</Badge>
-                    <h1 className="text-3xl md:text-4xl font-display font-bold mb-2">
-                        Discover <span className="gradient-text">Expert Prompts</span>
+                <div className="mb-12">
+                    <span className="pill text-xs md:text-sm mb-4 inline-flex">
+                        <Sparkles className="w-3 h-3 md:w-4 md:h-4" />
+                        Marketplace
+                    </span>
+                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold mb-4">
+                        Discover <span className="hero-gradient-text">Expert Prompts</span>
                     </h1>
-                    <p className="text-muted-foreground">
+                    <p className="text-lg text-muted-foreground max-w-2xl">
                         Browse {total.toLocaleString()} prompts from professional photographers and AI specialists
                     </p>
                 </div>

@@ -400,8 +400,11 @@ export default function PocketPage() {
     return (
         <>
             <Navbar />
-            <main className="min-h-screen bg-linear-to-br from-background via-background to-primary/5">
-                <div className="section-container py-12">
+            <main className="min-h-screen relative overflow-hidden">
+                {/* Background Gradient Accents */}
+                <div className="absolute top-0 right-0 w-[500px] h-[500px] pointer-events-none" style={{ background: 'radial-gradient(circle at center, rgba(147, 51, 234, 0.06) 0%, rgba(59, 130, 246, 0.03) 40%, transparent 70%)' }} />
+
+                <div className="section-container py-12 relative z-10">
                     {/* Header */}
                     <div className="flex items-center justify-between mb-8">
                         <motion.div

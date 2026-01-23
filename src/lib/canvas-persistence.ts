@@ -1,36 +1,37 @@
-
 import * as fabric from "fabric";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { toast } from "sonner";
+import type { CanvasState } from "@/types/canvas";
 
 const AUTOSAVE_DELAY = 1000;
 
-export async function loadCanvasFromApi(): Promise<any | null> {
+export async function loadCanvasFromApi(): Promise<CanvasState | null> {
     try {
         const res = await fetch("/api/canvas");
-        if (!res.ok) throw new Error("Failed to load");
+        if (!res.ok) return null;
         const data = await res.json();
         return data.snapshot;
-    } catch (err) {
-        console.error("Load error:", err);
+    } catch {
         return null;
     }
 }
 
-export async function saveCanvasToApi(snapshot: any) {
+export async function saveCanvasToApi(snapshot: CanvasState): Promise<boolean> {
     try {
-        await fetch("/api/canvas", {
+        const res = await fetch("/api/canvas", {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ snapshot }),
         });
-    } catch (err) {
-        console.error("Save error:", err);
+        return res.ok;
+    } catch {
+        return false;
     }
 }
 
 export function useCanvasPersistence(canvas: fabric.Canvas | null, onLoaded?: () => void) {
     const [isLoaded, setIsLoaded] = useState(false);
+    const saveTimerRef = useRef<NodeJS.Timeout | null>(null);
 
     // Initial Load
     useEffect(() => {
@@ -49,8 +50,6 @@ export function useCanvasPersistence(canvas: fabric.Canvas | null, onLoaded?: ()
                         toast.info("Canvas loaded");
                     });
                 }
-            } catch (e) {
-                console.error("Failed to load init snapshot", e);
             } finally {
                 if (isMounted) {
                     setIsLoaded(true);
@@ -62,19 +61,16 @@ export function useCanvasPersistence(canvas: fabric.Canvas | null, onLoaded?: ()
         load();
 
         return () => { isMounted = false; };
-    }, [canvas]);
+    }, [canvas, onLoaded]);
 
     // Auto-Save
     useEffect(() => {
         if (!canvas || !isLoaded) return;
 
-        // Debounced save
-        const saveTimer = { current: null as any };
-
         const save = () => {
-            if (saveTimer.current) clearTimeout(saveTimer.current);
-            saveTimer.current = setTimeout(() => {
-                const snapshot = canvas.toJSON(); // Serializes everything
+            if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+            saveTimerRef.current = setTimeout(() => {
+                const snapshot = canvas.toJSON() as CanvasState;
                 saveCanvasToApi(snapshot);
             }, AUTOSAVE_DELAY);
         };
@@ -88,7 +84,7 @@ export function useCanvasPersistence(canvas: fabric.Canvas | null, onLoaded?: ()
             canvas.off("object:modified", save);
             canvas.off("object:added", save);
             canvas.off("object:removed", save);
-            if (saveTimer.current) clearTimeout(saveTimer.current);
+            if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
         };
     }, [canvas, isLoaded]);
 

@@ -26,6 +26,7 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { signUpSchema, type SignUpSchema } from "@/lib/validations";
 import { cn } from "@/lib/utils";
+import { InteractiveHeroBackground } from "@/components/landing/interactive-hero-background";
 
 export default function SignUpPage() {
     const router = useRouter();
@@ -360,39 +361,38 @@ export default function SignUpPage() {
                 </motion.div>
             </div>
 
-            {/* Right Panel - Decorative */}
+            {/* Right Panel - Interactive Hero Background */}
             <div className="hidden lg:flex flex-1 relative overflow-hidden">
-                <div className="absolute inset-0 animated-gradient" />
-                <div className="absolute inset-0 bg-black/20" />
-                <div className="absolute inset-0 grid-pattern opacity-20" />
+                <InteractiveHeroBackground />
+                <div className="absolute inset-0 bg-gradient-to-br from-black/30 via-transparent to-black/20 pointer-events-none" />
 
                 <div className="relative z-10 flex flex-col items-center justify-center p-12 text-white text-center">
-                    <div className="h-20 w-20 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center mb-8">
+                    <div className="h-20 w-20 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center mb-8">
                         <Sparkles className="h-10 w-10" />
                     </div>
-                    <h2 className="text-3xl font-display font-bold mb-4">
+                    <h2 className="text-3xl md:text-4xl font-display font-bold mb-4 hero-gradient-text">
                         Join Our Community
                     </h2>
-                    <p className="text-white/80 max-w-md mb-8">
+                    <p className="text-white/80 max-w-md mb-8 text-lg">
                         Whether you&apos;re buying prompts to enhance your product photos or selling
                         your expertise to earn passive income, ZeroLens is your platform.
                     </p>
 
                     <div className="space-y-4 text-left">
                         <div className="flex items-center gap-3 text-white/90">
-                            <div className="h-8 w-8 rounded-lg bg-white/20 flex items-center justify-center">
+                            <div className="h-8 w-8 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center">
                                 <Check className="h-4 w-4" />
                             </div>
                             <span>Access to 2,500+ expert prompts</span>
                         </div>
                         <div className="flex items-center gap-3 text-white/90">
-                            <div className="h-8 w-8 rounded-lg bg-white/20 flex items-center justify-center">
+                            <div className="h-8 w-8 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center">
                                 <Check className="h-4 w-4" />
                             </div>
                             <span>Generate images with Google Imagen 3</span>
                         </div>
                         <div className="flex items-center gap-3 text-white/90">
-                            <div className="h-8 w-8 rounded-lg bg-white/20 flex items-center justify-center">
+                            <div className="h-8 w-8 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center">
                                 <Check className="h-4 w-4" />
                             </div>
                             <span>Earn 70% on every prompt sale</span>
