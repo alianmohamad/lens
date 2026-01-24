@@ -12,7 +12,7 @@ const faqs = [
     {
         id: "faq-2",
         title: "How does the quality compare to a real studio?",
-        content: "ZeroLens uses advanced light simulation models trained specifically on professional product photography. Most users find our 4K results indistinguishable from traditional studio shots, but at 1/100th of the cost and time."
+        content: "ZeroLens uses advanced light simulation models trained specifically on professional product photography. Most users find our high-resolution results indistinguishable from traditional studio shots, but at 1/100th of the cost and time."
     },
     {
         id: "faq-3",

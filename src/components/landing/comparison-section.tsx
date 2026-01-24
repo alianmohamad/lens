@@ -55,7 +55,7 @@ const comparisonData = {
                 { text: "$29/month flat rate", type: "positive" },
                 { text: "30 seconds per image", type: "positive" },
                 { text: "No shipping required", type: "positive" },
-                { text: "Unlimited digital scenes", type: "positive" },
+                { text: "Curated digital scenes", type: "positive" },
                 { text: "Unlimited generations", type: "positive" }
             ]
         }

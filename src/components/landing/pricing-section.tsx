@@ -30,7 +30,7 @@ const plans = [
         description: "For creators & small brands.",
         features: [
             "500 generations per month",
-            "4K Ultra-HD resolution",
+            "High-Resolution generations",
             "Commercial license",
             "Priority processing",
             "Advanced lighting studio",

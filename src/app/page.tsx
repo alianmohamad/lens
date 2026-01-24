@@ -36,19 +36,19 @@ const heroWords = ["reimagined.", "transformed.", "elevated.", "perfected."];
 // Testimonials
 const testimonials = [
   {
-    quote: "Cut photo costs by 85%. Quality rivals studio shots.",
+    quote: "Significantly reduced our production time. The quality is studio-grade.",
     author: "Sarah Chen",
     role: "E-commerce Director",
   },
   {
-    quote: "Our conversion rate jumped 40% after switching.",
+    quote: "The consistency across different batches is exactly what we needed.",
     author: "Marcus Webb",
     role: "DTC Founder",
   },
   {
-    quote: "Made $12k selling prompts. Platform is incredible.",
+    quote: "Finally, a tool that understands product lighting and materials.",
     author: "Elena Torres",
-    role: "Prompt Engineer",
+    role: "Digital Marketer",
   },
 ];
 
@@ -224,7 +224,7 @@ export default function HomePage() {
               <div className="w-12 h-12 rounded-xl bg-neon/10 border border-neon/20 flex items-center justify-center mb-6 group-hover:bg-neon/20 transition-colors">
                 <ImageIcon className="w-6 h-6 text-neon" />
               </div>
-              <div className="text-5xl font-bold text-neon mb-2">2,500+</div>
+              <div className="text-3xl font-bold text-neon mb-2">Curated</div>
               <p className="text-muted-foreground">Pro prompts available</p>
             </motion.div>
 
@@ -371,7 +371,7 @@ export default function HomePage() {
                 Start creating <span className="text-neon">today</span>
               </h2>
               <p className="text-base md:text-xl text-muted-foreground mb-6 md:mb-10 max-w-lg mx-auto">
-                Join thousands of creators using ZeroLens. Free to start.
+                Join a growing community of creators using ZeroLens. Free to start.
               </p>
 
               <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-3 sm:gap-4 mb-6 md:mb-10">
