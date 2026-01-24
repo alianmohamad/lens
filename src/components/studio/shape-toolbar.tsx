@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from "react";
 import * as fabric from "fabric";
-import { Download, Copy, SplitSquareHorizontal, Save, X, Link as LinkIcon, Trash2, CopyPlus, Replace } from "lucide-react";
+import { Download, Copy, SplitSquareHorizontal, Save, X, Link as LinkIcon, Trash2, CopyPlus, Replace, RotateCcw, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { ComparisonSlider } from "./comparison-slider";
@@ -12,9 +12,11 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 
 interface ShapeToolbarProps {
     canvas: fabric.Canvas;
+    onRetry?: (failedCard: fabric.Object) => void;
+    onGenerateFrom?: (sourceCard: fabric.Object) => void;
 }
 
-export function ShapeToolbar({ canvas }: ShapeToolbarProps) {
+export function ShapeToolbar({ canvas, onRetry, onGenerateFrom }: ShapeToolbarProps) {
     const [selectedObj, setSelectedObj] = useState<fabric.Object | null>(null);
     const [toolbarPos, setToolbarPos] = useState({ x: 0, y: 0 });
     const [showComparison, setShowComparison] = useState(false);
@@ -25,9 +27,10 @@ export function ShapeToolbar({ canvas }: ShapeToolbarProps) {
             const allActive = canvas.getActiveObjects() || [];
 
             const isSingleFrame = allActive.length === 1 && (allActive[0] as any).data?.type === "generation-frame";
+            const isFailedCard = allActive.length === 1 && (allActive[0] as any).data?.type === "failed-generation";
             const isMultiSelection = allActive.length > 1;
 
-            if (active && (isSingleFrame || isMultiSelection)) {
+            if (active && (isSingleFrame || isFailedCard || isMultiSelection)) {
                 const vpt = canvas.viewportTransform;
                 if (!vpt) return;
 
@@ -77,6 +80,7 @@ export function ShapeToolbar({ canvas }: ShapeToolbarProps) {
     const data = (selectedObj as any).data || {};
     const count = canvas.getActiveObjects().length;
     const isMulti = count > 1;
+    const isFailedCard = data.type === "failed-generation";
 
     const handleDownload = () => {
         if (!data.originalUrl) return;
@@ -174,14 +178,31 @@ export function ShapeToolbar({ canvas }: ShapeToolbarProps) {
                     }}
                     onMouseDown={e => e.stopPropagation()}
                 >
-                    {/* Single Selection Tools */}
-                    {!isMulti && data.originalUrl && (
+                    {/* Failed Card Tools */}
+                    {!isMulti && isFailedCard && (
+                        <>
+                            <ToolbarButton
+                                icon={<RotateCcw className="h-4 w-4 text-amber-400" />}
+                                label="Retry Generation"
+                                onClick={() => onRetry?.(selectedObj)}
+                            />
+                        </>
+                    )}
+
+                    {/* Single Selection Tools (Generation Frame) */}
+                    {!isMulti && !isFailedCard && data.originalUrl && (
                         <>
                             <ToolbarButton icon={<Download className="h-4 w-4" />} label="Download" onClick={handleDownload} />
                             <ToolbarButton icon={<Copy className="h-4 w-4" />} label="Copy to Clipboard" onClick={handleCopy} />
                             <ToolbarButton icon={<CopyPlus className="h-4 w-4" />} label="Duplicate" onClick={handleDuplicate} />
                             <div className="w-px h-5 bg-zinc-700 mx-0.5" />
                             <ToolbarButton icon={<SplitSquareHorizontal className="h-4 w-4" />} label="Compare" onClick={() => setShowComparison(true)} />
+                            <div className="w-px h-5 bg-zinc-700 mx-0.5" />
+                            <ToolbarButton
+                                icon={<Sparkles className="h-4 w-4 text-purple-400" />}
+                                label="Generate Variation"
+                                onClick={() => onGenerateFrom?.(selectedObj)}
+                            />
                         </>
                     )}
 

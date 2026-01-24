@@ -6,7 +6,6 @@ import { ThemeProvider as NextThemeProvider } from "next-themes";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "sonner";
 import { LanguageProvider } from "@/components/providers/language-provider";
-import { ThemeProvider as AppThemeProvider } from "@/contexts/theme-context";
 
 interface ProvidersProps {
     children: ReactNode;
@@ -34,22 +33,20 @@ export function Providers({ children }: ProvidersProps) {
                     enableSystem
                     disableTransitionOnChange
                 >
-                    <AppThemeProvider>
-                        <LanguageProvider>
-                            {children}
-                        </LanguageProvider>
-                        <Toaster
-                            position="bottom-right"
-                            richColors
-                            toastOptions={{
-                                style: {
-                                    background: "var(--card)",
-                                    border: "1px solid var(--border)",
-                                    color: "var(--foreground)",
-                                },
-                            }}
-                        />
-                    </AppThemeProvider>
+                    <LanguageProvider>
+                        {children}
+                    </LanguageProvider>
+                    <Toaster
+                        position="bottom-right"
+                        richColors
+                        toastOptions={{
+                            style: {
+                                background: "var(--card)",
+                                border: "1px solid var(--border)",
+                                color: "var(--foreground)",
+                            },
+                        }}
+                    />
                 </NextThemeProvider>
             </QueryClientProvider>
         </SessionProvider>

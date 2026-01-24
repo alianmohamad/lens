@@ -70,7 +70,7 @@ export function BeforeAfterShowcase() {
   };
 
   return (
-    <section className="relative py-24 md:py-32 overflow-hidden">
+    <section className="relative py-32 overflow-hidden">
       <div className="section-container">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

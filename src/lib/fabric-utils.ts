@@ -195,37 +195,36 @@ export const createGenerationCard = (imageUrl: string, options: {
                 top: 0,
             });
 
-            // Label
-            const LABEL_H = 24;
+            // Label - Dark floating badge with icon (matching reference style)
+            const LABEL_H = 22;
             const labelText = options.label || `Creation #${cardId.slice(-4)}`;
-            const labelW = Math.max(labelText.length * 7 + 24, 90);
+            const labelFullText = `📷  ${labelText}`;
+            const labelW = Math.max(labelFullText.length * 6.5 + 20, 100);
 
             const labelBg = new fabric.Rect({
                 width: labelW,
                 height: LABEL_H,
-                fill: CARD_BG,
-                stroke: CARD_BORDER,
-                strokeWidth: 1,
+                fill: "rgba(15, 23, 42, 0.85)", // Dark semi-transparent
                 rx: 6,
                 ry: 6,
                 originX: 'left',
                 originY: 'bottom',
                 left: -displayW / 2,
-                top: -displayH / 2 - 6,
+                top: -displayH / 2 - 8,
             });
 
-            const label = new fabric.Text(labelText, {
+            const label = new fabric.Text(labelFullText, {
                 fontSize: 11,
                 fontFamily: "Inter, sans-serif",
                 fontWeight: "500",
-                fill: TEXT_COLOR,
+                fill: "#f8fafc", // White text
                 originX: 'left',
                 originY: 'center',
                 left: -displayW / 2 + 8,
-                top: -displayH / 2 - 6 - LABEL_H / 2,
+                top: -displayH / 2 - 8 - LABEL_H / 2,
             });
 
-            // Create group
+            // Create group with card elements (no connector button - was causing layout issues)
             const group = new fabric.Group([frame, img, labelBg, label], {
                 left: options.left,
                 top: options.top,
@@ -386,4 +385,133 @@ export const updateConnector = (connector: fabric.Path, source: fabric.Object, t
         dirty: true
     });
     connector.setCoords();
+};
+
+// Failed generation card type
+interface GenerationParams {
+    productImageUrl: string;
+    prompt: string;
+    stylePreset: string;
+    aspectRatio: string;
+    modelId: string;
+}
+
+/**
+ * Creates a Failed Generation Card - Shows error with retry option
+ */
+export const createFailedCard = (options: {
+    left: number;
+    top: number;
+    error: string;
+    generationParams?: GenerationParams;
+    id?: string;
+}): fabric.Group => {
+    const cardId = options.id || `failed_${Date.now()}`;
+    const cardSize = 256;
+
+    // Red-tinted background frame
+    const frame = new fabric.Rect({
+        width: cardSize,
+        height: cardSize,
+        fill: "#1e1520", // Dark red-tinted background
+        stroke: "#dc2626", // Red border
+        strokeWidth: 2,
+        rx: 16,
+        ry: 16,
+        originX: 'center',
+        originY: 'center',
+    });
+
+    // Error icon (X mark)
+    const iconSize = 48;
+    const iconCircle = new fabric.Circle({
+        radius: iconSize / 2,
+        fill: "transparent",
+        stroke: "#ef4444",
+        strokeWidth: 3,
+        originX: 'center',
+        originY: 'center',
+        top: -40,
+    });
+
+    const iconX1 = new fabric.Line([-12, -12, 12, 12], {
+        stroke: "#ef4444",
+        strokeWidth: 3,
+        strokeLineCap: 'round',
+        originX: 'center',
+        originY: 'center',
+        top: -40,
+    });
+
+    const iconX2 = new fabric.Line([12, -12, -12, 12], {
+        stroke: "#ef4444",
+        strokeWidth: 3,
+        strokeLineCap: 'round',
+        originX: 'center',
+        originY: 'center',
+        top: -40,
+    });
+
+    // "Generation Failed" text
+    const titleText = new fabric.Text("Generation Failed", {
+        fontSize: 16,
+        fontFamily: "Inter, sans-serif",
+        fontWeight: "600",
+        fill: "#fecaca", // Light red
+        originX: 'center',
+        originY: 'center',
+        top: 20,
+    });
+
+    // Error message (truncated)
+    const errorMsg = options.error.length > 40
+        ? options.error.slice(0, 37) + "..."
+        : options.error;
+
+    const errorText = new fabric.Text(errorMsg, {
+        fontSize: 12,
+        fontFamily: "Inter, sans-serif",
+        fill: "#f87171", // Red-400
+        originX: 'center',
+        originY: 'center',
+        top: 45,
+    });
+
+    // "Click to Retry" text
+    const retryText = new fabric.Text("Click to retry", {
+        fontSize: 13,
+        fontFamily: "Inter, sans-serif",
+        fontWeight: "500",
+        fill: "#94a3b8", // Slate-400
+        originX: 'center',
+        originY: 'center',
+        top: 80,
+    });
+
+    // Create group
+    const group = new fabric.Group([frame, iconCircle, iconX1, iconX2, titleText, errorText, retryText], {
+        left: options.left,
+        top: options.top,
+        hasControls: true,
+        lockUniScaling: true,
+        lockScalingFlip: true,
+        subTargetCheck: true,
+        data: {
+            type: "failed-generation",
+            id: cardId,
+            error: options.error,
+            generationParams: options.generationParams,
+        }
+    } as any);
+
+    // Corner-only resize
+    if (fabric.controlsUtils?.createObjectDefaultControls) {
+        group.controls = { ...fabric.controlsUtils.createObjectDefaultControls() };
+        delete (group.controls as any).mt;
+        delete (group.controls as any).mb;
+        delete (group.controls as any).ml;
+        delete (group.controls as any).mr;
+    }
+
+    return group;
 };

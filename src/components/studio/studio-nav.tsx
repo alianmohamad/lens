@@ -4,9 +4,9 @@ import { useState, useCallback, useRef, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ChevronLeft, Download, Check, Pencil, Image, FileImage, Loader2, Cloud, CloudOff } from "lucide-react";
+import { ChevronLeft, Download, Check, Pencil, Image, FileImage, Loader2, Cloud, CloudOff, Moon, Sun } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ThemeSwitcher } from "@/components/theme-switcher";
+import { useTheme } from "next-themes";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -24,6 +24,7 @@ interface StudioNavProps {
     onProjectNameChange?: (name: string) => void;
     saveStatus?: "idle" | "saving" | "saved" | "error";
     lastSaved?: Date | null;
+    backLink?: string;
 }
 
 export function StudioNav({
@@ -32,11 +33,13 @@ export function StudioNav({
     projectName = "Untitled Project",
     onProjectNameChange,
     saveStatus = "idle",
-    lastSaved
+    lastSaved,
+    backLink = "/dashboard"
 }: StudioNavProps) {
     const [isEditing, setIsEditing] = useState(false);
     const [editedName, setEditedName] = useState(projectName);
     const inputRef = useRef<HTMLInputElement>(null);
+    const { theme, setTheme } = useTheme();
 
     useEffect(() => {
         setEditedName(projectName);
@@ -114,17 +117,21 @@ export function StudioNav({
         return lastSaved.toLocaleTimeString();
     }, [lastSaved]);
 
+    const toggleTheme = useCallback(() => {
+        setTheme(theme === "dark" ? "light" : "dark");
+    }, [theme, setTheme]);
+
     return (
         <header className="flex items-center justify-between px-6 py-4 pointer-events-auto w-full">
             {/* Left: Back & Branding */}
             <div className="flex items-center gap-4">
-                <Link href="/">
-                    <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full bg-slate-800/50 hover:bg-slate-700 text-slate-300 border border-slate-700/50">
+                <Link href={backLink}>
+                    <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full bg-slate-100 dark:bg-slate-800/50 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700/50">
                         <ChevronLeft className="h-5 w-5" />
                     </Button>
                 </Link>
                 <div className="flex flex-col">
-                    <span className="text-sm font-bold text-white tracking-wide font-display">ZeroLens Studio</span>
+                    <span className="text-sm font-bold text-slate-800 dark:text-white tracking-wide font-display">ZeroLens Studio</span>
                     <div className="flex items-center gap-2">
                         {isEditing ? (
                             <Input
@@ -133,7 +140,7 @@ export function StudioNav({
                                 onChange={(e) => setEditedName(e.target.value)}
                                 onBlur={handleNameSubmit}
                                 onKeyDown={handleKeyDown}
-                                className="h-5 text-[10px] px-1 py-0 bg-slate-800 border-slate-600 text-slate-200 w-32"
+                                className="h-5 text-[10px] px-1 py-0 bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-600 text-slate-800 dark:text-slate-200 w-32"
                                 maxLength={50}
                             />
                         ) : (
@@ -141,7 +148,7 @@ export function StudioNav({
                                 onClick={() => setIsEditing(true)}
                                 className="flex items-center gap-1 group max-w-[120px] md:max-w-[200px]"
                             >
-                                <span className="text-[10px] text-slate-400 font-medium group-hover:text-slate-300 transition-colors truncate">
+                                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium group-hover:text-slate-700 dark:group-hover:text-slate-300 transition-colors truncate">
                                     {projectName}
                                 </span>
                                 <Pencil className="h-2.5 w-2.5 text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
@@ -178,48 +185,57 @@ export function StudioNav({
             <div className="flex items-center gap-3">
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm" className="h-9 gap-2 text-slate-300 hover:text-white hover:bg-slate-800">
+                        <Button variant="ghost" size="sm" className="h-9 gap-2 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800">
                             <Download className="h-4 w-4" />
                             <span className="hidden sm:inline text-xs">Export</span>
                         </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="bg-slate-900 border-slate-800 text-slate-200 w-48">
+                    <DropdownMenuContent align="end" className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 w-48">
                         <DropdownMenuItem
                             onClick={() => handleExport("png", true)}
-                            className="flex items-center gap-2 cursor-pointer hover:bg-slate-800"
+                            className="flex items-center gap-2 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800"
                         >
                             <Image className="h-4 w-4" />
                             <span>PNG (with background)</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem
                             onClick={() => handleExport("png", false)}
-                            className="flex items-center gap-2 cursor-pointer hover:bg-slate-800"
+                            className="flex items-center gap-2 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800"
                         >
                             <Image className="h-4 w-4" />
                             <span>PNG (transparent)</span>
                         </DropdownMenuItem>
-                        <DropdownMenuSeparator className="bg-slate-800" />
+                        <DropdownMenuSeparator className="bg-slate-200 dark:bg-slate-800" />
                         <DropdownMenuItem
                             onClick={() => handleExport("jpeg", true)}
-                            className="flex items-center gap-2 cursor-pointer hover:bg-slate-800"
+                            className="flex items-center gap-2 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800"
                         >
                             <FileImage className="h-4 w-4" />
                             <span>JPEG (high quality)</span>
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
-                <div className="hidden sm:block h-4 w-px bg-slate-800" />
+                <div className="hidden sm:block h-4 w-px bg-slate-200 dark:bg-slate-800" />
 
-                {/* Theme Switcher - Hidden on mobile */}
-                <div className="hidden sm:block">
-                    <ThemeSwitcher />
-                </div>
+                {/* Dark/Light Toggle */}
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={toggleTheme}
+                    className="hidden sm:flex h-9 w-9 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800"
+                >
+                    {theme === "dark" ? (
+                        <Sun className="h-4 w-4" />
+                    ) : (
+                        <Moon className="h-4 w-4" />
+                    )}
+                </Button>
 
-                <div className="h-4 w-px bg-slate-800" />
+                <div className="h-4 w-px bg-slate-200 dark:bg-slate-800" />
                 <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full">
-                    <Avatar className="h-8 w-8 border border-slate-700">
+                    <Avatar className="h-8 w-8 border border-slate-200 dark:border-slate-700">
                         <AvatarImage src={userImage || undefined} />
-                        <AvatarFallback className="bg-slate-800 text-slate-300 text-xs">U</AvatarFallback>
+                        <AvatarFallback className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs">U</AvatarFallback>
                     </Avatar>
                 </Button>
             </div>

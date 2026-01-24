@@ -37,7 +37,6 @@ import { Badge } from "@/components/ui/badge";
 import { useCartStore } from "@/stores/cart-store";
 import { useLanguageStore } from "@/stores/language-store";
 import { cn } from "@/lib/utils";
-import { ThemeSwitcher } from "@/components/theme-switcher";
 
 const navLinks = [
     { href: "/marketplace", label: "Marketplace", icon: Store },

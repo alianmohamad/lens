@@ -2,12 +2,26 @@ import * as fabric from "fabric";
 
 // Canvas object data types
 export interface CanvasObjectData {
-    type: "generation-frame" | "skeleton" | "connector" | "image" | "text";
+    type: "generation-frame" | "skeleton" | "connector" | "image" | "text" | "failed-generation";
     id?: string;
     prompt?: string;
     label?: string;
     createdAt?: string;
     modelId?: string;
+    originalUrl?: string;
+    sourceId?: string;
+    targetId?: string;
+    error?: string;
+    generationParams?: GenerationParams;
+}
+
+// Generation parameters for retry functionality
+export interface GenerationParams {
+    productImageUrl: string;
+    prompt: string;
+    stylePreset: string;
+    aspectRatio: string;
+    modelId: string;
 }
 
 // Extended Fabric object with custom data

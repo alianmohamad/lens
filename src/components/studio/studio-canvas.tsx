@@ -4,15 +4,18 @@ import * as fabric from "fabric";
 import { initInfiniteCanvas, createGenerationCard, updateConnector } from "@/lib/fabric-utils";
 import useMeasure from "react-use-measure";
 import { ShapeToolbar } from "./shape-toolbar";
+import { useTheme } from "next-themes";
 
 interface StudioCanvasProps {
     onCanvasReady?: (canvas: fabric.Canvas) => void;
     generatedImage?: string | null;
     originalImage?: string | null;
     activeTool?: "select" | "hand";
+    onRetry?: (failedCard: fabric.Object) => void;
+    onGenerateFrom?: (sourceCard: fabric.Object) => void;
 }
 
-export function StudioCanvas({ onCanvasReady, generatedImage, originalImage, activeTool = "select" }: StudioCanvasProps) {
+export function StudioCanvas({ onCanvasReady, generatedImage, originalImage, activeTool = "select", onRetry, onGenerateFrom }: StudioCanvasProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const [fabricCanvas, setFabricCanvas] = useState<fabric.Canvas | null>(null);
@@ -20,6 +23,7 @@ export function StudioCanvas({ onCanvasReady, generatedImage, originalImage, act
 
     // Grid State for CSS Background
     const [gridState, setGridState] = useState({ zoom: 1, x: 0, y: 0 });
+    const { resolvedTheme } = useTheme();
 
     // Initialize Canvas
     useEffect(() => {
@@ -261,13 +265,17 @@ export function StudioCanvas({ onCanvasReady, generatedImage, originalImage, act
         });
     }, [fabricCanvas, originalImage]);
 
-    // Grid Style
+    // Grid Style - theme-aware
     const gridSize = Math.max(20, 40 * gridState.zoom);
-    const svgString = `<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="1.5" fill="#94a3b8" fill-opacity="0.5"/></svg>`;
+    // Use darker dots for light mode, lighter for dark mode
+    const dotColor = resolvedTheme === 'dark' ? '#64748b' : '#475569';
+    const dotOpacity = resolvedTheme === 'dark' ? '0.4' : '0.6';
+    const svgString = `<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="1.5" fill="${dotColor}" fill-opacity="${dotOpacity}"/></svg>`;
     const bgImage = `url("data:image/svg+xml;base64,${btoa(svgString)}")`;
 
+
     return (
-        <div ref={measureRef} className="w-full h-full relative overflow-hidden bg-[#020617]">
+        <div ref={measureRef} className="w-full h-full relative overflow-hidden bg-slate-100 dark:bg-[#020617]">
             <div
                 className="absolute inset-0 pointer-events-none"
                 style={{
@@ -281,7 +289,7 @@ export function StudioCanvas({ onCanvasReady, generatedImage, originalImage, act
                 <canvas ref={canvasRef} />
             </div>
 
-            {fabricCanvas && <ShapeToolbar canvas={fabricCanvas} />}
+            {fabricCanvas && <ShapeToolbar canvas={fabricCanvas} onRetry={onRetry} onGenerateFrom={onGenerateFrom} />}
         </div>
     );
 }

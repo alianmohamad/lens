@@ -17,7 +17,16 @@ import {
 } from "lucide-react";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
-import { BeforeAfterShowcase, AIProcessVisualizer, ResultsGallery, InteractiveHeroBackground } from "@/components/landing";
+import {
+  BeforeAfterShowcase,
+  AIProcessVisualizer,
+  ResultsGallery,
+  InteractiveHeroBackground,
+  PricingSection,
+  ComparisonSection,
+  FaqSection,
+  EcosystemSection
+} from "@/components/landing";
 import { TypeWriter } from "@/components/ui/typewriter";
 
 
@@ -136,10 +145,13 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Before & After Showcase - NEW */}
+      {/* Before & After Showcase */}
       <BeforeAfterShowcase />
 
-      {/* AI Process Visualizer - NEW */}
+      {/* Comparison Section - Why Us vs Them */}
+      <ComparisonSection />
+
+      {/* AI Process Visualizer */}
       <AIProcessVisualizer />
 
       {/* Bento Grid Section */}
@@ -243,8 +255,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Results Gallery - NEW */}
-      <ResultsGallery />
 
       {/* How It Works */}
       <section className="relative py-32 overflow-hidden">
@@ -331,6 +341,18 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Results Gallery */}
+      <ResultsGallery />
+
+      {/* Ecosystem Section */}
+      <EcosystemSection />
+
+      {/* Pricing Section */}
+      <PricingSection />
+
+      {/* FAQ Section */}
+      <FaqSection />
 
       {/* Final CTA */}
       <section className="relative py-16 md:py-32">

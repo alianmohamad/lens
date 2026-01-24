@@ -131,7 +131,7 @@ export function AIProcessVisualizer() {
   };
 
   return (
-    <section className="py-16 md:py-24">
+    <section className="py-32">
       <div className="section-container">
         {/* Section Header */}
         <div className="text-center mb-12">
@@ -149,9 +149,9 @@ export function AIProcessVisualizer() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="text-3xl md:text-4xl font-bold mb-3"
+            className="text-5xl md:text-6xl font-display font-bold mb-3"
           >
-            Watch AI Transform Your Photos
+            Watch AI <span className="text-neon-subtle">Transform</span> Your Photos
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}

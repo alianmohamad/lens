@@ -16,6 +16,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { motion, AnimatePresence } from "framer-motion";
 import { Textarea } from "@/components/ui/textarea";
 import { SettingsModal, type GenerationSettings } from "./settings-modal";
+import { PocketPrompts } from "./pocket-prompts";
 
 interface StudioBottomBarProps {
     onUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -57,9 +58,20 @@ export function StudioBottomBar({
     onAdvancedSettingsChange
 }: StudioBottomBarProps) {
     const fileInputRef = React.useRef<HTMLInputElement>(null);
-    const [isFocused, setIsFocused] = React.useState(false);
     const [showTools, setShowTools] = React.useState(false);
     const textareaRef = React.useRef<HTMLTextAreaElement>(null);
+
+    // Auto-resize textarea based on content
+    React.useEffect(() => {
+        const textarea = textareaRef.current;
+        if (!textarea) return;
+
+        // Reset height to auto to get the correct scrollHeight
+        textarea.style.height = '40px';
+        // Set height based on content, with max limit
+        const newHeight = Math.min(Math.max(40, textarea.scrollHeight), 120);
+        textarea.style.height = `${newHeight}px`;
+    }, [prompt]);
 
     // Default advanced settings
     const defaultSettings: GenerationSettings = {
@@ -101,7 +113,7 @@ export function StudioBottomBar({
             {/* DESKTOP ONLY: Tool Pill */}
             <TooltipProvider>
                 <motion.div
-                    className="hidden md:flex items-center gap-2 p-2 rounded-2xl bg-zinc-900/90 backdrop-blur-xl border border-zinc-800 shadow-2xl h-[56px]"
+                    className="hidden md:flex items-center gap-1.5 p-2 rounded-2xl bg-white/90 dark:bg-zinc-900/90 backdrop-blur-xl border border-slate-200 dark:border-zinc-800 shadow-xl dark:shadow-2xl h-[56px]"
                 >
                     {/* Upload Action */}
                     <Tooltip>
@@ -109,11 +121,11 @@ export function StudioBottomBar({
                             <Button
                                 variant="ghost"
                                 size="icon"
-                                className="h-10 w-10 rounded-xl hover:bg-zinc-800 text-zinc-400 hover:text-white"
+                                className="h-10 w-10 rounded-xl hover:bg-slate-100 dark:hover:bg-zinc-800 text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white shrink-0"
                                 onClick={() => fileInputRef.current?.click()}
                             >
                                 {uploadedImage ? (
-                                    <div className="relative h-8 w-8 rounded-lg overflow-hidden border border-zinc-700">
+                                    <div className="relative h-8 w-8 rounded-lg overflow-hidden border border-slate-300 dark:border-zinc-700">
                                         <img src={uploadedImage} className="h-full w-full object-cover" alt="Uploaded" />
                                     </div>
                                 ) : (
@@ -121,37 +133,35 @@ export function StudioBottomBar({
                                 )}
                             </Button>
                         </TooltipTrigger>
-                        <TooltipContent side="top" className="bg-zinc-900 border-zinc-800 text-xs">Upload Image</TooltipContent>
+                        <TooltipContent side="top" className="bg-white dark:bg-zinc-900 border-slate-200 dark:border-zinc-800 text-xs">Upload Image</TooltipContent>
                     </Tooltip>
 
-                    <div className="h-5 w-px bg-zinc-800" />
+                    <div className="h-6 w-px bg-slate-200 dark:bg-zinc-700/50 mx-0.5" />
 
                     {/* Model Select */}
                     <Select value={modelId} onValueChange={setModelId}>
-                        <SelectTrigger className="w-[110px] h-9 bg-zinc-950/50 border-zinc-800 text-xs text-zinc-300 focus:ring-0 rounded-lg">
-                            <div className="flex items-center gap-1.5">
-                                <Sparkles className="h-3 w-3 text-purple-400" />
+                        <SelectTrigger className="w-[130px] h-9 bg-slate-100 dark:bg-zinc-950/50 border-slate-200 dark:border-zinc-700/50 text-xs text-slate-700 dark:text-zinc-300 focus:ring-0 rounded-lg px-2.5 gap-1">
+                            <div className="flex items-center gap-1.5 truncate">
+                                <Sparkles className="h-3 w-3 text-purple-400 shrink-0" />
                                 <SelectValue placeholder="Model" />
                             </div>
                         </SelectTrigger>
-                        <SelectContent className="bg-zinc-900 border-zinc-800 text-zinc-200">
+                        <SelectContent className="bg-white dark:bg-zinc-900 border-slate-200 dark:border-zinc-800 text-slate-800 dark:text-zinc-200">
                             {MODELS.map(m => (
                                 <SelectItem key={m.id} value={m.id} className="text-xs">{m.label}</SelectItem>
                             ))}
                         </SelectContent>
                     </Select>
 
-                    <div className="h-5 w-px bg-zinc-800" />
-
                     {/* Style Select */}
                     <Select value={stylePreset} onValueChange={setStylePreset}>
-                        <SelectTrigger className="w-[100px] h-9 bg-zinc-950/50 border-zinc-800 text-xs text-zinc-300 focus:ring-0 rounded-lg">
-                            <div className="flex items-center gap-1.5">
-                                <Layers className="h-3 w-3 text-zinc-500" />
+                        <SelectTrigger className="w-[110px] h-9 bg-slate-100 dark:bg-zinc-950/50 border-slate-200 dark:border-zinc-700/50 text-xs text-slate-700 dark:text-zinc-300 focus:ring-0 rounded-lg px-2.5 gap-1">
+                            <div className="flex items-center gap-1.5 truncate">
+                                <Layers className="h-3 w-3 text-zinc-500 shrink-0" />
                                 <SelectValue placeholder="Style" />
                             </div>
                         </SelectTrigger>
-                        <SelectContent className="bg-zinc-900 border-zinc-800 text-zinc-200">
+                        <SelectContent className="bg-white dark:bg-zinc-900 border-slate-200 dark:border-zinc-800 text-slate-800 dark:text-zinc-200">
                             {STYLES.map(s => (
                                 <SelectItem key={s.id} value={s.id} className="text-xs">{s.label}</SelectItem>
                             ))}
@@ -160,20 +170,20 @@ export function StudioBottomBar({
 
                     {/* Ratio Select */}
                     <Select value={aspectRatio} onValueChange={setAspectRatio}>
-                        <SelectTrigger className="w-[80px] h-9 bg-zinc-950/50 border-zinc-800 text-xs text-zinc-300 focus:ring-0 rounded-lg">
-                            <div className="flex items-center gap-1.5">
-                                <Ratio className="h-3 w-3 text-zinc-500" />
+                        <SelectTrigger className="w-[75px] h-9 bg-slate-100 dark:bg-zinc-950/50 border-slate-200 dark:border-zinc-700/50 text-xs text-slate-700 dark:text-zinc-300 focus:ring-0 rounded-lg px-2.5 gap-1">
+                            <div className="flex items-center gap-1.5 truncate">
+                                <Ratio className="h-3 w-3 text-zinc-500 shrink-0" />
                                 <SelectValue placeholder="Ratio" />
                             </div>
                         </SelectTrigger>
-                        <SelectContent className="bg-zinc-900 border-zinc-800 text-zinc-200">
+                        <SelectContent className="bg-white dark:bg-zinc-900 border-slate-200 dark:border-zinc-800 text-slate-800 dark:text-zinc-200">
                             {RATIOS.map(s => (
                                 <SelectItem key={s.id} value={s.id} className="text-xs">{s.label}</SelectItem>
                             ))}
                         </SelectContent>
                     </Select>
 
-                    <div className="h-5 w-px bg-zinc-800" />
+                    <div className="h-6 w-px bg-slate-200 dark:bg-zinc-700/50 mx-0.5" />
 
                     {/* Advanced Settings Modal */}
                     <Tooltip>
@@ -190,7 +200,7 @@ export function StudioBottomBar({
                                 />
                             </div>
                         </TooltipTrigger>
-                        <TooltipContent side="top" className="bg-zinc-900 border-zinc-800 text-xs">Advanced Settings</TooltipContent>
+                        <TooltipContent side="top" className="bg-white dark:bg-zinc-900 border-slate-200 dark:border-zinc-800 text-xs">Advanced Settings</TooltipContent>
                     </Tooltip>
                 </motion.div>
             </TooltipProvider>
@@ -199,7 +209,7 @@ export function StudioBottomBar({
             <motion.div
                 layout
                 className={cn(
-                    "w-full md:flex-1 md:max-w-xl md:min-w-[280px] flex items-end gap-2 p-2 rounded-2xl bg-zinc-900/90 backdrop-blur-xl border border-zinc-800 shadow-2xl transition-all duration-300"
+                    "w-full md:flex-1 md:max-w-xl md:min-w-[280px] flex items-end gap-2 p-2 rounded-2xl bg-white/90 dark:bg-zinc-900/90 backdrop-blur-xl border border-slate-200 dark:border-zinc-800 shadow-xl dark:shadow-2xl transition-all duration-300"
                 )}
             >
                 {/* MOBILE ONLY: Embedded Upload Button */}
@@ -282,23 +292,23 @@ export function StudioBottomBar({
                     </Popover>
                 </div>
 
+                {/* Pocket Prompts Button */}
+                <div className="shrink-0">
+                    <PocketPrompts onSelect={setPrompt} />
+                </div>
+
                 {/* Textarea */}
                 <div
-                    className="flex-1 relative bg-zinc-950/50 rounded-xl border border-zinc-800/50 focus-within:border-purple-500/50 focus-within:bg-zinc-950 transition-colors"
+                    className="flex-1 relative bg-slate-50 dark:bg-zinc-950/50 rounded-xl border border-slate-200 dark:border-zinc-800/50 focus-within:border-purple-500/50 focus-within:bg-white dark:focus-within:bg-zinc-950 transition-colors"
                     onClick={() => textareaRef.current?.focus()}
                 >
                     <Textarea
                         ref={textareaRef}
                         value={prompt}
                         onChange={(e) => setPrompt(e.target.value)}
-                        onFocus={() => setIsFocused(true)}
-                        onBlur={() => setIsFocused(false)}
                         placeholder="Describe your vision..."
-                        className={cn(
-                            "w-full bg-transparent border-none text-sm resize-none focus-visible:ring-0 px-3 py-2.5 custom-scrollbar placeholder:text-zinc-600 font-medium",
-                            isFocused ? "h-20" : "h-10"
-                        )}
-                        style={{ minHeight: "40px" }}
+                        className="w-full bg-transparent border-none text-sm resize-none focus-visible:ring-0 px-3 py-2.5 custom-scrollbar text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-zinc-600 font-medium overflow-hidden"
+                        style={{ height: '40px', minHeight: '40px', maxHeight: '120px' }}
                     />
                 </div>
 

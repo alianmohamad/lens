@@ -56,6 +56,14 @@
   --color-cool-indigo: var(--cool-indigo);
   --color-cool-blue: var(--cool-blue);
   --color-warm-amber: var(--warm-amber);
+
+  /* Softer Shadows */
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.02);
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.05), 0 1px 2px -1px rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.05), 0 8px 10px -6px rgb(0 0 0 / 0.05);
+  --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.1);
 }
 
 /* ==================== LIGHT MODE ==================== */
@@ -65,8 +73,8 @@
   /* Primary Accent - Vibrant Purple */
   --neon: #9333EA;
   --neon-muted: #9333EA20;
-  --neon-glow: rgba(147, 51, 234, 0.3);
-  --grid-color: rgba(147, 51, 234, 0.06);
+  --neon-glow: rgba(147, 51, 234, 0.15);
+  --grid-color: rgba(147, 51, 234, 0.04);
 
   /* Warm accent - muted amber for subtle accents */
   --warm-amber: #C7A589;
@@ -124,8 +132,8 @@
   /* Primary Accent - Purple with higher vibrancy for dark mode */
   --neon: #A855F7;
   --neon-muted: #A855F722;
-  --neon-glow: rgba(168, 85, 247, 0.35);
-  --grid-color: rgba(168, 85, 247, 0.04);
+  --neon-glow: rgba(168, 85, 247, 0.2);
+  --grid-color: rgba(168, 85, 247, 0.03);
 
   /* Warm accent - muted amber */
   --warm-amber: #D4B896;
@@ -613,13 +621,13 @@
     @apply transition-all duration-300;
     @apply hover:scale-105;
     background: linear-gradient(135deg, #9333EA 0%, #3B82F6 50%, #FBBF88 100%);
-    box-shadow: 0 0 30px rgba(147, 51, 234, 0.3), 0 0 60px rgba(59, 130, 246, 0.15);
+    box-shadow: 0 10px 30px -5px rgba(147, 51, 234, 0.25), 0 0 20px rgba(59, 130, 246, 0.1);
   }
 
   .btn-cta:hover {
     box-shadow:
-      0 0 40px rgba(147, 51, 234, 0.4),
-      0 0 80px rgba(59, 130, 246, 0.25);
+      0 10px 40px -5px rgba(147, 51, 234, 0.35),
+      0 0 30px rgba(59, 130, 246, 0.2);
   }
 
   .btn-cta:active {
@@ -637,7 +645,7 @@
 
   .btn-ghost:hover {
     border-color: transparent;
-    box-shadow: 0 0 20px rgba(147, 51, 234, 0.2);
+    box-shadow: 0 4px 20px -5px rgba(147, 51, 234, 0.15);
     background:
       linear-gradient(var(--background), var(--background)) padding-box,
       conic-gradient(from var(--gradient-angle, 0deg), #9333EA, #3B82F6, #FBBF88, #9333EA) border-box;
@@ -674,10 +682,9 @@
     border-color: transparent;
     background:
       linear-gradient(var(--card), var(--card)) padding-box,
-      conic-gradient(from var(--card-gradient-angle, 0deg), rgba(147, 51, 234, 0.6), rgba(59, 130, 246, 0.5), rgba(251, 191, 136, 0.5), rgba(147, 51, 234, 0.6)) border-box;
+      conic-gradient(from var(--card-gradient-angle, 0deg), rgba(147, 51, 234, 0.3), rgba(59, 130, 246, 0.25), rgba(251, 191, 136, 0.25), rgba(147, 51, 234, 0.3)) border-box;
     box-shadow:
-      0 0 60px rgba(147, 51, 234, 0.08),
-      inset 0 0 60px rgba(147, 51, 234, 0.02);
+      0 10px 40px -10px rgba(147, 51, 234, 0.05);
     animation: card-border-spin 4s linear infinite;
   }
 
@@ -754,8 +761,9 @@
   }
 
   .glass-strong {
-    @apply bg-background/60 backdrop-blur-2xl;
-    @apply border border-neon/20;
+    @apply bg-background/60 backdrop-blur-3xl;
+    @apply border border-white/5;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
   }
 
   .glow {
@@ -777,7 +785,7 @@
     @apply transition-all duration-300;
     @apply hover:scale-105;
     background: linear-gradient(135deg, #9333EA 0%, #3B82F6 50%, #FBBF88 100%);
-    box-shadow: 0 0 30px rgba(147, 51, 234, 0.4);
+    box-shadow: 0 10px 30px -5px rgba(147, 51, 234, 0.25);
   }
 
   .badge-glass {
@@ -786,6 +794,34 @@
       linear-gradient(135deg, #9333EA, #3B82F6, #FBBF88) border-box;
     border: 1px solid transparent;
     color: #9333EA;
+  }
+
+  /* Premium Gradient Border (Mask approach for glass support) */
+  .border-gradient-premium {
+    position: relative;
+    border: 1px solid transparent;
+    /* Fallback / Spacing */
+  }
+
+  .border-gradient-premium::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1.5px;
+    /* Border thickness */
+    background: conic-gradient(from var(--card-gradient-angle, 0deg), var(--neon), var(--cool-blue), var(--warm-amber), var(--neon));
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    z-index: 2;
+    animation: card-border-spin 4s linear infinite;
   }
 }
 

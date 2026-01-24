@@ -2,7 +2,7 @@
 "use client";
 
 import * as React from "react";
-import { MousePointer2, Maximize, Undo2 } from "lucide-react";
+import { MousePointer2, Maximize, Undo2, Redo2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
@@ -11,6 +11,10 @@ interface StudioToolPaletteProps {
     activeTool: "select" | "hand";
     setActiveTool: (tool: "select" | "hand") => void;
     onFitToScreen?: () => void;
+    onUndo?: () => void;
+    onRedo?: () => void;
+    canUndo?: boolean;
+    canRedo?: boolean;
 }
 
 // Custom Hand SVG icon (simpler than lucide's broken one)
@@ -34,10 +38,18 @@ function HandIcon({ className }: { className?: string }) {
     );
 }
 
-export function StudioToolPalette({ activeTool, setActiveTool, onFitToScreen }: StudioToolPaletteProps) {
+export function StudioToolPalette({
+    activeTool,
+    setActiveTool,
+    onFitToScreen,
+    onUndo,
+    onRedo,
+    canUndo = false,
+    canRedo = false
+}: StudioToolPaletteProps) {
     return (
         <TooltipProvider delayDuration={100}>
-            <div className="flex flex-col gap-2 p-2 rounded-2xl bg-zinc-900/90 backdrop-blur-xl border border-zinc-800 shadow-2xl pointer-events-auto">
+            <div className="flex flex-col gap-2 p-2 rounded-2xl bg-white/90 dark:bg-zinc-900/90 backdrop-blur-xl border border-slate-200 dark:border-zinc-800 shadow-xl dark:shadow-2xl pointer-events-auto">
                 <ToolButton
                     active={activeTool === "select"}
                     onClick={() => setActiveTool("select")}
@@ -53,7 +65,7 @@ export function StudioToolPalette({ activeTool, setActiveTool, onFitToScreen }: 
                     shortcut="H"
                 />
 
-                <div className="h-px w-8 bg-zinc-800 mx-auto my-1" />
+                <div className="h-px w-8 bg-slate-200 dark:bg-zinc-800 mx-auto my-1" />
 
                 <ToolButton
                     onClick={onFitToScreen}
@@ -61,13 +73,21 @@ export function StudioToolPalette({ activeTool, setActiveTool, onFitToScreen }: 
                     label="Fit to Screen"
                 />
 
-                <div className="h-px w-8 bg-zinc-800 mx-auto my-1" />
+                <div className="h-px w-8 bg-slate-200 dark:bg-zinc-800 mx-auto my-1" />
 
                 <ToolButton
-                    onClick={() => { }}
-                    icon={<Undo2 className="h-4 w-4 opacity-40" />}
-                    label="Undo (Soon)"
-                    disabled
+                    onClick={onUndo}
+                    icon={<Undo2 className={cn("h-4 w-4", !canUndo && "opacity-40")} />}
+                    label="Undo"
+                    shortcut="Ctrl+Z"
+                    disabled={!canUndo}
+                />
+                <ToolButton
+                    onClick={onRedo}
+                    icon={<Redo2 className={cn("h-4 w-4", !canRedo && "opacity-40")} />}
+                    label="Redo"
+                    shortcut="Ctrl+Shift+Z"
+                    disabled={!canRedo}
                 />
             </div>
         </TooltipProvider>
@@ -101,7 +121,7 @@ function ToolButton({
                         "rounded-xl h-10 w-10 transition-all duration-200",
                         active
                             ? "bg-purple-600 text-white shadow-lg shadow-purple-900/50 hover:bg-purple-500"
-                            : "text-zinc-400 hover:text-white hover:bg-zinc-800"
+                            : "text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-zinc-800"
                     )}
                 >
                     {icon}
@@ -110,11 +130,11 @@ function ToolButton({
             <TooltipContent
                 side="right"
                 sideOffset={12}
-                className="bg-zinc-900 border-zinc-800 text-xs px-3 py-1.5 flex items-center gap-2"
+                className="bg-white dark:bg-zinc-900 border-slate-200 dark:border-zinc-800 text-xs px-3 py-1.5 flex items-center gap-2"
             >
-                <span className="text-white font-medium">{label}</span>
+                <span className="text-slate-900 dark:text-white font-medium">{label}</span>
                 {shortcut && (
-                    <span className="text-zinc-500 text-[10px] bg-zinc-800 px-1.5 py-0.5 rounded">{shortcut}</span>
+                    <span className="text-slate-400 dark:text-zinc-500 text-[10px] bg-slate-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded">{shortcut}</span>
                 )}
             </TooltipContent>
         </Tooltip>
