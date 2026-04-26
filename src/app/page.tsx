@@ -73,7 +73,7 @@ export default function HomePage() {
           >
             <span className="pill text-xs md:text-sm">
               <Sparkles className="w-3 h-3 md:w-4 md:h-4" />
-              AI-Powered Generation
+              AI-Powered Generation Tool
             </span>
           </motion.div>
 
