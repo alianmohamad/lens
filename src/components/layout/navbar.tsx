@@ -97,7 +97,7 @@ export function Navbar() {
                         {/* Logo */}
                         <Link href="/" className="shrink-0">
                             <span className="text-xl font-display font-bold gradient-text">
-                                ZeroLens
+                                LensTest
                             </span>
                         </Link>
 
