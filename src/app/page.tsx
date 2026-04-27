@@ -168,7 +168,7 @@ export default function HomePage() {
             className="mb-16"
           >
             <h2 className="text-5xl md:text-6xl font-display font-bold mb-4">
-              The <span className="text-neon-subtle">ZeroLens</span>Advantage
+              The <span className="text-neon-subtle">ZeroLens</span>?
             </h2>
             <p className="text-xl text-muted-foreground max-w-xl">
               Everything you need to create professional product photography at scale.
