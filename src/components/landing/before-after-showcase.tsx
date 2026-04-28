@@ -78,11 +78,13 @@ export function BeforeAfterShowcase() {
           viewport={{ once: true }}
           className="text-center mb-12 md:mb-16"
         >
-          <span className="pill mb-6 inline-flex gap-1.5 px-3 py-1.5 text-xs">
-            <Star className="w-3 h-3" />
-            <ArrowLeftRight className="w-3 h-3" />
-            Try
-          </span>
+          <div className="mb-6 inline-flex items-center gap-3 px-4 py-2.5 rounded-lg bg-gradient-to-r from-neon/10 to-neon/5 border border-neon/30 hover:border-neon/60 transition-colors">
+            <div className="flex items-center gap-1.5">
+              <Star className="w-3.5 h-3.5 text-neon" />
+              <ArrowLeftRight className="w-3.5 h-3.5 text-neon" />
+            </div>
+            <span className="text-xs font-semibold text-foreground">Vs Generic AI Photographer</span>
+          </div>
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-bold mb-4">
             Compare <span className="text-neon-subtle block sm:inline">transformation</span>
           </h2>
