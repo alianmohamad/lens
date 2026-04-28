@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Check, Zap, Sparkles, Building2 } from "lucide-react";
+import { Check, Zap, Sparkles, Users, Building2 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
@@ -41,6 +41,25 @@ const plans = [
         href: "/sign-up?plan=pro",
         popular: true,
         icon: Sparkles
+    },
+    {
+        name: "Team",
+        price: "$99",
+        period: "/month",
+        description: "For growing teams & studios.",
+        features: [
+            "3000 generations per month",
+            "4K resolution outputs",
+            "Team collaboration (5 users)",
+            "Commercial license",
+            "Advanced API access",
+            "Custom presets & models",
+            "Priority support"
+        ],
+        cta: "Get Team Plan",
+        href: "/sign-up?plan=team",
+        popular: false,
+        icon: Users
     },
     {
         name: "Agency",
@@ -84,7 +103,7 @@ export function PricingSection() {
                     </p>
                 </motion.div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-8 max-w-7xl mx-auto">
                     {plans.map((plan, i) => (
                         <motion.div
                             key={plan.name}
