@@ -80,7 +80,7 @@ export function BeforeAfterShowcase() {
         >
           <span className="pill mb-6 inline-flex">
             <ArrowLeftRight className="w-4 h-4" />
-            Before & After
+            Try
           </span>
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-bold mb-4">
             Compare <span className="text-neon-subtle block sm:inline">transformation</span>
