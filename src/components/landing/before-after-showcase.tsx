@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeftRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeftRight, ChevronLeft, ChevronRight, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 
@@ -78,8 +78,9 @@ export function BeforeAfterShowcase() {
           viewport={{ once: true }}
           className="text-center mb-12 md:mb-16"
         >
-          <span className="pill mb-6 inline-flex">
-            <ArrowLeftRight className="w-4 h-4" />
+          <span className="pill mb-6 inline-flex gap-1.5 px-3 py-1.5 text-xs">
+            <Star className="w-3 h-3" />
+            <ArrowLeftRight className="w-3 h-3" />
             Try
           </span>
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-bold mb-4">
