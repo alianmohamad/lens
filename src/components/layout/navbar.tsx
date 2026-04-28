@@ -39,9 +39,9 @@ import { useLanguageStore } from "@/stores/language-store";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
-    { href: "/marketplace", label: "Marketplace", icon: Store },
+    { href: "/marketplace", label: "Browse", icon: Store },
     { href: "/studio", label: "Studio", icon: Sparkles },
-    { href: "/pocket", label: "Pocket", icon: Bookmark },
+    { href: "/pocket", label: "Wallet", icon: Bookmark },
     { href: "/sell", label: "Sell", icon: PenTool },
 ];
 
