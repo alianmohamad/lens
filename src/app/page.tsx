@@ -12,7 +12,7 @@ import {
   Star,
   ArrowUpRight,
   Gift,
-  Clock,
+  Calendar,
   CircleCheck,
 } from "lucide-react";
 import { Navbar } from "@/components/layout/navbar";
@@ -138,7 +138,7 @@ export default function HomePage() {
               <span>Easy start</span>
             </span>
             <span className="flex items-center gap-1 sm:gap-2">
-              <Clock className="w-4 h-4 text-neon" />
+              <Calendar className="w-4 h-4 text-neon" />
               <span>30s results</span>
             </span>
           </motion.div>
