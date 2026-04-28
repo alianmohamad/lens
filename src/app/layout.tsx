@@ -3,6 +3,7 @@ import { Inter, Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
 import { CartSidebar } from "@/components/layout/cart-sidebar";
+import Script from "next/script";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -74,6 +75,14 @@ export default function RootLayout({
           {children}
           <CartSidebar />
         </Providers>
+        <Script
+          src="https://content-chat.vercel.app/api/sdk/contentchat.js"
+          strategy="afterInteractive"
+          data-cc-sdk
+          data-site-id="679f9806-b3b5-44b0-8e08-9213cd64a870"
+          data-api-key="827c5c765f9d49fa5b9df9e1:e1e1a9db8670d608bcbc4e4cc926f4a7:fdbaf55aec947c93f387e480a6db7cab3d1d3137a0c7b1969786d4afbe1beb5020ac96bd9a9594c07efc1af5d2c71d478d1cb0"
+        />
+
 
       </body>
     </html>
