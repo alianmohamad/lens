@@ -131,7 +131,7 @@ export default function HomePage() {
           >
             <span className="flex items-center gap-1 sm:gap-2">
               <Gift className="w-4 h-4 text-neon" />
-              <span>Free credits</span>
+              <span>no credits</span>
             </span>
             <span className="flex items-center gap-1 sm:gap-2">
               <Zap className="w-4 h-4 text-neon" />
