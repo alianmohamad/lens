@@ -19,7 +19,7 @@ const examples: TransformExample[] = [
     id: "1",
     title: "Premium Sneakers",
     category: "Footwear",
-    beforeImage: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&h=600&fit=crop&q=80",
+    beforeImage: "/uploads/02hero-1.png",
     afterImage: "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=800&h=600&fit=crop&q=80",
   },
   {
