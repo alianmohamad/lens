@@ -14,6 +14,7 @@ import {
   Gift,
   Calendar,
   CircleCheck,
+  Smile,
 } from "lucide-react";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
@@ -138,7 +139,7 @@ export default function HomePage() {
               <span>no credits</span>
             </span>
             <span className="flex items-center gap-1 sm:gap-2">
-              <Zap className="w-4 h-4 text-neon" />
+              <Smile className="w-4 h-4 text-neon" />
               <span>Easy start</span>
             </span>
             <span className="flex items-center gap-1 sm:gap-2">
