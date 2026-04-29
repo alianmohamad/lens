@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-    Menu,
+    MoreVertical,
     X,
     ShoppingCart,
     LogOut,
@@ -274,7 +274,7 @@ export function Navbar() {
                                 {isMobileMenuOpen ? (
                                     <X className="h-5 w-5" />
                                 ) : (
-                                    <Menu className="h-5 w-5" />
+                                    <MoreVertical className="h-5 w-5" />
                                 )}
                             </Button>
                         </div>
