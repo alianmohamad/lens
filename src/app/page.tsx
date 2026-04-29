@@ -97,8 +97,8 @@ export default function HomePage() {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="text-base sm:text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-2xl mx-auto mb-5 md:mb-12"
           >
-            Transform any product image into studio-quality photography.
-            No photographer. No studio. Just AI.
+            Professional product photos in 30 seconds. Skip the studio.
+            Skip the waiting. Start selling better, today.
           </motion.p>
 
           {/* CTA Buttons - Centered */}
