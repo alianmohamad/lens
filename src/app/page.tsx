@@ -90,10 +90,8 @@ export default function HomePage() {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="text-5xl sm:text-6xl md:text-6xl lg:text-7xl xl:text-8xl font-display font-bold leading-[1.1] tracking-tight mb-2 md:mb-4 mx-auto max-w-5xl"
           >
-            <span className="block">Your Product Photos,</span>
-            <span className="block pb-6 sm:pb-4">
-              <TypeWriter words={heroWords} interval={3000} className="hero-gradient-text" />
-            </span>
+            <span className="block">Flawless Product Photos,</span>
+            <span className="block pb-6 sm:pb-4">Instantly</span>
           </motion.h1>
 
           {/* Subheadline */}
