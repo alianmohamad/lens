@@ -112,13 +112,13 @@ export function Navbar() {
                                         key={link.href}
                                         href={link.href}
                                         className={cn(
-                                            "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200",
+                                            "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200",
                                             isActive
                                                 ? "bg-primary/10 text-primary"
                                                 : "text-muted-foreground hover:text-foreground hover:bg-muted"
                                         )}
                                     >
-                                        <link.icon className="h-4 w-4" />
+                                        <link.icon className="h-3.5 w-3.5" />
                                         {link.label}
                                     </Link>
                                 );
@@ -304,13 +304,13 @@ export function Navbar() {
                                                 key={link.href}
                                                 href={link.href}
                                                 className={cn(
-                                                    "flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all",
+                                                    "flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all",
                                                     isActive
                                                         ? "bg-primary/10 text-primary"
                                                         : "text-muted-foreground hover:text-foreground hover:bg-muted"
                                                 )}
                                             >
-                                                <link.icon className="h-5 w-5" />
+                                                <link.icon className="h-4 w-4" />
                                                 {link.label}
                                             </Link>
                                         );
