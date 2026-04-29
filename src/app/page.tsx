@@ -117,7 +117,7 @@ export default function HomePage() {
             <Link href="/marketplace">
               <button className="btn-ghost flex items-center justify-center gap-2 text-sm sm:text-base md:text-lg">
                 <Play className="w-4 h-4 md:w-5 md:h-5" />
-                See How It Works
+                More
               </button>
             </Link>
           </motion.div>
