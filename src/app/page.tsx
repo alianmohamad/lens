@@ -36,6 +36,12 @@ const heroWords = ["reimagined.", "transformed.", "elevated.", "perfected."];
 // Testimonials
 const testimonials = [
   {
+    quote: "Love it!",
+    author: "Sarah",
+    role: "Creator",
+    rating: 5,
+  },
+  {
     quote: "Significantly reduced our production time. The quality is studio-grade.",
     author: "Sarah Chen",
     role: "E-commerce Director",
