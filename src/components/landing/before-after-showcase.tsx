@@ -17,7 +17,7 @@ interface TransformExample {
 const examples: TransformExample[] = [
   {
     id: "1",
-    title: "Premium Sneakers",
+    title: "High-End Footwear",
     category: "Footwear",
     beforeImage: "/uploads/02hero-1.png",
     afterImage: "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=800&h=600&fit=crop&q=80",
