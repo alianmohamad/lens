@@ -20,6 +20,7 @@ import {
     Moon,
     ChevronDown,
     Heart,
+    Info,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
@@ -43,6 +44,7 @@ const navLinks = [
     { href: "/studio", label: "Studio", icon: Sparkles },
     { href: "/pocket", label: "Wishlist", icon: Heart },
     { href: "/sell", label: "Sell", icon: PenTool },
+    { href: "/about", label: "About", icon: Info },
 ];
 
 export function Navbar() {
