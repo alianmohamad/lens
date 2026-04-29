@@ -72,34 +72,37 @@ export function BeforeAfterShowcase() {
   return (
     <section className="relative py-32 overflow-hidden">
       <div className="section-container">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-12 md:mb-16"
-        >
-          <div className="mb-6 inline-flex items-center gap-3 px-4 py-2.5 rounded-lg bg-gradient-to-r from-neon/10 to-neon/5 border border-neon/30 hover:border-neon/60 transition-colors">
-            <div className="flex items-center gap-1.5">
-              <Star className="w-3.5 h-3.5 text-neon" />
-              <ArrowLeftRight className="w-3.5 h-3.5 text-neon" />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+          {/* Left column: title & description */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center lg:text-left"
+          >
+            <div className="mb-6 inline-flex items-center gap-3 px-4 py-2.5 rounded-lg bg-gradient-to-r from-neon/10 to-neon/5 border border-neon/30 hover:border-neon/60 transition-colors">
+              <div className="flex items-center gap-1.5">
+                <Star className="w-3.5 h-3.5 text-neon" />
+                <ArrowLeftRight className="w-3.5 h-3.5 text-neon" />
+              </div>
+              <span className="text-xs font-semibold text-foreground">Vs Generic AI Photographer</span>
             </div>
-            <span className="text-xs font-semibold text-foreground">Vs Generic AI Photographer</span>
-          </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-bold mb-4">
-            Compare <span className="text-neon-subtle block sm:inline">transformation</span>
-          </h2>
-          <p className="text-base md:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
-            From amateur snapshots to professional studio shots. Drag the slider to see the magic.
-          </p>
-        </motion.div>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-bold mb-4">
+              Compare <span className="text-neon-subtle block sm:inline">transformation</span>
+            </h2>
+            <p className="text-base md:text-xl text-muted-foreground max-w-2xl mx-auto lg:mx-0 px-4 lg:px-0">
+              From amateur snapshots to professional studio shots. Drag the slider to see the magic.
+            </p>
+          </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.2 }}
-          className="relative max-w-4xl mx-auto"
-        >
+          {/* Right column: comparison slider */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            className="relative w-full"
+          >
           {/* Main Comparison Container */}
           <div
             className="relative aspect-[4/3] rounded-3xl overflow-hidden bento-card cursor-col-resize select-none"
@@ -202,7 +205,8 @@ export function BeforeAfterShowcase() {
               </div>
             </div>
           </div>
-        </motion.div>
+          </motion.div>
+        </div>
       </div>
     </section>
   );
