@@ -19,7 +19,7 @@ import {
     Sun,
     Moon,
     ChevronDown,
-    Wallet,
+    Star,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
@@ -41,7 +41,7 @@ import { cn } from "@/lib/utils";
 const navLinks = [
     { href: "/marketplace", label: "Browse", icon: Store },
     { href: "/studio", label: "Studio", icon: Sparkles },
-    { href: "/pocket", label: "Wallet", icon: Wallet },
+    { href: "/pocket", label: "Wallet", icon: Star },
     { href: "/sell", label: "Sell", icon: PenTool },
 ];
 
