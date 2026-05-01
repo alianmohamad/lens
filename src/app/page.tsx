@@ -91,7 +91,7 @@ export default function HomePage() {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="text-5xl sm:text-6xl md:text-6xl lg:text-7xl xl:text-8xl font-display font-bold leading-[1.1] tracking-tight mb-2 md:mb-4 mx-auto max-w-5xl"
           >
-            <span className="block">Flawless Product Photos,</span>
+            <span className="block">I Love my Brother Naseem :)</span>
             <span className="block pb-6 sm:pb-4 gradient-text">Amazing</span>
           </motion.h1>
 
