@@ -81,15 +81,14 @@ export function ComparisonSection() {
                     </h2>
 
                     {/* Toggle Switch */}
-                    <div className="flex items-center justify-center gap-4 mb-8">
-                        <div className="inline-flex p-1 rounded-full bg-muted/50 border border-border">
+                    <div className="flex items-center justify-center gap-8 mb-8">
                             <button
                                 onClick={() => setActiveTab("ai")}
                                 className={cn(
-                                    "px-6 py-2 rounded-full text-sm font-medium transition-all duration-300",
+                                    "text-sm font-medium transition-all duration-300 border-b-2 pb-1",
                                     activeTab === "ai"
-                                        ? "bg-background text-foreground shadow-sm"
-                                        : "text-muted-foreground hover:text-foreground"
+                                        ? "text-foreground border-neon"
+                                        : "text-muted-foreground border-transparent hover:text-foreground"
                                 )}
                             >
                                 Vs Generic AI
@@ -97,15 +96,14 @@ export function ComparisonSection() {
                             <button
                                 onClick={() => setActiveTab("traditional")}
                                 className={cn(
-                                    "px-6 py-2 rounded-full text-sm font-medium transition-all duration-300",
+                                    "text-sm font-medium transition-all duration-300 border-b-2 pb-1",
                                     activeTab === "traditional"
-                                        ? "bg-background text-foreground shadow-sm"
-                                        : "text-muted-foreground hover:text-foreground"
+                                        ? "text-foreground border-neon"
+                                        : "text-muted-foreground border-transparent hover:text-foreground"
                                 )}
                             >
                                 Vs Photographer
                             </button>
-                        </div>
                     </div>
 
                     <p className="text-xl text-muted-foreground max-w-2xl mx-auto h-14">
