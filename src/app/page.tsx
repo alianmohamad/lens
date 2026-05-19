@@ -321,7 +321,7 @@ export default function HomePage() {
             </h2>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
             {testimonials.map((t, i) => (
               <motion.div
                 key={t.author}
@@ -329,7 +329,7 @@ export default function HomePage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="bento-card p-8"
+                className="bento-card p-8 flex-shrink-0 w-80 snap-start"
               >
                 <div className="flex gap-1 mb-4">
                   {[...Array(5)].map((_, j) => (
