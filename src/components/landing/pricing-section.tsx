@@ -43,7 +43,7 @@ const plans = [
         icon: Sparkles
     },
     {
-        name: "Agency",
+        name: "Team",
         price: "Contact",
         period: "",
         description: "For high-volume needs.",
