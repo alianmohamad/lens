@@ -44,7 +44,7 @@ const plans = [
     },
     {
         name: "Agency",
-        price: "Custom",
+        price: "Contact",
         period: "",
         description: "For high-volume needs.",
         features: [
