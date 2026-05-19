@@ -321,29 +321,44 @@ export default function HomePage() {
             </h2>
           </motion.div>
 
-          <div className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
-            {testimonials.map((t, i) => (
-              <motion.div
-                key={t.author}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="bento-card p-8 flex-shrink-0 w-80 snap-start"
-              >
-                <div className="flex gap-1 mb-4">
-                  {[...Array(5)].map((_, j) => (
-                    <Star key={j} className="w-4 h-4 fill-neon text-neon" />
-                  ))}
+          <div className="overflow-hidden relative">
+            {/* Fade edges */}
+            <div className="absolute left-0 top-0 bottom-0 w-16 z-10 pointer-events-none" style={{ background: 'linear-gradient(to right, var(--background), transparent)' }} />
+            <div className="absolute right-0 top-0 bottom-0 w-16 z-10 pointer-events-none" style={{ background: 'linear-gradient(to left, var(--background), transparent)' }} />
+
+            <div
+              className="flex gap-6"
+              style={{
+                animation: 'marquee 28s linear infinite',
+                width: 'max-content',
+              }}
+            >
+              {[...testimonials, ...testimonials].map((t, i) => (
+                <div
+                  key={i}
+                  className="bento-card p-8 flex-shrink-0 w-80"
+                >
+                  <div className="flex gap-1 mb-4">
+                    {[...Array(5)].map((_, j) => (
+                      <Star key={j} className="w-4 h-4 fill-neon text-neon" />
+                    ))}
+                  </div>
+                  <p className="text-lg mb-6">&ldquo;{t.quote}&rdquo;</p>
+                  <div>
+                    <div className="font-semibold">{t.author}</div>
+                    <div className="text-sm text-muted-foreground">{t.role}</div>
+                  </div>
                 </div>
-                <p className="text-lg mb-6">&ldquo;{t.quote}&rdquo;</p>
-                <div>
-                  <div className="font-semibold">{t.author}</div>
-                  <div className="text-sm text-muted-foreground">{t.role}</div>
-                </div>
-              </motion.div>
-            ))}
+              ))}
+            </div>
           </div>
+
+          <style>{`
+            @keyframes marquee {
+              0%   { transform: translateX(0); }
+              100% { transform: translateX(-50%); }
+            }
+          `}</style>
         </div>
       </section>
 
