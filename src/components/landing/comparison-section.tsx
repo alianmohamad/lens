@@ -81,14 +81,14 @@ export function ComparisonSection() {
                     </h2>
 
                     {/* Toggle Switch */}
-                    <div className="flex items-center justify-center gap-8 mb-8">
+                    <div className="inline-flex items-center bg-muted/40 border border-border/50 rounded-full p-1 mb-8">
                             <button
                                 onClick={() => setActiveTab("ai")}
                                 className={cn(
-                                    "text-sm font-medium transition-all duration-300 border-b-2 pb-1",
+                                    "relative px-5 py-2 text-sm font-medium rounded-full transition-all duration-300",
                                     activeTab === "ai"
-                                        ? "text-foreground border-neon"
-                                        : "text-muted-foreground border-transparent hover:text-foreground"
+                                        ? "bg-neon text-white shadow-md shadow-neon/30"
+                                        : "text-muted-foreground hover:text-foreground"
                                 )}
                             >
                                 Vs Generic AI
@@ -96,10 +96,10 @@ export function ComparisonSection() {
                             <button
                                 onClick={() => setActiveTab("traditional")}
                                 className={cn(
-                                    "text-sm font-medium transition-all duration-300 border-b-2 pb-1",
+                                    "relative px-5 py-2 text-sm font-medium rounded-full transition-all duration-300",
                                     activeTab === "traditional"
-                                        ? "text-foreground border-neon"
-                                        : "text-muted-foreground border-transparent hover:text-foreground"
+                                        ? "bg-neon text-white shadow-md shadow-neon/30"
+                                        : "text-muted-foreground hover:text-foreground"
                                 )}
                             >
                                 Vs Photographer
