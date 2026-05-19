@@ -250,7 +250,7 @@ function SignInForm() {
                         <Sparkles className="h-10 w-10" />
                     </div>
                     <h2 className="text-3xl md:text-4xl font-display font-bold mb-4 hero-gradient-text">
-                        Transform Your Product Photography
+                        Your AI Product Photography
                     </h2>
                     <p className="text-white/80 max-w-md text-lg">
                         Access thousands of expert-crafted AI prompts and generate stunning
